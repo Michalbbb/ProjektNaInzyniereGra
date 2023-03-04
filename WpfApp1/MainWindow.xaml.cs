@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -111,7 +112,7 @@ namespace WpfApp1
         private void checkCollision(object sender, EventArgs e)
         {
 
-            foreach (var x in GameScreen.Children.OfType<Rectangle>())
+            foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
             {
                 if ((string)x.Tag == "collision") // Zaawansowana kolizja
                 {
@@ -121,7 +122,7 @@ namespace WpfApp1
                     Rect collisionChecker = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
 
 
-                    //Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
+                    Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
 
                     if (playerHitBox.IntersectsWith(collisionChecker))
                     {
@@ -146,7 +147,22 @@ namespace WpfApp1
         }
         private void gameTick(object sender, EventArgs e)
         {
-            Write.Text = "Pozycja gracza : " + (Convert.ToInt32(Canvas.GetLeft(Player)) - Convert.ToInt32(Canvas.GetTop(Player))).ToString()+" "+Convert.ToInt32(Canvas.GetLeft(Player))+":"+Convert.ToInt32(Canvas.GetTop(Player));
+            double rectLeft = Canvas.GetLeft(Player);
+            double rectTop = Canvas.GetTop(Player);
+            double rectRight = rectLeft + Player.Width;
+            double rectBottom = rectTop + Player.Height;
+
+           
+            double viewportWidth = Camera.ViewportWidth;
+            double viewportHeight = Camera.ViewportHeight;
+
+            
+            double horizontalOffset = (rectLeft + rectRight - viewportWidth) / 2;
+            double verticalOffset = (rectTop + rectBottom - viewportHeight) / 2;
+
+            
+            Camera.ScrollToHorizontalOffset(horizontalOffset);
+            Camera.ScrollToVerticalOffset(verticalOffset);
             checkCollision(sender,e);
             if(UpKey||DownKey||RightKey||LeftKey)
             {
