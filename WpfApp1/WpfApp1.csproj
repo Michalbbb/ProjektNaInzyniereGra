@@ -8,44 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="images\newRunner_01.gif" />
-    <None Remove="images\newRunner_01l.gif" />
-    <None Remove="images\newRunner_01l.png" />
-    <None Remove="images\newRunner_02.gif" />
-    <None Remove="images\newRunner_02l.png" />
-    <None Remove="images\newRunner_03.gif" />
-    <None Remove="images\newRunner_03l.png" />
-    <None Remove="images\newRunner_04.gif" />
-    <None Remove="images\newRunner_04l.png" />
-    <None Remove="images\newRunner_05.gif" />
-    <None Remove="images\newRunner_05l.png" />
-    <None Remove="images\newRunner_06.gif" />
-    <None Remove="images\newRunner_06l.png" />
-    <None Remove="images\newRunner_07.gif" />
-    <None Remove="images\newRunner_07l.png" />
-    <None Remove="images\newRunner_08.gif" />
-    <None Remove="images\newRunner_08l.png" />
+    <None Remove="images\mainCharacter01.png" />
+    <None Remove="images\mainCharacter01l.png" />
+   
     <None Remove="images\PrzykladoweTlo.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="images\newRunner_01.gif" />
-    <Resource Include="images\newRunner_01l.gif" />
-    <Resource Include="images\newRunner_01l.png" />
-    <Resource Include="images\newRunner_02.gif" />
-    <Resource Include="images\newRunner_02l.png" />
-    <Resource Include="images\newRunner_03.gif" />
-    <Resource Include="images\newRunner_03l.png" />
-    <Resource Include="images\newRunner_04.gif" />
-    <Resource Include="images\newRunner_04l.png" />
-    <Resource Include="images\newRunner_05.gif" />
-    <Resource Include="images\newRunner_05l.png" />
-    <Resource Include="images\newRunner_06.gif" />
-    <Resource Include="images\newRunner_06l.png" />
-    <Resource Include="images\newRunner_07.gif" />
-    <Resource Include="images\newRunner_07l.png" />
-    <Resource Include="images\newRunner_08.gif" />
-    <Resource Include="images\newRunner_08l.png" />
+    <Resource Include="images\mainCharacter01.png" />
+    <Resource Include="images\mainCharacter01l.png" />
     <Resource Include="images\PrzykladoweTlo.png" />
   </ItemGroup>
 

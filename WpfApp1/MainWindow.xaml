@@ -14,10 +14,10 @@
             <ImageBrush ImageSource="/Images/PrzykladoweTlo.png" />
         </Grid.Background>
         <Canvas x:Name="GameScreen" Focusable="true" KeyUp="KeyboardUp" KeyDown="KeyboardDown">
-            <Rectangle Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="108" Height="122" x:Name="Player"></Rectangle>
+            <Rectangle Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="64" Height="109" x:Name="Player"></Rectangle>
             <Rectangle Canvas.Left="708" Canvas.Top="308" Fill="Transparent" Width="180" Height="30" Tag="collision" HorizontalAlignment="Left" VerticalAlignment="Center"></Rectangle>
 
-            <TextBox x:Name="Write"  Width="200" Height="40" Background="Transparent" Foreground="White" Canvas.Left="1000" Canvas.Top="0"></TextBox>
+            <TextBox x:Name="Write"  Width="250" Height="40" Background="Transparent" Foreground="White" Canvas.Left="950" Canvas.Top="0"></TextBox>
 
         </Canvas>
     </Grid>

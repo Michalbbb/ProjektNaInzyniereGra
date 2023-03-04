@@ -89,11 +89,11 @@ namespace WpfApp1
             {
                 leftRun[i] = new BitmapImage();
                 leftRun[i].BeginInit();
-                leftRun[i].UriSource= new Uri($"pack://application:,,,/WpfApp1;component/images/newRunner_0{i+1}l.png", UriKind.Absolute);
+                leftRun[i].UriSource= new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter01l.png", UriKind.Absolute);
                 leftRun[i].EndInit();
                 rightRun[i]=new BitmapImage();
                 rightRun[i].BeginInit();
-                rightRun[i].UriSource = new Uri($"pack://application:,,,/WpfApp1;component/images/newRunner_0{1+i}.gif", UriKind.Absolute);
+                rightRun[i].UriSource = new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter01.png", UriKind.Absolute);
                 rightRun[i].EndInit();
 
             }
@@ -172,9 +172,9 @@ namespace WpfApp1
                 else playerSprite.ImageSource = leftRun[0];
             }
             //Podstowe kolizje
-            if (UpKey&&Canvas.GetTop(Player)>50)
+            if (UpKey&&Canvas.GetTop(Player)>70)
             {
-                if (((Canvas.GetLeft(Player) > 980) && (Canvas.GetTop(Player) < 130)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 940))
+                if (((Canvas.GetLeft(Player) > 980) && (Canvas.GetTop(Player) < 140)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
                 {
                     
 
@@ -186,9 +186,9 @@ namespace WpfApp1
                
               SpeedY += Speed;
             }
-            if (RightKey && Canvas.GetLeft(Player) < 1060)
+            if (RightKey && Canvas.GetLeft(Player) < 1090)
             {
-                if (((Canvas.GetLeft(Player) > 980) && (Canvas.GetTop(Player) < 130))&& (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 940))
+                if (((Canvas.GetLeft(Player) > 980) && (Canvas.GetTop(Player) < 140))&& (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
                 {
                     
 
