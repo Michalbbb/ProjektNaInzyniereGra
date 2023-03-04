@@ -1,11 +1,11 @@
-﻿<Window x:Class="WpfApp1.MainWindow"
+﻿<Window x:Class="BasicsOfGame.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:local="clr-namespace:BasicsOfGame"
         mc:Ignorable="d"
-        Title="Test" Height="600" Width="1200"
+        Title="Łódź 2245" Icon="images/icon.ico" Height="600" Width="1200"
      
         WindowStartupLocation="CenterScreen"
         Foreground="#FFFFFF">
@@ -20,9 +20,10 @@
                 <Rectangle Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="88" Height="109" x:Name="Player"></Rectangle>
                 <Rectangle Canvas.Left="708" Canvas.Top="329" Fill="Transparent" Width="204" Height="47" Tag="collision" HorizontalAlignment="Left" VerticalAlignment="Center"></Rectangle>
 
-                <TextBox x:Name="Write"  Width="250" Height="40" Background="Transparent" Foreground="White" Canvas.Left="950" Canvas.Top="0"></TextBox>
+                
 
             </Canvas>
         </ScrollViewer>
+        <TextBox x:Name="Write"  Width="250" Height="50" Background="Transparent" Foreground="White" Canvas.Left="950" Canvas.Top="0" Margin="950,0,0,544"></TextBox>
     </Grid>
 </Window>

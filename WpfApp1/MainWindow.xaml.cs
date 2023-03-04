@@ -18,7 +18,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace WpfApp1
+namespace BasicsOfGame
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -91,11 +91,11 @@ namespace WpfApp1
             {
                 leftRun[i] = new BitmapImage();
                 leftRun[i].BeginInit();
-                leftRun[i].UriSource= new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter0{1+i}l.png", UriKind.Absolute);
+                leftRun[i].UriSource= new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1+i}l.png", UriKind.Absolute);
                 leftRun[i].EndInit();
                 rightRun[i]=new BitmapImage();
                 rightRun[i].BeginInit();
-                rightRun[i].UriSource = new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter0{1+i}.png", UriKind.Absolute);
+                rightRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1+i}.png", UriKind.Absolute);
                 rightRun[i].EndInit();
 
             }
@@ -159,7 +159,7 @@ namespace WpfApp1
             
             double horizontalOffset = (rectLeft + rectRight - viewportWidth) / 2;
             double verticalOffset = (rectTop + rectBottom - viewportHeight) / 2;
-
+            
             
             Camera.ScrollToHorizontalOffset(horizontalOffset);
             Camera.ScrollToVerticalOffset(verticalOffset);
