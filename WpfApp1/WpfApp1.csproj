@@ -10,6 +10,8 @@
   <ItemGroup>
     <None Remove="images\mainCharacter01.png" />
     <None Remove="images\mainCharacter01l.png" />
+    <None Remove="images\mainCharacter02.png" />
+    <None Remove="images\mainCharacter02l.png" />
    
     <None Remove="images\PrzykladoweTlo.png" />
   </ItemGroup>
@@ -17,6 +19,8 @@
   <ItemGroup>
     <Resource Include="images\mainCharacter01.png" />
     <Resource Include="images\mainCharacter01l.png" />
+    <Resource Include="images\mainCharacter02.png" />
+    <Resource Include="images\mainCharacter02l.png" />
     <Resource Include="images\PrzykladoweTlo.png" />
   </ItemGroup>
 

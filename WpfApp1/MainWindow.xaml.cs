@@ -28,14 +28,15 @@ namespace WpfApp1
     {
        
         private DispatcherTimer gameTimer = new DispatcherTimer();
-        private bool UpKey,DownKey,LeftKey,RightKey,rightD;
+        private bool UpKey,DownKey,LeftKey,RightKey,rightD,returnUp,returnDown,returnLeft,returnRight;
         double lastT=300, lastL=300;
         private const float startFriction = 0.58f;
         private const float maxFriction = 0.74f;
         private float SpeedX, SpeedY, Friction=0.55f, Speed=2;
         ImageBrush playerSprite = new ImageBrush();
-        BitmapImage[] rightRun = new BitmapImage[8];
-        BitmapImage[] leftRun= new BitmapImage[8];
+        private const int animations=2;
+        BitmapImage[] rightRun = new BitmapImage[animations];
+        BitmapImage[] leftRun= new BitmapImage[animations];
         private int ticksDone = 0;
         private int currentAnimation = 0;
        
@@ -85,15 +86,15 @@ namespace WpfApp1
         {
             InitializeComponent();
             GameScreen.Focus();
-            for(int i = 0; i < 8; i++)
+            for(int i = 0; i < animations; i++)
             {
                 leftRun[i] = new BitmapImage();
                 leftRun[i].BeginInit();
-                leftRun[i].UriSource= new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter01l.png", UriKind.Absolute);
+                leftRun[i].UriSource= new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter0{1+i}l.png", UriKind.Absolute);
                 leftRun[i].EndInit();
                 rightRun[i]=new BitmapImage();
                 rightRun[i].BeginInit();
-                rightRun[i].UriSource = new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter01.png", UriKind.Absolute);
+                rightRun[i].UriSource = new Uri($"pack://application:,,,/WpfApp1;component/images/mainCharacter0{1+i}.png", UriKind.Absolute);
                 rightRun[i].EndInit();
 
             }
@@ -120,7 +121,7 @@ namespace WpfApp1
                     Rect collisionChecker = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
 
 
-                    Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
+                    //Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
 
                     if (playerHitBox.IntersectsWith(collisionChecker))
                     {
@@ -145,21 +146,22 @@ namespace WpfApp1
         }
         private void gameTick(object sender, EventArgs e)
         {
+            Write.Text = "Pozycja gracza : " + (Convert.ToInt32(Canvas.GetLeft(Player)) - Convert.ToInt32(Canvas.GetTop(Player))).ToString()+" "+Convert.ToInt32(Canvas.GetLeft(Player))+":"+Convert.ToInt32(Canvas.GetTop(Player));
             checkCollision(sender,e);
             if(UpKey||DownKey||RightKey||LeftKey)
             {
-                if (ticksDone % 5 == 0)
+                if (ticksDone % Convert.ToInt32(10/Speed) == 0)
                 {
                     if (rightD)
                     {
                         currentAnimation++;
-                        if (currentAnimation == 8) currentAnimation = 0;
+                        if (currentAnimation == animations) currentAnimation = 0;
                         playerSprite.ImageSource = rightRun[currentAnimation];
                     }
                     else
                     {
                         currentAnimation++;
-                        if (currentAnimation == 8) currentAnimation = 0;
+                        if (currentAnimation == animations) currentAnimation = 0;
                         playerSprite.ImageSource = leftRun[currentAnimation];
                         
                     }
@@ -172,25 +174,27 @@ namespace WpfApp1
                 else playerSprite.ImageSource = leftRun[0];
             }
             //Podstowe kolizje
-            if (UpKey&&Canvas.GetTop(Player)>70)
+            if (UpKey)
             {
-                if (((Canvas.GetLeft(Player) > 980) && (Canvas.GetTop(Player) < 140)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
+                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
                 {
-                    
+
 
                 }
                 else SpeedY -= Speed;
             }
-            if (DownKey && Canvas.GetTop(Player) < 430) 
+            
+            if (DownKey) 
             {
                
               SpeedY += Speed;
             }
-            if (RightKey && Canvas.GetLeft(Player) < 1090)
+        
+            if (RightKey)
             {
-                if (((Canvas.GetLeft(Player) > 980) && (Canvas.GetTop(Player) < 140))&& (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
+                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
                 {
-                    
+
 
                 }
                 else
@@ -204,19 +208,66 @@ namespace WpfApp1
                     }
                     SpeedX += Speed;
                 }
-                
+
             }
-            if (LeftKey && Canvas.GetLeft(Player) > 10)
+            if (LeftKey)
             {
+               
+                SpeedX -= Speed;
                 if (rightD) {
                     Friction = startFriction;
                     rightD = false;
                     currentAnimation = 0;
                     playerSprite.ImageSource = leftRun[0];
                 }
-                SpeedX -= Speed;
+                
             }
+            if(Canvas.GetTop(Player) < 70)
+            {
+                Canvas.SetTop(Player, 70);
+                returnUp = true;
+            }
+            if(Canvas.GetLeft(Player) < -11)
+            {
+                Canvas.SetLeft(Player, -11);
+                 returnLeft = true;
+            }
+            if(Canvas.GetLeft(Player) > 1120)
+            {
+                Canvas.SetLeft(Player, 1120);
+                returnRight = true;
+            }
+            if(Canvas.GetTop(Player) > 488)
+            {
+                Canvas.SetTop(Player, 488);
+                returnDown = true;
+            }
+  
             ticksDone++;
+            if (returnUp || Canvas.GetTop(Player) == 70)
+            {
+                if (SpeedY < 0) SpeedY = 0;
+                returnUp = false;
+            }
+            if (returnDown || Canvas.GetTop(Player) == 488)
+            {
+                if(SpeedY >0)
+                    SpeedY = 0;
+                returnDown=false;
+            }
+            if (returnRight||Canvas.GetLeft(Player)==1120)
+            {
+                if (SpeedX > 0)
+                    SpeedX = 0;
+                returnRight = false;
+            }
+            if (returnLeft || Canvas.GetLeft(Player) == -11)
+            {
+                if (SpeedX < 0)
+                    SpeedX = 0;
+                returnLeft = false;
+            }
+
             if (Friction < maxFriction) Friction+=0.01f;
             SpeedX = SpeedX * Friction;
             SpeedY = SpeedY * Friction;

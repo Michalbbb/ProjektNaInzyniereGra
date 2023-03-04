@@ -10,12 +10,13 @@
         WindowStartupLocation="CenterScreen"
         Foreground="#FFFFFF">
     <Grid>
-        <Grid.Background>
-            <ImageBrush ImageSource="/Images/PrzykladoweTlo.png" />
-        </Grid.Background>
-        <Canvas x:Name="GameScreen" Focusable="true" KeyUp="KeyboardUp" KeyDown="KeyboardDown">
-            <Rectangle Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="64" Height="109" x:Name="Player"></Rectangle>
-            <Rectangle Canvas.Left="708" Canvas.Top="308" Fill="Transparent" Width="180" Height="30" Tag="collision" HorizontalAlignment="Left" VerticalAlignment="Center"></Rectangle>
+        <Grid.Background>#000000</Grid.Background>
+        <Canvas ClipToBounds="True" x:Name="GameScreen" Focusable="true" KeyUp="KeyboardUp" KeyDown="KeyboardDown" Height="600" Width="1200" MaxHeight="600" MaxWidth="1200">
+            <Canvas.Background>
+                <ImageBrush ImageSource="/Images/PrzykladoweTlo.png" />
+            </Canvas.Background>
+            <Rectangle Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="88" Height="109" x:Name="Player"></Rectangle>
+            <Rectangle Canvas.Left="708" Canvas.Top="329" Fill="Transparent" Width="204" Height="47" Tag="collision" HorizontalAlignment="Left" VerticalAlignment="Center"></Rectangle>
 
             <TextBox x:Name="Write"  Width="250" Height="40" Background="Transparent" Foreground="White" Canvas.Left="950" Canvas.Top="0"></TextBox>
 
