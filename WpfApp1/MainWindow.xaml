@@ -12,19 +12,21 @@
     <Grid>
         <Grid.Background>#000000</Grid.Background>
         <ScrollViewer x:Name="Camera" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
-            <Canvas ClipToBounds="True"  x:Name="GameScreen" Focusable="true" MouseRightButtonDown="PreviewMouseDown" MouseLeftButtonDown="PreviewMouseDown" KeyUp="KeyboardUp" KeyDown="KeyboardDown" Height="600" Width="1200" MaxHeight="600" MaxWidth="1200">
+            <Canvas ClipToBounds="True"  x:Name="GameScreen" Focusable="true" MouseRightButtonDown="RightClick" MouseLeftButtonDown="RightClick" KeyUp="KeyboardUp" KeyDown="KeyboardDown" Height="600" Width="1200" MaxHeight="600" MaxWidth="1200">
 
                 <Canvas.Background>
                     <ImageBrush ImageSource="/Images/PrzykladoweTlo.png" />
                 </Canvas.Background>
                 <Rectangle Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="88" Height="109" x:Name="Player"></Rectangle>
-                <Rectangle Canvas.Left="708" Canvas.Top="329" Fill="Transparent" Width="204" Height="47" Tag="collision" HorizontalAlignment="Left" VerticalAlignment="Center"></Rectangle>
+                <Rectangle Canvas.Left="702" Canvas.Top="344" Fill="Transparent" Width="218" Height="10" Tag="collision" HorizontalAlignment="Center" VerticalAlignment="Top"></Rectangle>
 
-                
+
 
             </Canvas>
         </ScrollViewer>
-        <TextBox x:Name="Write" Width="250" Height="100" IsEnabled="false" Background="Transparent" Foreground="White" Canvas.Left="950" Canvas.Top="0" Margin="950,0,0,544">
-		</TextBox>
+        <TextBox x:Name="Write" Width="250" Height="100" IsEnabled="false" Background="Transparent" Foreground="White"  Margin="950,0,0,544">
+        </TextBox>
+        
+
     </Grid>
 </Window>

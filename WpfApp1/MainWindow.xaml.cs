@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -16,7 +17,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using static System.Net.Mime.MediaTypeNames;
+using static System.Net.Mime.MediaTypeNames; // Nie mam pojecia co to robi i jak sie tu znalazlo
 
 namespace BasicsOfGame
 {
@@ -30,7 +31,6 @@ namespace BasicsOfGame
        
         private DispatcherTimer gameTimer = new DispatcherTimer();
         private bool UpKey,DownKey,LeftKey,RightKey,rightD,returnUp,returnDown,returnLeft,returnRight;
-        double lastT=300, lastL=300;
         private const float startFriction = 0.58f;
         private const float maxFriction = 0.74f;
         private float SpeedX, SpeedY, Friction=0.55f, Speed=2;
@@ -40,27 +40,33 @@ namespace BasicsOfGame
         BitmapImage[] leftRun= new BitmapImage[animations];
         private int ticksDone = 0;
         private int currentAnimation = 0;
+        
        
 
 
         private void KeyboardDown(object sender, KeyEventArgs e)
         {
-            if(e.Key== Key.W)
+            if (e.Key == Key.W && e.Key != Key.S)
             {
                 UpKey = true;
             }
-            if (e.Key == Key.S)
+          
+            if (e.Key == Key.S && e.Key != Key.W)
             {
                 DownKey = true;
             }
-            if (e.Key == Key.D)
+            
+            if (e.Key == Key.D && e.Key != Key.A)
             {
                 RightKey = true;
             }
-            if (e.Key == Key.A)
+            
+            if (e.Key == Key.A && e.Key != Key.D)
             {
                 LeftKey = true;
             }
+            
+
         }
 
         private void KeyboardUp(object sender, KeyEventArgs e)
@@ -108,41 +114,91 @@ namespace BasicsOfGame
             
             gameTimer.Start();
         }
+        private bool determinateCollision(Rect player,Rect obj)
+        {
+            if (obj.X < (player.X + player.Width) && (obj.X + obj.Width) > player.X)
+            {
 
+               if(obj.Y < (player.Y + player.Height) && (obj.Y + obj.Height) > player.Y)return true;
+               else return false;
+            }
+             else return false;
+        }
         private void checkCollision(object sender, EventArgs e)
         {
+            if (UpKey)
+            {
+                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
+                {
 
+
+                }
+                else SpeedY -= Speed;
+            }
+
+            if (DownKey)
+            {
+
+                SpeedY += Speed;
+            }
+
+            if (RightKey)
+            {
+                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
+                {
+
+
+                }
+                else
+                {
+                    if (!rightD)
+                    {
+                        Friction = startFriction;
+                        rightD = true;
+                        currentAnimation = 0;
+                        playerSprite.ImageSource = rightRun[0];
+                    }
+                    SpeedX += Speed;
+                }
+
+            }
+            if (LeftKey)
+            {
+
+                SpeedX -= Speed;
+                if (rightD)
+                {
+                    Friction = startFriction;
+                    rightD = false;
+                    currentAnimation = 0;
+                    playerSprite.ImageSource = leftRun[0];
+                }
+
+            }
             foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
             {
                 if ((string)x.Tag == "collision") // Zaawansowana kolizja
                 {
 
-                   
-                    Rect playerHitBox = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width,Player.Height);
+                    Rect playerHitBoxU = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player) - Speed*3, Player.Width, Player.Height);
+                    Rect playerHitBoxD = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player) + Speed*3, Player.Width, Player.Height);
+                    Rect playerHitBoxR = new Rect(Canvas.GetLeft(Player) + Speed*3, Canvas.GetTop(Player), Player.Width, Player.Height);
+                    Rect playerHitBoxL = new Rect(Canvas.GetLeft(Player) - Speed*3, Canvas.GetTop(Player), Player.Width, Player.Height);
+                    Rect playerHitBoxUltimate = new Rect(Canvas.GetLeft(Player) + SpeedX * 3, Canvas.GetTop(Player) + SpeedY * 3, Player.Width, Player.Height);
+
                     Rect collisionChecker = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+                    if (!determinateCollision(playerHitBoxUltimate, collisionChecker)) continue;
+                
+                    if (UpKey) if (determinateCollision(playerHitBoxU, collisionChecker)) { SpeedY = 0;  }
+                    if (DownKey) if (determinateCollision(playerHitBoxD, collisionChecker)) { SpeedY = 0; }
+                    if (LeftKey) if (determinateCollision(playerHitBoxL, collisionChecker)) { SpeedX = 0;  }
+                    if (RightKey) if (determinateCollision(playerHitBoxR, collisionChecker)) { SpeedX = 0; }
 
-
-                   // Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
-
-                    if (playerHitBox.IntersectsWith(collisionChecker))
-                    {
-                        Rect ifPlayerShorter = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width, Player.Height - 15);
-                        Rect ifPlayerPositionLower = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player) + 15, Player.Width, Player.Height );
-                        Rect ifPlayerSlimer = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width - 15, Player.Height);
-                        Rect ifPlayerPositionRight = new Rect(Canvas.GetLeft(Player) + 15, Canvas.GetTop(Player), Player.Width , Player.Height);
-                        if (!(ifPlayerShorter.IntersectsWith(collisionChecker)) || !(ifPlayerPositionLower.IntersectsWith(collisionChecker))) { lastL = Canvas.GetLeft(Player);}
-                        else Canvas.SetLeft(Player, lastL);
-                        if (!(ifPlayerSlimer.IntersectsWith(collisionChecker)) || !(ifPlayerPositionRight.IntersectsWith(collisionChecker))) { lastT = Canvas.GetTop(Player); }
-                        else Canvas.SetTop(Player, lastT);
-                        return;
-                    }
-
-                }
+                } 
 
 
             }
-            lastL = Canvas.GetLeft(Player);
-            lastT = Canvas.GetTop(Player);
+           
 
         }
         private void gameTick(object sender, EventArgs e)
@@ -181,6 +237,7 @@ namespace BasicsOfGame
                         playerSprite.ImageSource = leftRun[currentAnimation];
                         
                     }
+                    ticksDone = 0;
                 }
             }
             else
@@ -189,55 +246,8 @@ namespace BasicsOfGame
                 if (rightD) playerSprite.ImageSource = rightRun[0];
                 else playerSprite.ImageSource = leftRun[0];
             }
-            //Podstowe kolizje
-            if (UpKey)
-            {
-                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
-                {
-
-
-                }
-                else SpeedY -= Speed;
-            }
+           
             
-            if (DownKey) 
-            {
-               
-              SpeedY += Speed;
-            }
-        
-            if (RightKey)
-            {
-                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
-                {
-
-
-                }
-                else
-                {
-                    if (!rightD)
-                    {
-                        Friction = startFriction;
-                        rightD = true;
-                        currentAnimation = 0;
-                        playerSprite.ImageSource = rightRun[0];
-                    }
-                    SpeedX += Speed;
-                }
-
-            }
-            if (LeftKey)
-            {
-               
-                SpeedX -= Speed;
-                if (rightD) {
-                    Friction = startFriction;
-                    rightD = false;
-                    currentAnimation = 0;
-                    playerSprite.ImageSource = leftRun[0];
-                }
-                
-            }
             if(Canvas.GetTop(Player) < 70)
             {
                 Canvas.SetTop(Player, 70);
@@ -289,8 +299,10 @@ namespace BasicsOfGame
             SpeedY = SpeedY * Friction;
             Canvas.SetLeft(Player,Canvas.GetLeft(Player) + SpeedX);
             Canvas.SetTop(Player,Canvas.GetTop(Player) + SpeedY);
+            
+           
         }
-        private void PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void RightClick(object sender, MouseButtonEventArgs e) // CHWILOWE PRZYPISANE DO OBYDWU KLIKNIEC ( PRAWO, LEWO )
         {
             System.Windows.Point mousePosition = e.GetPosition(sender as IInputElement);
 
