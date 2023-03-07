@@ -122,7 +122,7 @@ namespace BasicsOfGame
                     Rect collisionChecker = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
 
 
-                    Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
+                   // Write.Text = "Obecna Pozycja gracza : " + Convert.ToInt32(Canvas.GetLeft(Player)).ToString() + ":" + Convert.ToInt32(Canvas.GetTop(Player)).ToString();
 
                     if (playerHitBox.IntersectsWith(collisionChecker))
                     {
@@ -290,13 +290,12 @@ namespace BasicsOfGame
             Canvas.SetLeft(Player,Canvas.GetLeft(Player) + SpeedX);
             Canvas.SetTop(Player,Canvas.GetTop(Player) + SpeedY);
         }
-        private void startGame()
+        private void PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            System.Windows.Point mousePosition = e.GetPosition(sender as IInputElement);
 
-        }
-     private void run()
-        {
-
+            Write.Text = mousePosition.X + " " + mousePosition.Y;
+            e.Handled = true;
         }
     }
 }
