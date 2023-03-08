@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Ribbon.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -93,12 +94,12 @@ namespace BasicsOfGame
         {
             InitializeComponent();
             GameScreen.Focus();
-            for(int i = 0; i < animations; i++)
+            for(int i = 0; i < animations; i++)                                                                                                                                                                                                                         //ta pentla tylko ładuje obrazki 
             {
-                leftRun[i] = new BitmapImage();
-                leftRun[i].BeginInit();
-                leftRun[i].UriSource= new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1+i}l.png", UriKind.Absolute);
-                leftRun[i].EndInit();
+                leftRun[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
+                leftRun[i].BeginInit();                                                                                                                                                                                                                                 //zaczynasz se inicjalizacje 
+                leftRun[i].UriSource= new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1+i}l.png", UriKind.Absolute);                                                                                                                      //podajesz sciezke do obrazka
+                leftRun[i].EndInit();                                                                                                                                                                                                                                   //konczysz inicjalizacje 
                 rightRun[i]=new BitmapImage();
                 rightRun[i].BeginInit();
                 rightRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1+i}.png", UriKind.Absolute);
@@ -109,7 +110,7 @@ namespace BasicsOfGame
             playerSprite.ImageSource = rightRun[0];
             rightD = true;
             Player.Fill=playerSprite;
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
+            CompositionTarget.Rendering += CompositionTarget_Rendering; //funkcja wbudowana odpala się przy nowym renderingu 
             //gameTimer.Interval = TimeSpan.FromMilliseconds(16); // 60 fps
             //gameTimer.Tick += gameTick;
             
@@ -320,11 +321,40 @@ namespace BasicsOfGame
             
            
         }
+        double abs(double x)
+        { if (x < 0) return -x;
+            else return x;
+                
+        }
+
+        private int ReturnDirection(System.Windows.Point mousePosition)
+        {
+
+            double CenterXPlayer = Canvas.GetLeft(Player) + Player.Width / 2;
+            double CenterYPlayer = Canvas.GetTop(Player) + Player.Height / 2;                      //logika Canvas
+            double DeltaX = CenterXPlayer - mousePosition.X;
+            double DeltaY = CenterYPlayer - mousePosition.Y;
+            if(abs(DeltaX)-abs(DeltaY)>=0)
+            {//x jest dominujacy czyli myszka znajduje sie dalej na przestrzeni poziomej wiec atak lewo lub prawo 
+                if (DeltaX < 0) return 1;//lewo
+                else return 2;//prawo
+            }   
+            else
+            {
+                if (DeltaY < 0) return 3;//dol 
+                else return 4;
+            }
+            //1-lewo 2-prawo 3-dol 4-gora
+        }
+
+
+
         private void RightClick(object sender, MouseButtonEventArgs e) // CHWILOWE PRZYPISANE DO OBYDWU KLIKNIEC ( PRAWO, LEWO )
         {
             System.Windows.Point mousePosition = e.GetPosition(sender as IInputElement);
 
-            Write.Text = mousePosition.X + " " + mousePosition.Y;
+            Write.Text = ReturnDirection(mousePosition).ToString();
+                         //mousePosition.X + " " + mousePosition.Y; // zwraca pozycje myszy 
             e.Handled = true;
         }
     }
