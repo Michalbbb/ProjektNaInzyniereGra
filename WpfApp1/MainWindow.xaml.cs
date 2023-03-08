@@ -234,7 +234,7 @@ namespace BasicsOfGame
             checkCollision(sender,e);
             if(UpKey||DownKey||RightKey||LeftKey)
             {
-                if (ticksDone >= Convert.ToInt32(10/Speed) )
+                if (ticksDone >= 10/Speed )
                 {
                     if (rightD)
                     {
@@ -249,7 +249,9 @@ namespace BasicsOfGame
                         playerSprite.ImageSource = leftRun[currentAnimation];
                         
                     }
-                    ticksDone = 0;
+                    ticksDone -= 10 / Speed;
+                    if (ticksDone < 0) ticksDone = 0;
+                    else if (ticksDone >= 10 / Speed) ticksDone = 0;
                 }
             }
             else
