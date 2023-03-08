@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="images\dusted.png" />
     <None Remove="images\icon.ico" />
     <None Remove="images\mainCharacter01.png" />
     <None Remove="images\mainCharacter01l.png" />
@@ -15,15 +16,22 @@
     <None Remove="images\mainCharacter02l.png" />
    
     <None Remove="images\PrzykladoweTlo.png" />
+   
+    <None Remove="images\tlo.png" />
+   
+    <None Remove="images\tlo1Obstacle.PNG" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\dusted.png" />
     <Resource Include="images\icon.ico" />
     <Resource Include="images\mainCharacter01.png" />
     <Resource Include="images\mainCharacter01l.png" />
     <Resource Include="images\mainCharacter02.png" />
     <Resource Include="images\mainCharacter02l.png" />
     <Resource Include="images\PrzykladoweTlo.png" />
+    <Resource Include="images\tlo.png" />
+    <Resource Include="images\tlo1Obstacle.PNG" />
   </ItemGroup>
 
 </Project>

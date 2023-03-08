@@ -140,7 +140,7 @@ namespace BasicsOfGame
         {
             if (UpKey)
             {
-                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
+                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 1000))
                 {
 
 
@@ -150,17 +150,18 @@ namespace BasicsOfGame
 
             if (DownKey)
             {
-
-                SpeedY += Speed;
+                if(Canvas.GetTop(Player) + Canvas.GetLeft(Player) > 1520) { }
+                else SpeedY += Speed;
             }
 
             if (RightKey)
             {
-                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 915))
+                if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 1000))
                 {
 
 
                 }
+                else if (Canvas.GetTop(Player) + Canvas.GetLeft(Player) > 1520) { }
                 else
                 {
                     if (!rightD)
@@ -215,6 +216,9 @@ namespace BasicsOfGame
         }
         private void gameTick(object sender, EventArgs e)
         {
+            
+            
+            Canvas.SetZIndex(Player, Convert.ToInt32((Canvas.GetTop(Player)+Player.Height)/ 100));
             double rectLeft = Canvas.GetLeft(Player);
             double rectTop = Canvas.GetTop(Player);
             double rectRight = rectLeft + Player.Width;
@@ -262,9 +266,9 @@ namespace BasicsOfGame
             }
            
             
-            if(Canvas.GetTop(Player) < 70)
+            if(Canvas.GetTop(Player) < 10)
             {
-                Canvas.SetTop(Player, 70);
+                Canvas.SetTop(Player, 10);
                 returnUp = true;
             }
             if(Canvas.GetLeft(Player) < -11)
@@ -272,9 +276,9 @@ namespace BasicsOfGame
                 Canvas.SetLeft(Player, -11);
                  returnLeft = true;
             }
-            if(Canvas.GetLeft(Player) > 1120)
+            if(Canvas.GetLeft(Player) > 1100)
             {
-                Canvas.SetLeft(Player, 1120);
+                Canvas.SetLeft(Player, 1100);
                 returnRight = true;
             }
             if(Canvas.GetTop(Player) > 488)
