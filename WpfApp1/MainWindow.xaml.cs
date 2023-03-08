@@ -29,16 +29,16 @@ namespace BasicsOfGame
     public partial class MainWindow : Window
     {
        
-        private DispatcherTimer gameTimer = new DispatcherTimer();
+        //private DispatcherTimer gameTimer = new DispatcherTimer();
         private bool UpKey,DownKey,LeftKey,RightKey,rightD,returnUp,returnDown,returnLeft,returnRight;
         private const float startFriction = 0.58f;
         private const float maxFriction = 0.74f;
-        private float SpeedX, SpeedY, Friction=0.55f, Speed=2;
+        private double SpeedX, SpeedY, Friction=0.55f, Speed=2,baseSpeed=2;
         ImageBrush playerSprite = new ImageBrush();
         private const int animations=2;
         BitmapImage[] rightRun = new BitmapImage[animations];
         BitmapImage[] leftRun= new BitmapImage[animations];
-        private int ticksDone = 0;
+        private double ticksDone = 0;
         private int currentAnimation = 0;
         
        
@@ -109,10 +109,22 @@ namespace BasicsOfGame
             playerSprite.ImageSource = rightRun[0];
             rightD = true;
             Player.Fill=playerSprite;
-            gameTimer.Interval = TimeSpan.FromMilliseconds(16); // 60 fps
-            gameTimer.Tick += gameTick;
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
+            //gameTimer.Interval = TimeSpan.FromMilliseconds(16); // 60 fps
+            //gameTimer.Tick += gameTick;
             
-            gameTimer.Start();
+            //gameTimer.Start();
+        }
+        private DateTime _lastRenderTime = DateTime.MinValue;
+        private void CompositionTarget_Rendering(object sender, EventArgs e)
+        {
+            DateTime now = DateTime.Now;
+            double deltaTime = (now - _lastRenderTime).TotalSeconds;
+            _lastRenderTime = now;
+            Speed = baseSpeed * 30 * deltaTime;
+            ticksDone = ticksDone+1 * 30 * deltaTime;
+            gameTick(sender,e);
+
         }
         private bool determinateCollision(Rect player,Rect obj)
         {
@@ -222,7 +234,7 @@ namespace BasicsOfGame
             checkCollision(sender,e);
             if(UpKey||DownKey||RightKey||LeftKey)
             {
-                if (ticksDone % Convert.ToInt32(10/Speed) == 0)
+                if (ticksDone >= Convert.ToInt32(10/Speed) )
                 {
                     if (rightD)
                     {
@@ -269,7 +281,7 @@ namespace BasicsOfGame
                 returnDown = true;
             }
   
-            ticksDone++;
+           
             if (returnUp || Canvas.GetTop(Player) == 70)
             {
                 if (SpeedY < 0) SpeedY = 0;
