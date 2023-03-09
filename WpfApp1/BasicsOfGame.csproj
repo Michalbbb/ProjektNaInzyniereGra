@@ -8,6 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="images\att1.png" />
+    <None Remove="images\att1d.png" />
+    <None Remove="images\att1l.png" />
+    <None Remove="images\att1p.png" />
+    <None Remove="images\att1u.png" />
+    <None Remove="images\att2.png" />
+    <None Remove="images\att2d.png" />
+    <None Remove="images\att2l.png" />
+    <None Remove="images\att2p.png" />
+    <None Remove="images\att2u.png" />
+    <None Remove="images\att3.png" />
+    <None Remove="images\att3d.png" />
+    <None Remove="images\att3l.png" />
+    <None Remove="images\att3p.png" />
+    <None Remove="images\att3u.png" />
+    <None Remove="images\att4.png" />
+    <None Remove="images\att4d.png" />
+    <None Remove="images\att4l.png" />
+    <None Remove="images\att4p.png" />
+    <None Remove="images\att4u.png" />
     <None Remove="images\dusted.png" />
     <None Remove="images\icon.ico" />
     <None Remove="images\mainCharacter01.png" />
@@ -25,6 +45,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\att1d.png" />
+    <Resource Include="images\att1l.png" />
+    <Resource Include="images\att1p.png" />
+    <Resource Include="images\att1u.png" />
+    <Resource Include="images\att2d.png" />
+    <Resource Include="images\att2l.png" />
+    <Resource Include="images\att2p.png" />
+    <Resource Include="images\att2u.png" />
+    <Resource Include="images\att3d.png" />
+    <Resource Include="images\att3l.png" />
+    <Resource Include="images\att3p.png" />
+    <Resource Include="images\att3u.png" />
+    <Resource Include="images\att4d.png" />
+    <Resource Include="images\att4l.png" />
+    <Resource Include="images\att4p.png" />
+    <Resource Include="images\att4u.png" />
     <Resource Include="images\dusted.png" />
     <Resource Include="images\icon.ico" />
     <Resource Include="images\mainCharacter01.png" />
