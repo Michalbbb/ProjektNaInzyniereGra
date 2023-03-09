@@ -36,11 +36,12 @@ namespace BasicsOfGame
         private const float maxFriction = 0.74f;
         private double SpeedX, SpeedY, Friction=0.55f, Speed=2,baseSpeed=2;
         ImageBrush playerSprite = new ImageBrush();
-        private const int animations=2;
+        private const int animations=3;
         BitmapImage[] rightRun = new BitmapImage[animations];
         BitmapImage[] leftRun= new BitmapImage[animations];
         private double ticksDone = 0;
         private int currentAnimation = 0;
+        private int attackRange = 100;
         
        
 
@@ -327,25 +328,60 @@ namespace BasicsOfGame
                 
         }
 
-        private int ReturnDirection(System.Windows.Point mousePosition)
+        private void animateAttack(System.Windows.Point mousePosition)
         {
 
             double CenterXPlayer = Canvas.GetLeft(Player) + Player.Width / 2;
             double CenterYPlayer = Canvas.GetTop(Player) + Player.Height / 2;                      //logika Canvas
             double DeltaX = CenterXPlayer - mousePosition.X;
             double DeltaY = CenterYPlayer - mousePosition.Y;
+            int direction;
             if(abs(DeltaX)-abs(DeltaY)>=0)
-            {//x jest dominujacy czyli myszka znajduje sie dalej na przestrzeni poziomej wiec atak lewo lub prawo 
-                if (DeltaX < 0) return 1;//lewo
-                else return 2;//prawo
+            {
+                if (DeltaX < 0) direction = 1;
+                else direction = 2;
             }   
             else
             {
-                if (DeltaY < 0) return 3;//dol 
-                else return 4;
+                if (DeltaY < 0) direction = 3; 
+                else direction = 4;
             }
-            //1-lewo 2-prawo 3-dol 4-gora
+            if (direction == 1) //prawo
+            {
+                Canvas.SetLeft(Weapon, CenterXPlayer);
+                Canvas.SetTop(Weapon, CenterYPlayer-(Player.Height*1.6)/2);
+                Weapon.Width = attackRange;
+                Weapon.Height =Player.Height*1.6;
+                Weapon.Stroke = Brushes.Black;
+
+            }
+            else if (direction == 2) //lewo
+            {
+                Canvas.SetLeft(Weapon, CenterXPlayer- attackRange);
+                Canvas.SetTop(Weapon, CenterYPlayer - (Player.Height * 1.6) / 2);
+                Weapon.Width = attackRange;
+                Weapon.Height = Player.Height * 1.6;
+                Weapon.Stroke = Brushes.Black;
+            }
+            else if (direction == 3) //dol
+            {
+                Canvas.SetLeft(Weapon, CenterXPlayer - (Player.Height * 1.6) / 2);
+                Canvas.SetTop(Weapon, CenterYPlayer);
+                Weapon.Width = Player.Height * 1.6;
+                Weapon.Height = attackRange;
+                Weapon.Stroke = Brushes.Black;
+            }
+            else if (direction == 4) // gora
+            {
+                Canvas.SetLeft(Weapon, CenterXPlayer - (Player.Height * 1.6) / 2);
+                Canvas.SetTop(Weapon, CenterYPlayer - attackRange);
+                Weapon.Width = Player.Height * 1.6;
+                Weapon.Height = attackRange;
+                Weapon.Stroke = Brushes.Black;
+            }
         }
+
+       
 
 
 
@@ -353,8 +389,8 @@ namespace BasicsOfGame
         {
             System.Windows.Point mousePosition = e.GetPosition(sender as IInputElement);
 
-            Write.Text = ReturnDirection(mousePosition).ToString();
-                         //mousePosition.X + " " + mousePosition.Y; // zwraca pozycje myszy 
+            animateAttack(mousePosition);
+                        
             e.Handled = true;
         }
     }

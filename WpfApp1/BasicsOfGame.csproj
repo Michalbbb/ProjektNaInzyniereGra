@@ -14,6 +14,8 @@
     <None Remove="images\mainCharacter01l.png" />
     <None Remove="images\mainCharacter02.png" />
     <None Remove="images\mainCharacter02l.png" />
+    <None Remove="images\mainCharacter03.png" />
+    <None Remove="images\mainCharacter03l.png" />
    
     <None Remove="images\PrzykladoweTlo.png" />
    
@@ -29,6 +31,8 @@
     <Resource Include="images\mainCharacter01l.png" />
     <Resource Include="images\mainCharacter02.png" />
     <Resource Include="images\mainCharacter02l.png" />
+    <Resource Include="images\mainCharacter03.png" />
+    <Resource Include="images\mainCharacter03l.png" />
     <Resource Include="images\PrzykladoweTlo.png" />
     <Resource Include="images\tlo.png" />
     <Resource Include="images\tlo1Obstacle.PNG" />
