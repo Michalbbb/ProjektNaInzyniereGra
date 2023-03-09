@@ -33,9 +33,9 @@ namespace BasicsOfGame
         private DispatcherTimer attackTimer = new DispatcherTimer();
         
         private bool UpKey,DownKey,LeftKey,RightKey,rightD,returnUp,returnDown,returnLeft,returnRight,blockMovement,blockAttack;
-        private const float startFriction = 0.58f;
-        private const float maxFriction = 0.74f;
-        private double SpeedX, SpeedY, Friction=0.55f, Speed=2,baseSpeed=2;
+        
+        private const float Friction = 0.65f;
+        private double SpeedX, SpeedY, Speed=2,baseSpeed=2;
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
         private const int animations=3;
@@ -190,6 +190,7 @@ namespace BasicsOfGame
         private void checkCollision(object sender, EventArgs e)
         {
             if (blockMovement) return;
+            else Speed = baseSpeed;
             if (UpKey)
             {
                 if (((Canvas.GetLeft(Player) > 960) && (Canvas.GetTop(Player) < 170)) && (Canvas.GetLeft(Player) - Canvas.GetTop(Player) > 1000))
@@ -218,7 +219,7 @@ namespace BasicsOfGame
                 {
                     if (!rightD)
                     {
-                        Friction = startFriction;
+                        
                         rightD = true;
                         currentMovementAnimation = 0;
                         playerSprite.ImageSource = rightRun[0];
@@ -233,7 +234,7 @@ namespace BasicsOfGame
                 SpeedX -= Speed;
                 if (rightD)
                 {
-                    Friction = startFriction;
+                    
                     rightD = false;
                     currentMovementAnimation = 0;
                     playerSprite.ImageSource = leftRun[0];
@@ -365,7 +366,7 @@ namespace BasicsOfGame
                 returnLeft = false;
             }
 
-            if (Friction < maxFriction) Friction+=0.01f;
+            
             SpeedX = SpeedX * Friction;
             SpeedY = SpeedY * Friction;
             Canvas.SetLeft(Player,Canvas.GetLeft(Player) + SpeedX);
@@ -419,7 +420,7 @@ namespace BasicsOfGame
         private void animateAttack(System.Windows.Point mousePosition)
         {
             blockMovement = true;
-
+            
             double CenterXPlayer = Canvas.GetLeft(Player) + Player.Width / 2;
             double CenterYPlayer = Canvas.GetTop(Player) + Player.Height / 2;                     
             double DeltaX = CenterXPlayer - mousePosition.X;
@@ -487,8 +488,8 @@ namespace BasicsOfGame
                  return;
             }
             blockAttack = true;
-            System.Windows.Point mousePosition = e.GetPosition(sender as IInputElement);
-
+            Speed = 0;
+            System.Windows.Point mousePosition = e.GetPosition(sender as IInputElement);  
             animateAttack(mousePosition);
                         
             e.Handled = true;
