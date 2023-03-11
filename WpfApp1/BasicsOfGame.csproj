@@ -36,6 +36,13 @@
     <None Remove="images\mainCharacter02l.png" />
     <None Remove="images\mainCharacter03.png" />
     <None Remove="images\mainCharacter03l.png" />
+    <None Remove="images\mainCharacter04.png" />
+    <None Remove="images\mainCharacter04l.png" />
+    <None Remove="images\mainCharacter05.png" />
+    <None Remove="images\mainCharacter05l.png" />
+    <None Remove="images\mainCharacter06.png" />
+    <None Remove="images\mainCharacter06l.png" />
+   
    
     <None Remove="images\PrzykladoweTlo.png" />
    
@@ -69,6 +76,13 @@
     <Resource Include="images\mainCharacter02l.png" />
     <Resource Include="images\mainCharacter03.png" />
     <Resource Include="images\mainCharacter03l.png" />
+    <Resource Include="images\mainCharacter04.png" />
+    <Resource Include="images\mainCharacter04l.png" />
+    <Resource Include="images\mainCharacter05.png" />
+    <Resource Include="images\mainCharacter05l.png" />
+    <Resource Include="images\mainCharacter06.png" />
+    <Resource Include="images\mainCharacter06l.png" />
+    
     <Resource Include="images\PrzykladoweTlo.png" />
     <Resource Include="images\tlo.png" />
     <Resource Include="images\tlo1Obstacle.PNG" />

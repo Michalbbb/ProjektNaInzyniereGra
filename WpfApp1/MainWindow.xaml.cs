@@ -38,7 +38,7 @@ namespace BasicsOfGame
         private double SpeedX, SpeedY, Speed = 2, baseSpeed = 2;
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
-        private const int animations = 3;
+        private const int animations = 6;
         BitmapImage[] rightRun = new BitmapImage[animations];
         BitmapImage[] leftRun = new BitmapImage[animations];
         BitmapImage[] attackAnimationsU = new BitmapImage[4];
@@ -256,7 +256,7 @@ namespace BasicsOfGame
             checkCollision(sender, e);
             if (UpKey || DownKey || RightKey || LeftKey)
             {
-                if (ticksDone >= 10 / Speed)
+                if (ticksDone >= 5 / Speed)
                 {
                     if (rightD)
                     {
@@ -271,9 +271,9 @@ namespace BasicsOfGame
                         playerSprite.ImageSource = leftRun[currentMovementAnimation];
 
                     }
-                    ticksDone -= 10 / Speed;
+                    ticksDone -= 5 / Speed;
                     if (ticksDone < 0) ticksDone = 0;
-                    if (ticksDone >= 10 / Speed) ticksDone = 0;
+                    if (ticksDone >= 5 / Speed) ticksDone = 0;
                 }
 
             }
