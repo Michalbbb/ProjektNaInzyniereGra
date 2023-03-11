@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Accessibility;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
@@ -31,11 +33,13 @@ namespace BasicsOfGame
     {
 
         private DispatcherTimer attackTimer = new DispatcherTimer();
-
+        private int enemies = 0;
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
-
+        private TextBox[] boxes;
         private const float Friction = 0.65f;
         private double SpeedX, SpeedY, Speed = 2, baseSpeed = 2;
+        private int minDmg = 10;
+        private int maxDmg = 15;   
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
         private const int animations = 6;
@@ -45,11 +49,12 @@ namespace BasicsOfGame
         BitmapImage[] attackAnimationsD = new BitmapImage[4];
         BitmapImage[] attackAnimationsL = new BitmapImage[4];
         BitmapImage[] attackAnimationsR = new BitmapImage[4];
-        private int intervalForAttackAnimations = 30;
+        private int intervalForAttackAnimations = 20;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
         private int attackRange = 100, attackDirection, attackTicks = 0;
         private double unlockAttack = 0;
+        Random getRand = new Random();
 
 
 
@@ -102,6 +107,7 @@ namespace BasicsOfGame
         public MainWindow()
         {
             InitializeComponent();
+            generateTB("obstacle");
             GameScreen.Focus();
             attackTimer.Interval = TimeSpan.FromMilliseconds(intervalForAttackAnimations);
             attackTimer.Tick += attackOmni;
@@ -140,7 +146,52 @@ namespace BasicsOfGame
 
             }
             gameTick(sender, e);
+            checkOpacity();
 
+        }
+        private void checkOpacity()
+        {
+            
+            for(int i = 0; i < enemies; i++)
+            {
+                if (boxes[i].Opacity > 0) boxes[i].Opacity-=Speed;
+                else
+                {
+                    boxes[i].Text = "0";
+                }
+            }
+            
+        }
+        private void generateTB(string tag) // Text Boxes
+        {
+            int i = 0;
+            foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
+            {
+                if ((string)x.Tag == tag)
+                {
+                    i++;
+
+                }
+                    
+            }
+            boxes = new TextBox[i];
+            enemies = i;
+            for(int j=0;j<i; j++)
+            {
+                boxes[j] = new TextBox();
+                boxes[j].Width = 40;  
+                boxes[j].Height = 20;
+                boxes[j].FontSize = 15;
+                boxes[j].Text = "0";
+                boxes[j].Opacity = 0;
+                boxes[j].Foreground = Brushes.Yellow;
+                boxes[j].Background = Brushes.Transparent;
+                boxes[j].BorderBrush= Brushes.Transparent;
+                boxes[j].IsEnabled = false;
+                GameScreen.Children.Add(boxes[j]);
+                Canvas.SetZIndex(boxes[j], 999);
+
+            }
         }
         private bool determinateCollision(Rect player, Rect obj)
         {
@@ -231,6 +282,38 @@ namespace BasicsOfGame
             }
 
 
+        }
+        private void checkCollision(string tag)
+        {
+            int i = 0;
+            foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
+            {
+                if ((string)x.Tag == tag) 
+                {
+
+                   
+                    Rect hitbox=new Rect(Canvas.GetLeft(Weapon),Canvas.GetTop(Weapon),Weapon.ActualWidth, Weapon.ActualHeight);    
+                    Rect collisionChecker = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.ActualWidth, x.ActualHeight);
+                    if (determinateCollision(hitbox, collisionChecker))
+                    {
+                        int obecnyDmg = Convert.ToInt32(boxes[i].Text);
+                        obecnyDmg += getRand.Next(minDmg,maxDmg+1);
+                        boxes[i].Text = obecnyDmg.ToString();
+                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length)*10;
+                        boxes[i].Opacity = 100;
+                        Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width/2));
+                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x)-(x.Height-x.ActualHeight))-boxes[i].Height);
+
+                    }
+                    
+
+                    i++;
+
+
+                }
+
+
+            }
         }
         private void gameTick(object sender, EventArgs e)
         {
@@ -349,6 +432,7 @@ namespace BasicsOfGame
         {
             if (attackTicks == 4)
             {
+                checkCollision("obstacle");
                 attackTicks = 0;
                 attackTimer.Stop();
                 Weapon.Fill = new SolidColorBrush(Colors.Transparent);
@@ -462,27 +546,28 @@ namespace BasicsOfGame
         }
         private void initAttack()
         {
-            //ta pentla tylko ładuje obrazki 
+            // Ładowanie klatek do animacji ataku
+            
             for (int i = 0; i < 4; i++)
             {
-                attackAnimationsU[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
-                attackAnimationsU[i].BeginInit();                                                                                                                                                                                                                                 //zaczynasz se inicjalizacje 
-                attackAnimationsU[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}u.png", UriKind.Absolute);                                                                                                                      //podajesz sciezke do obrazka
+                attackAnimationsU[i] = new BitmapImage();                                                                                                                                                                                                                 
+                attackAnimationsU[i].BeginInit();                                                                                                                                                                                                  
+                attackAnimationsU[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}u.png", UriKind.Absolute);                                                                                       
                 attackAnimationsU[i].EndInit();
-                attackAnimationsD[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
-                attackAnimationsD[i].BeginInit();                                                                                                                                                                                                                                 //zaczynasz se inicjalizacje 
-                attackAnimationsD[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}d.png", UriKind.Absolute);                                                                                                                      //podajesz sciezke do obrazka
+                attackAnimationsD[i] = new BitmapImage();                                                                                                                                                                                                                 
+                attackAnimationsD[i].BeginInit();                                                                                                                                                                                                  
+                attackAnimationsD[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}d.png", UriKind.Absolute);                                                                                 
                 attackAnimationsD[i].EndInit();
-                attackAnimationsL[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
-                attackAnimationsL[i].BeginInit();                                                                                                                                                                                                                                 //zaczynasz se inicjalizacje 
-                attackAnimationsL[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}l.png", UriKind.Absolute);                                                                                                                      //podajesz sciezke do obrazka
+                attackAnimationsL[i] = new BitmapImage();                                                                                                                                                                                                                 
+                attackAnimationsL[i].BeginInit();                                                                                                                                                                                                                                
+                attackAnimationsL[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}l.png", UriKind.Absolute);                                                                                                                     
                 attackAnimationsL[i].EndInit();
-                attackAnimationsR[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
-                attackAnimationsR[i].BeginInit();                                                                                                                                                                                                                                 //zaczynasz se inicjalizacje 
-                attackAnimationsR[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}p.png", UriKind.Absolute);                                                                                                                      //podajesz sciezke do obrazka
+                attackAnimationsR[i] = new BitmapImage();                                                                                                                                                                                                                       
+                attackAnimationsR[i].BeginInit();                                                                                                                                                                                                                                
+                attackAnimationsR[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/att{1 + i}p.png", UriKind.Absolute);                                                                                                                     
                 attackAnimationsR[i].EndInit();
 
-                //konczysz inicjalizacje 
+               
 
 
 
