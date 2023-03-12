@@ -49,7 +49,7 @@ namespace BasicsOfGame
         BitmapImage[] attackAnimationsD = new BitmapImage[4];
         BitmapImage[] attackAnimationsL = new BitmapImage[4];
         BitmapImage[] attackAnimationsR = new BitmapImage[4];
-        
+        Goblin [] goblins=new Goblin[2];
         private int intervalForAttackAnimations = 30;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
@@ -109,27 +109,30 @@ namespace BasicsOfGame
         public MainWindow()
         {
             InitializeComponent();
-            generateTB("obstacle");
-            GameScreen.Focus();
             
-            for (int i = 0; i < animations; i++)                                                                                                                                                                                                                         //ta pentla tylko ładuje obrazki 
+            goblins[0] = new Goblin(GameScreen, 200, 200);
+            goblins[1] = new Goblin(GameScreen, 200, 700);
+            GameScreen.Focus();
+            generateTB("enemy");
+
+            for (int i = 0; i < animations; i++)                                                                                                                                                                                                                         
             {
-                leftRun[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
-                leftRun[i].BeginInit();                                                                                                                                                                                                                                 //zaczynasz se inicjalizacje 
-                leftRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1 + i}l.png", UriKind.Absolute);                                                                                                                      //podajesz sciezke do obrazka
-                leftRun[i].EndInit();                                                                                                                                                                                                                                   //konczysz inicjalizacje 
+                leftRun[i] = new BitmapImage();                                                                                                                                                                                                                         
+                leftRun[i].BeginInit();                                                                                                                                                                                                                                
+                leftRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1 + i}l.png", UriKind.Absolute);                                                                                                                     
+                leftRun[i].EndInit();                                                                                                                                                                                                                                 
                 rightRun[i] = new BitmapImage();
                 rightRun[i].BeginInit();
                 rightRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1 + i}.png", UriKind.Absolute);
                 rightRun[i].EndInit();
 
             }
-            initAttack();
-
+            initializeAnimationsForAttack();
+            
             playerSprite.ImageSource = rightRun[0];
             rightD = true;
             Player.Fill = playerSprite;
-            CompositionTarget.Rendering += CompositionTarget_Rendering; //funkcja wbudowana odpala się przy nowym renderingu 
+            CompositionTarget.Rendering += CompositionTarget_Rendering; 
 
         }
         private DateTime _lastRenderTime = DateTime.MinValue;
@@ -141,7 +144,7 @@ namespace BasicsOfGame
             _lastRenderTime = now;
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed/2 * deltaTime;
-         
+            
             if (blockAttack)
             {
                   
@@ -156,20 +159,31 @@ namespace BasicsOfGame
 
             }
             gameTick(sender, e);
-            checkOpacity();
+            checkOpacity("enemy");
+            for(int i=0;i<2;i++)
+                goblins[i].moveToTarget(Player, deltaTime, Friction,Write);
 
         }
-        private void checkOpacity()
+        private void checkOpacity(string tag)
         {
-            
-            for(int i = 0; i < enemies; i++)
+            int i = 0;
+            foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
             {
-                if (boxes[i].Opacity > 0) boxes[i].Opacity-=Speed/2;
-                else
+                if ((string)x.Tag == tag)
                 {
-                    boxes[i].Text = "0";
+                        
+                        if (boxes[i].Opacity > 0) boxes[i].Opacity -= Speed / 2;
+                        else boxes[i].Text = "0"; 
+                        Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width / 2));
+                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x) - (x.Height - x.ActualHeight)) - boxes[i].Height);
+                        i++;
+
+
                 }
+
+
             }
+            
             
         }
         private void generateTB(string tag) // Text Boxes
@@ -189,7 +203,7 @@ namespace BasicsOfGame
             for(int j=0;j<i; j++)
             {
                 boxes[j] = new TextBox();
-                boxes[j].Width = 50;  
+                boxes[j].Width = 30;  
                 boxes[j].Height = 25;
                 boxes[j].FontSize = 20;
             
@@ -310,8 +324,8 @@ namespace BasicsOfGame
                     {
                         int obecnyDmg = Convert.ToInt32(boxes[i].Text);
                         obecnyDmg += getRand.Next(minDmg,maxDmg+1);
-                        boxes[i].Text = obecnyDmg.ToString();
-                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length)*22;
+                        boxes[i].Text = obecnyDmg.ToString();              
+                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length)*15;
                         boxes[i].Opacity = 100;
                         Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width/2));
                         Canvas.SetTop(boxes[i], (Canvas.GetTop(x)-(x.Height-x.ActualHeight))-boxes[i].Height);
@@ -444,7 +458,7 @@ namespace BasicsOfGame
         {
             if (ticksRemaining == 1)
             {
-                checkCollision("obstacle");
+                checkCollision("enemy");
 
                 ticksRemaining--;
                 Weapon.Fill = new SolidColorBrush(Colors.Transparent);
@@ -553,7 +567,7 @@ namespace BasicsOfGame
 
             e.Handled = true;
         }
-        private void initAttack()
+        private void initializeAnimationsForAttack()
         {
             // Ładowanie klatek do animacji ataku
             
