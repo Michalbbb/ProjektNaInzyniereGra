@@ -53,7 +53,7 @@ namespace BasicsOfGame
         private int intervalForAttackAnimations = 30;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
-        private int attackRange = 100, attackDirection, attackTicks = 0;
+        private int attackRange = 100, attackDirection;
         private double unlockAttack = 0;
         Random getRand = new Random();
        
