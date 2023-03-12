@@ -32,12 +32,12 @@ namespace BasicsOfGame
     public partial class MainWindow : Window
     {
 
-        private DispatcherTimer attackTimer = new DispatcherTimer();
+        private int ticksRemaining=0;
         private int enemies = 0;
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
         private TextBox[] boxes;
         private const float Friction = 0.65f;
-        private double SpeedX, SpeedY, Speed = 2, baseSpeed = 2;
+        private double SpeedX, SpeedY, Speed = 100, baseSpeed = 100;
         private int minDmg = 10;
         private int maxDmg = 15;   
         ImageBrush playerSprite = new ImageBrush();
@@ -49,12 +49,14 @@ namespace BasicsOfGame
         BitmapImage[] attackAnimationsD = new BitmapImage[4];
         BitmapImage[] attackAnimationsL = new BitmapImage[4];
         BitmapImage[] attackAnimationsR = new BitmapImage[4];
-        private int intervalForAttackAnimations = 20;
+        
+        private int intervalForAttackAnimations = 30;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
         private int attackRange = 100, attackDirection, attackTicks = 0;
         private double unlockAttack = 0;
         Random getRand = new Random();
+       
 
 
 
@@ -109,8 +111,7 @@ namespace BasicsOfGame
             InitializeComponent();
             generateTB("obstacle");
             GameScreen.Focus();
-            attackTimer.Interval = TimeSpan.FromMilliseconds(intervalForAttackAnimations);
-            attackTimer.Tick += attackOmni;
+            
             for (int i = 0; i < animations; i++)                                                                                                                                                                                                                         //ta pentla tylko ładuje obrazki 
             {
                 leftRun[i] = new BitmapImage();                                                                                                                                                                                                                         //coś jak wskaźnik na tablicę animacji (typ obrazek)
@@ -132,17 +133,26 @@ namespace BasicsOfGame
 
         }
         private DateTime _lastRenderTime = DateTime.MinValue;
+        double deltaTime;
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
-            double deltaTime = (now - _lastRenderTime).TotalSeconds;
+            deltaTime = (now - _lastRenderTime).TotalSeconds;
             _lastRenderTime = now;
-            if (Speed != 0) Speed = baseSpeed * 30 * deltaTime;
-            ticksDone += 30 * deltaTime;
+            if (Speed != 0) Speed = baseSpeed * deltaTime;
+            ticksDone += baseSpeed/2 * deltaTime;
+         
             if (blockAttack)
             {
+                  
                 unlockAttack += Convert.ToDouble(1000 * deltaTime);
-                if (unlockAttack > 500) { blockAttack = false; unlockAttack = 0; }
+
+                if (unlockAttack / (intervalForAttackAnimations * (6 - ticksRemaining)) >= 1&&ticksRemaining>0)
+                {
+                    
+                    attackOmni(sender, e);
+                }
+                if (unlockAttack > 400) { blockAttack = false; unlockAttack = 0;ticksRemaining = 0; }
 
             }
             gameTick(sender, e);
@@ -154,7 +164,7 @@ namespace BasicsOfGame
             
             for(int i = 0; i < enemies; i++)
             {
-                if (boxes[i].Opacity > 0) boxes[i].Opacity-=Speed;
+                if (boxes[i].Opacity > 0) boxes[i].Opacity-=Speed/2;
                 else
                 {
                     boxes[i].Text = "0";
@@ -179,14 +189,16 @@ namespace BasicsOfGame
             for(int j=0;j<i; j++)
             {
                 boxes[j] = new TextBox();
-                boxes[j].Width = 40;  
-                boxes[j].Height = 20;
-                boxes[j].FontSize = 15;
+                boxes[j].Width = 50;  
+                boxes[j].Height = 25;
+                boxes[j].FontSize = 20;
+            
                 boxes[j].Text = "0";
                 boxes[j].Opacity = 0;
                 boxes[j].Foreground = Brushes.Yellow;
                 boxes[j].Background = Brushes.Transparent;
                 boxes[j].BorderBrush= Brushes.Transparent;
+               
                 boxes[j].IsEnabled = false;
                 GameScreen.Children.Add(boxes[j]);
                 Canvas.SetZIndex(boxes[j], 999);
@@ -299,7 +311,7 @@ namespace BasicsOfGame
                         int obecnyDmg = Convert.ToInt32(boxes[i].Text);
                         obecnyDmg += getRand.Next(minDmg,maxDmg+1);
                         boxes[i].Text = obecnyDmg.ToString();
-                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length)*10;
+                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length)*22;
                         boxes[i].Opacity = 100;
                         Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width/2));
                         Canvas.SetTop(boxes[i], (Canvas.GetTop(x)-(x.Height-x.ActualHeight))-boxes[i].Height);
@@ -339,7 +351,7 @@ namespace BasicsOfGame
             checkCollision(sender, e);
             if (UpKey || DownKey || RightKey || LeftKey)
             {
-                if (ticksDone >= 5 / Speed)
+                if (ticksDone >= 10 / Speed)
                 {
                     if (rightD)
                     {
@@ -430,39 +442,39 @@ namespace BasicsOfGame
         }
         private void attackOmni(object sender, EventArgs e)
         {
-            if (attackTicks == 4)
+            if (ticksRemaining == 1)
             {
                 checkCollision("obstacle");
-                attackTicks = 0;
-                attackTimer.Stop();
+
+                ticksRemaining--;
                 Weapon.Fill = new SolidColorBrush(Colors.Transparent);
-                Speed = baseSpeed;
+                Speed = baseSpeed*deltaTime;
                 return;
 
             }
             if (attackDirection == 1)
             {
-                weaponSprite.ImageSource = attackAnimationsR[attackTicks];
+                weaponSprite.ImageSource = attackAnimationsR[5-ticksRemaining];
                 Weapon.Fill = weaponSprite;
-                attackTicks++;
+                ticksRemaining--;
             }
             else if (attackDirection == 2)
             {
-                weaponSprite.ImageSource = attackAnimationsL[attackTicks];
+                weaponSprite.ImageSource = attackAnimationsL[5 - ticksRemaining];
                 Weapon.Fill = weaponSprite;
-                attackTicks++;
+                ticksRemaining--;
             }
             else if (attackDirection == 3)
             {
-                weaponSprite.ImageSource = attackAnimationsD[attackTicks];
+                weaponSprite.ImageSource = attackAnimationsD[5 - ticksRemaining];
                 Weapon.Fill = weaponSprite;
-                attackTicks++;
+                ticksRemaining--;
             }
             else if (attackDirection == 4)
             {
-                weaponSprite.ImageSource = attackAnimationsU[attackTicks];
+                weaponSprite.ImageSource = attackAnimationsU[5 - ticksRemaining];
                 Weapon.Fill = weaponSprite;
-                attackTicks++;
+                ticksRemaining--;
             }
         }
 
@@ -475,55 +487,52 @@ namespace BasicsOfGame
             double CenterYPlayer = Canvas.GetTop(Player) + Player.Height / 2;
             double DeltaX = CenterXPlayer - mousePosition.X;
             double DeltaY = CenterYPlayer - mousePosition.Y;
-            int direction;
+            ticksRemaining=5;
+         
             if (abs(DeltaX) - abs(DeltaY) >= 0)
             {
-                if (DeltaX < 0) direction = 1;
-                else direction = 2;
+                if (DeltaX < 0) // right
+                    {
+                        Canvas.SetLeft(Weapon, CenterXPlayer);
+                        Canvas.SetTop(Weapon, CenterYPlayer - (Player.Height * 1.6) / 2);
+                        Weapon.Width = attackRange;
+                        Weapon.Height = Player.Height * 1.6;
+                    attackDirection = 1;
+
+                    }
+                else // left
+                {
+                    Canvas.SetLeft(Weapon, CenterXPlayer - attackRange);
+                    Canvas.SetTop(Weapon, CenterYPlayer - (Player.Height * 1.6) / 2);
+                    Weapon.Width = attackRange;
+                    Weapon.Height = Player.Height * 1.6;
+                    attackDirection = 2;
+                }
             }
             else
             {
-                if (DeltaY < 0) direction = 3;
-                else direction = 4;
-            }
-            if (direction == 1) //prawo
-            {
-                Canvas.SetLeft(Weapon, CenterXPlayer);
-                Canvas.SetTop(Weapon, CenterYPlayer - (Player.Height * 1.6) / 2);
-                Weapon.Width = attackRange;
-                Weapon.Height = Player.Height * 1.6;
-                attackDirection = 1;
-                attackTimer.Start();
+                if (DeltaY < 0) // down
+                {
+                    Canvas.SetLeft(Weapon, CenterXPlayer - (Player.Height * 1.6) / 2);
+                    Canvas.SetTop(Weapon, CenterYPlayer);
+                    Weapon.Width = Player.Height * 1.6;
+                    Weapon.Height = attackRange;
+                    attackDirection = 3;
 
-
+                }
+                else // up
+                {
+                    Canvas.SetLeft(Weapon, CenterXPlayer - (Player.Height * 1.6) / 2);
+                    Canvas.SetTop(Weapon, CenterYPlayer - attackRange);
+                    Weapon.Width = Player.Height * 1.6;
+                    Weapon.Height = attackRange;
+                    attackDirection = 4;
+                }
             }
-            else if (direction == 2) //lewo
-            {
-                Canvas.SetLeft(Weapon, CenterXPlayer - attackRange);
-                Canvas.SetTop(Weapon, CenterYPlayer - (Player.Height * 1.6) / 2);
-                Weapon.Width = attackRange;
-                Weapon.Height = Player.Height * 1.6;
-                attackDirection = 2;
-                attackTimer.Start();
-            }
-            else if (direction == 3) //dol
-            {
-                Canvas.SetLeft(Weapon, CenterXPlayer - (Player.Height * 1.6) / 2);
-                Canvas.SetTop(Weapon, CenterYPlayer);
-                Weapon.Width = Player.Height * 1.6;
-                Weapon.Height = attackRange;
-                attackDirection = 3;
-                attackTimer.Start();
-            }
-            else if (direction == 4) // gora
-            {
-                Canvas.SetLeft(Weapon, CenterXPlayer - (Player.Height * 1.6) / 2);
-                Canvas.SetTop(Weapon, CenterYPlayer - attackRange);
-                Weapon.Width = Player.Height * 1.6;
-                Weapon.Height = attackRange;
-                attackDirection = 4;
-                attackTimer.Start();
-            }
+            
+           
+            
+        
         }
 
 
