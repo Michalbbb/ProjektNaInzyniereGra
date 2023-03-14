@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BasicsOfGame"
         mc:Ignorable="d"
-        Title="Łódź 2245" Icon="images/icon.ico" Height="600" Width="1200"
+        Title="Crona" Icon="images/icon.ico" Height="600" Width="1200"
      
         WindowStartupLocation="CenterScreen"
         Foreground="#FFFFFF">

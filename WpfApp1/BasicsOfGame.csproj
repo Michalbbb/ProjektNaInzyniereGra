@@ -30,6 +30,7 @@
     <None Remove="images\att4u.png" />
     <None Remove="images\dusted.png" />
     <None Remove="images\icon.ico" />
+    <None Remove="images\icon2.ico" />
     <None Remove="images\mainCharacter01.png" />
     <None Remove="images\mainCharacter01l.png" />
     <None Remove="images\mainCharacter02.png" />
@@ -70,6 +71,7 @@
     <Resource Include="images\att4u.png" />
     <Resource Include="images\dusted.png" />
     <Resource Include="images\icon.ico" />
+    <Resource Include="images\icon2.ico" />
     <Resource Include="images\mainCharacter01.png" />
     <Resource Include="images\mainCharacter01l.png" />
     <Resource Include="images\mainCharacter02.png" />
