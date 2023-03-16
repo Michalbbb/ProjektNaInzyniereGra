@@ -16,13 +16,13 @@
 
 
                 <Canvas.Background >
-                    <ImageBrush ImageSource="/Images/dusted.png" />
+                    <ImageBrush ImageSource="/Images/backgrounds/castle1Door.png" />
                 </Canvas.Background>
                 <Rectangle  Canvas.Left="276" Canvas.Top="170" Fill="Black" Width="88" Height="109" x:Name="Player"></Rectangle>
-                <Rectangle Canvas.Left="716" Canvas.Top="218" Fill="Transparent" Width="100" Height="9" Tag="collision" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="0.696,1.251"></Rectangle>
-                <Rectangle Canvas.ZIndex="2" Canvas.Left="702" Canvas.Top="154"  Width="140" Height="140" Tag="obstacle" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Rectangle Canvas.Left="716" Canvas.Top="205" Fill="Transparent" Width="70" Height="3" Tag="collision" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="0.696,1.251"></Rectangle>
+                <Rectangle Canvas.ZIndex="2" Canvas.Left="702" Canvas.Top="100"  Width="100" Height="140" Tag="obstacle" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Rectangle.Fill>
-                        <ImageBrush ImageSource="/Images/tlo1Obstacle.png" />
+                        <ImageBrush ImageSource="/Images/bgdecorations/StatueDestroyed.png" />
                     </Rectangle.Fill>
                    
                 </Rectangle>

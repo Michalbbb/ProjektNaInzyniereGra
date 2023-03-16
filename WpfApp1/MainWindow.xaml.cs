@@ -158,10 +158,11 @@ namespace BasicsOfGame
                 if (unlockAttack > 400) { blockAttack = false; unlockAttack = 0;ticksRemaining = 0; }
 
             }
+            
             gameTick(sender, e);
             checkOpacity("enemy");
-            for(int i=0;i<2;i++)
-                goblins[i].moveToTarget(Player, deltaTime, Friction,Write);
+            for (int i = 0; i < 2; i++)
+                goblins[i].moveToTarget(Player, deltaTime, Friction);
 
         }
         private void checkOpacity(string tag)
@@ -380,9 +381,9 @@ namespace BasicsOfGame
                         playerSprite.ImageSource = leftRun[currentMovementAnimation];
 
                     }
-                    ticksDone -= 5 / Speed;
+                    ticksDone -= 10 / Speed;
                     if (ticksDone < 0) ticksDone = 0;
-                    if (ticksDone >= 5 / Speed) ticksDone = 0;
+                    if (ticksDone >= 10/ Speed) ticksDone = 0;
                 }
 
             }

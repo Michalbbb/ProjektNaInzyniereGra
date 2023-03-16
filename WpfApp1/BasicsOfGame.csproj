@@ -28,7 +28,19 @@
     <None Remove="images\att4l.png" />
     <None Remove="images\att4p.png" />
     <None Remove="images\att4u.png" />
+    <None Remove="images\backgrounds\castle1Door.png" />
+    <None Remove="images\backgrounds\castle2Doors.png" />
+    <None Remove="images\backgrounds\castle2Doors2.png" />
+    <None Remove="images\backgrounds\castle3Doors.png" />
+    <None Remove="images\backgrounds\dusted.png" />
+    <None Remove="images\backgrounds\tlo.png" />
+    <None Remove="images\bgdecorations\Flag.PNG" />
+    <None Remove="images\bgdecorations\Statue.PNG" />
+    <None Remove="images\bgdecorations\StatueDestroyed.PNG" />
+    <None Remove="images\bgdecorations\TarnishedFlag.PNG" />
+    <None Remove="images\bgdecorations\tlo1Obstacle.PNG" />
     <None Remove="images\dusted.png" />
+    <None Remove="images\goblinsword.png" />
     <None Remove="images\icon.ico" />
     <None Remove="images\icon2.ico" />
     <None Remove="images\mainCharacter01.png" />
@@ -69,7 +81,18 @@
     <Resource Include="images\att4l.png" />
     <Resource Include="images\att4p.png" />
     <Resource Include="images\att4u.png" />
-    <Resource Include="images\dusted.png" />
+    <Resource Include="images\backgrounds\castle1Door.png" />
+    <Resource Include="images\backgrounds\castle2Doors.png" />
+    <Resource Include="images\backgrounds\castle2Doors2.png" />
+    <Resource Include="images\backgrounds\castle3Doors.png" />
+    <Resource Include="images\backgrounds\dusted.png" />
+    <Resource Include="images\backgrounds\tlo.png" />
+    <Resource Include="images\bgdecorations\Flag.PNG" />
+    <Resource Include="images\bgdecorations\Statue.PNG" />
+    <Resource Include="images\bgdecorations\StatueDestroyed.PNG" />
+    <Resource Include="images\bgdecorations\TarnishedFlag.PNG" />
+    <Resource Include="images\bgdecorations\tlo1Obstacle.PNG" />
+    <Resource Include="images\goblinsword.png" />
     <Resource Include="images\icon.ico" />
     <Resource Include="images\icon2.ico" />
     <Resource Include="images\mainCharacter01.png" />
@@ -84,10 +107,6 @@
     <Resource Include="images\mainCharacter05l.png" />
     <Resource Include="images\mainCharacter06.png" />
     <Resource Include="images\mainCharacter06l.png" />
-    
-    <Resource Include="images\PrzykladoweTlo.png" />
-    <Resource Include="images\tlo.png" />
-    <Resource Include="images\tlo1Obstacle.PNG" />
   </ItemGroup>
 
 </Project>
