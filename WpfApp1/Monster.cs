@@ -104,6 +104,15 @@ namespace BasicsOfGame
                 }
             }
         }
+
+
+
+
+
+
+
+
+
         public void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction)
         {
             if (delta > 1) return;
@@ -111,7 +120,7 @@ namespace BasicsOfGame
             Speed = Convert.ToInt32(baseSpeed * delta);
             double x = 0, y = 0;
             System.Windows.Point p = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
-
+            // p - center of player
 
             if (p.X > Canvas.GetLeft(body) + body.Width + attackRange / 2)
             {
@@ -121,11 +130,11 @@ namespace BasicsOfGame
             {
                 x = -Speed* friction;
             }
-            if (p.Y < Canvas.GetTop(body) + body.Height / 2)
+            if (p.Y < Canvas.GetTop(body) - body.Height / 2)
             {
                 y = -Speed* friction;
             }
-            if (p.Y > Canvas.GetTop(body) + body.Height / 2)
+            if (p.Y > Canvas.GetTop(body) + body.Height *1.5)
             {
                 y = Speed* friction;
             }
