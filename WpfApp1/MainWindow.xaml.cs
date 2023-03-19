@@ -111,7 +111,7 @@ namespace BasicsOfGame
             InitializeComponent();
             
             goblins[0] = new Goblin(GameScreen, 200, 200);
-            goblins[1] = new Goblin(GameScreen, 200, 700);
+            goblins[1] = new Goblin(GameScreen, 300, 700);
             GameScreen.Focus();
             generateTB("enemy");
 

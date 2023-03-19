@@ -30,7 +30,7 @@ namespace BasicsOfGame
         int animations = 5;
         int currentAnimation = 0;
         double ticks = 0;
-        bool moveInRightDirection = true;
+        public bool moveInRightDirection = true;
         ImageBrush goblinSprite = new ImageBrush();
         Canvas BelongTO;
         
@@ -49,7 +49,10 @@ namespace BasicsOfGame
             loadImages();
             goblinSprite.ImageSource = goblinMovementRight[0];
             body.Fill = goblinSprite;
+           
             
+
+
 
         }
         public void loadImages()
@@ -122,13 +125,19 @@ namespace BasicsOfGame
             ticks += baseSpeed / 2 * delta;
             Speed = Convert.ToInt32(baseSpeed * delta);
         }
-       
+        private Random rnd=new Random();
 
-
+        private void collisionResolution(System.Windows.Point playerCenter,ref double moveX,ref double moveY,double friction)
+        {
+            int y=rnd.Next(-1,2);
+            moveY = y*Speed*friction;
+            int x = rnd.Next(-1, 2);
+            moveX=x*Speed*friction;
+        }
         public void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
-
+            
             NormalizeSpeed(delta);
 
             setRelativeVisibility();
@@ -163,12 +172,12 @@ namespace BasicsOfGame
             if(tryMovingByX!=moveMonsterByX) 
             {
                 if (tryMovingByY == moveMonsterByY && tryMovingByY != 0) { }
-                else { moveMonsterByY = tryMovingByY; } 
+                else { collisionResolution(playerCenter,ref moveMonsterByX,ref moveMonsterByY, friction); } 
             }
             else if (tryMovingByY != moveMonsterByY)
             {
                 if (tryMovingByX == moveMonsterByX && tryMovingByX != 0) { }
-                else { moveMonsterByY = tryMovingByY; }
+                else { collisionResolution(playerCenter,ref moveMonsterByX,ref moveMonsterByY, friction); }
             }
             if ((moveMonsterByY != 0|| moveMonsterByX != 0 )&& ticks >= 10 / Speed)
             {
@@ -266,17 +275,17 @@ namespace BasicsOfGame
         }
         private void checkCollisions(ref double coordinateX,ref double coordinateY)
         {
-            Rect tryGoingUp = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) - 3 * Speed, body.Width, body.Height);
-            Rect tryGoingDown = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) + 3 * Speed, body.Width, body.Height);
-            Rect tryGoingLeft = new Rect(Canvas.GetLeft(body) - 3 * Speed, Canvas.GetTop(body), body.Width, body.Height);
-            Rect tryGoingRight = new Rect(Canvas.GetLeft(body) + 3 * Speed , Canvas.GetTop(body), body.Width, body.Height);
+            Rect tryGoingUp = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) - 2 * Speed, body.Width, body.Height);
+            Rect tryGoingDown = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) + 2 * Speed, body.Width, body.Height);
+            Rect tryGoingLeft = new Rect(Canvas.GetLeft(body) - 2 * Speed, Canvas.GetTop(body), body.Width, body.Height);
+            Rect tryGoingRight = new Rect(Canvas.GetLeft(body) + 2 * Speed , Canvas.GetTop(body), body.Width, body.Height);
             foreach (var x in BelongTO.Children.OfType<System.Windows.Shapes.Rectangle>())
             {
                 if (x == body) continue;
                 if ((string)x.Tag!= "enemy" && (string)x.Tag != "collision") continue;
 
                 Rect hitBoxOfObject;
-                if ((string)x.Tag == "enemy") hitBoxOfObject = new Rect(Canvas.GetLeft(x)+ ( 3 * x.Width / 8 ), Canvas.GetTop(x)+x.Height/2, x.Width/4, 1);                 
+                if ((string)x.Tag == "enemy") { hitBoxOfObject = new Rect(Canvas.GetLeft(x) + (9 * x.Width / 20), Canvas.GetTop(x) + (9 * x.Height / 20), x.Width / 10, x.Height / 10); }              
                 else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
                 
                 if (coordinateY != 0)
