@@ -13,16 +13,17 @@ using System.IO;
 using System.Diagnostics.Eventing.Reader;
 using System.Windows.Automation.Text;
 using System.Windows.Media.Animation;
+using System.Security.Cryptography.Pkcs;
 
 namespace BasicsOfGame
 {
     internal class Goblin
     {
         System.Windows.Shapes.Rectangle body = new System.Windows.Shapes.Rectangle();
-        int attackRange = 100;
+        int attackRange = 50;
         int Speed = 130;
         int baseSpeed = 130;
-        BitmapImage[] goblinMovementRight=new BitmapImage[5];
+        BitmapImage[] goblinMovementRight = new BitmapImage[5];
         BitmapImage[] goblinMovementLeft = new BitmapImage[5];
         BitmapImage[] goblinAttackRight = new BitmapImage[5];
         BitmapImage[] goblinAttackLeft = new BitmapImage[5];
@@ -30,15 +31,17 @@ namespace BasicsOfGame
         int currentAnimation = 0;
         double ticks = 0;
         bool moveInRightDirection = true;
-        ImageBrush goblinSprite=new ImageBrush();
+        ImageBrush goblinSprite = new ImageBrush();
+        Canvas BelongTO;
+        
         public Goblin(Canvas a, int x, int y)
         {
             body.Height = 64;
             body.Width = 64;
             body.Fill = Brushes.Blue;
             body.Tag = "enemy";
-            
-            
+            BelongTO = a;
+
             a.Children.Add(body);
 
             body.SetValue(Canvas.TopProperty, (double)x);
@@ -46,6 +49,7 @@ namespace BasicsOfGame
             loadImages();
             goblinSprite.ImageSource = goblinMovementRight[0];
             body.Fill = goblinSprite;
+            
 
         }
         public void loadImages()
@@ -55,11 +59,11 @@ namespace BasicsOfGame
             int spriteHeight = 64;
             int k;
             int d = 0;
-            for(int i = spriteHeight; i < goblinSprits.Height; i += spriteHeight*2)
+            for (int i = spriteHeight; i < goblinSprits.Height; i += spriteHeight * 2)
             {
                 k = 0;
                 if (d == 20) break;
-                for (int j=0; j < goblinSprits.Width; j+=spriteWidth)
+                for (int j = 0; j < goblinSprits.Width; j += spriteWidth)
                 {
                     if (j > spriteWidth * 9) break;
                     d++;
@@ -81,7 +85,7 @@ namespace BasicsOfGame
                     {
                         if (i <= spriteWidth)
                         {
-                            goblinMovementRight[k] =sprite;
+                            goblinMovementRight[k] = sprite;
                         }
                         else
                         {
@@ -92,11 +96,11 @@ namespace BasicsOfGame
                     {
                         if (i <= spriteWidth)
                         {
-                            goblinAttackRight[k-5] = sprite;
+                            goblinAttackRight[k - 5] = sprite;
                         }
                         else
                         {
-                            goblinAttackLeft[k-5] = sprite;
+                            goblinAttackLeft[k - 5] = sprite;
                         }
 
                     }
@@ -107,44 +111,72 @@ namespace BasicsOfGame
 
 
 
+        private void setRelativeVisibility()
+        {
+            Canvas.SetZIndex(body, Convert.ToInt32((Canvas.GetTop(body) + body.Height) / 100)-1);
+           
+        }
 
-
-
-
+        private void NormalizeSpeed(double delta)
+        {
+            ticks += baseSpeed / 2 * delta;
+            Speed = Convert.ToInt32(baseSpeed * delta);
+        }
+       
 
 
         public void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction)
         {
-            if (delta > 1) return;
-            ticks += baseSpeed / 2 * delta;
-            Speed = Convert.ToInt32(baseSpeed * delta);
-            double x = 0, y = 0;
-            System.Windows.Point p = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
-            // p - center of player
+            if (delta > 1) return; // Starting delta value is about 3 billions 
 
-            if (p.X > Canvas.GetLeft(body) + body.Width + attackRange / 2)
+            NormalizeSpeed(delta);
+
+            setRelativeVisibility();
+
+            double moveMonsterByX = 0, moveMonsterByY = 0;
+
+            System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
+
+            double tryMovingByX=0;
+            double tryMovingByY=0;
+            if (playerCenter.X > Canvas.GetLeft(body) + body.Width + attackRange / 2)
             {
-                x = Speed* friction;
+                moveMonsterByX = Speed * friction;
             }
-            if (p.X < Canvas.GetLeft(body) - attackRange / 2)
+            if (playerCenter.X < Canvas.GetLeft(body) - attackRange / 2)
             {
-                x = -Speed* friction;
+                moveMonsterByX = -Speed * friction;
             }
-            if (p.Y < Canvas.GetTop(body) - body.Height / 2)
+            if (playerCenter.Y < Canvas.GetTop(body) - body.Height / 2)
             {
-                y = -Speed* friction;
+                moveMonsterByY = -Speed * friction;
             }
-            if (p.Y > Canvas.GetTop(body) + body.Height *1.5)
+            if (playerCenter.Y > Canvas.GetTop(body) + body.Height * 1.5)
             {
-                y = Speed* friction;
+                moveMonsterByY = Speed * friction;
             }
-            if (Speed!=0&&ticks >= 10/Speed)
+            tryMovingByX = moveMonsterByX;
+            tryMovingByY = moveMonsterByY;
+
+
+            checkCollisions(ref moveMonsterByX, ref moveMonsterByY);
+            if(tryMovingByX!=moveMonsterByX) 
             {
-                
+                if (tryMovingByY == moveMonsterByY && tryMovingByY != 0) { }
+                else { moveMonsterByY = tryMovingByY; } 
+            }
+            else if (tryMovingByY != moveMonsterByY)
+            {
+                if (tryMovingByX == moveMonsterByX && tryMovingByX != 0) { }
+                else { moveMonsterByY = tryMovingByY; }
+            }
+            if ((moveMonsterByY != 0|| moveMonsterByX != 0 )&& ticks >= 10 / Speed)
+            {
+
                 ticks -= 10 / Speed;
                 if (ticks < 0) ticks = 0;
                 if (ticks >= 10 / Speed) ticks = 0;
-                if (x > 0)
+                if (moveMonsterByX > 0)
                 {
                     if (moveInRightDirection)
                     {
@@ -161,7 +193,7 @@ namespace BasicsOfGame
                         body.Fill = goblinSprite;
                     }
                 }
-                if (x < 0)
+                else if (moveMonsterByX < 0)
                 {
                     if (!moveInRightDirection)
                     {
@@ -178,7 +210,7 @@ namespace BasicsOfGame
                         body.Fill = goblinSprite;
                     }
                 }
-                if (x == 0 && (y>1||y<-1))
+                else if (moveMonsterByX == 0 )
                 {
                     if (moveInRightDirection)
                     {
@@ -195,13 +227,85 @@ namespace BasicsOfGame
                         body.Fill = goblinSprite;
                     }
                 }
+               
             }
-            Canvas.SetLeft(body, Canvas.GetLeft(body)+x);
-            Canvas.SetTop(body, Canvas.GetTop(body)+y);
+            if(moveMonsterByX==0&&moveMonsterByY==0)
+            {
+                if (playerCenter.X > Canvas.GetLeft(body) + body.Width / 2)
+                {
+                    currentAnimation = 0;
+                    goblinSprite.ImageSource = goblinMovementRight[currentAnimation];
+                    body.Fill = goblinSprite;
+                }
+                if (playerCenter.X <= Canvas.GetLeft(body) + body.Width / 2)
+                {
+                    currentAnimation = 0;
+                    goblinSprite.ImageSource = goblinMovementLeft[currentAnimation];
+                    body.Fill = goblinSprite;
+                }
+            }
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
+            if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
+                if (Canvas.GetTop(body) <= 93-(body.Height*3/4))Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
+            
+
+
+
         }
+        
+        private bool determinateCollision(Rect player, Rect obj)
+        {
+            if (obj.X < (player.X + player.Width) && (obj.X + obj.Width) > player.X)
+            {
+
+                if (obj.Y < (player.Y + player.Height) && (obj.Y + obj.Height) > player.Y) return true;
+                else return false;
+            }
+            else return false;
+        }
+        private void checkCollisions(ref double coordinateX,ref double coordinateY)
+        {
+            Rect tryGoingUp = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) - 3 * Speed, body.Width, body.Height);
+            Rect tryGoingDown = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) + 3 * Speed, body.Width, body.Height);
+            Rect tryGoingLeft = new Rect(Canvas.GetLeft(body) - 3 * Speed, Canvas.GetTop(body), body.Width, body.Height);
+            Rect tryGoingRight = new Rect(Canvas.GetLeft(body) + 3 * Speed , Canvas.GetTop(body), body.Width, body.Height);
+            foreach (var x in BelongTO.Children.OfType<System.Windows.Shapes.Rectangle>())
+            {
+                if (x == body) continue;
+                if ((string)x.Tag!= "enemy" && (string)x.Tag != "collision") continue;
+
+                Rect hitBoxOfObject;
+                if ((string)x.Tag == "enemy") hitBoxOfObject = new Rect(Canvas.GetLeft(x)+ ( 3 * x.Width / 8 ), Canvas.GetTop(x)+x.Height/2, x.Width/4, 1);                 
+                else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+                
+                if (coordinateY != 0)
+                {
+                    if (coordinateY > 0)
+                    {
+                        if (determinateCollision(tryGoingDown, hitBoxOfObject)) coordinateY = 0;
+                    }
+                    else
+                    {
+                        if (determinateCollision(tryGoingUp, hitBoxOfObject)) coordinateY = 0;
+                    }
+                }
+                if (coordinateX != 0)
+                {
+                    if (coordinateX > 0)
+                    {
+                        if (determinateCollision(tryGoingRight, hitBoxOfObject)) coordinateX = 0;
+                    }
+                    else
+                    {
+                        if (determinateCollision(tryGoingLeft, hitBoxOfObject)) coordinateX = 0;
+                    }
+                }
+            }
 
 
-       
+
+        }
     }
 }
 

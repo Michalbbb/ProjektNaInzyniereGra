@@ -210,7 +210,7 @@ namespace BasicsOfGame
             
                 boxes[j].Text = "0";
                 boxes[j].Opacity = 0;
-                boxes[j].Foreground = Brushes.Yellow;
+                boxes[j].Foreground = Brushes.BlanchedAlmond;
                 boxes[j].Background = Brushes.Transparent;
                 boxes[j].BorderBrush= Brushes.Transparent;
                
@@ -246,8 +246,8 @@ namespace BasicsOfGame
 
             if (DownKey)
             {
-                if (Canvas.GetTop(Player) + Canvas.GetLeft(Player) > 1520) { }
-                else SpeedY += Speed;
+                
+                SpeedY += Speed;
             }
 
             if (RightKey)
@@ -257,7 +257,6 @@ namespace BasicsOfGame
 
 
                 }
-                else if (Canvas.GetTop(Player) + Canvas.GetLeft(Player) > 1520) { }
                 else
                 {
                     if (!rightD)
