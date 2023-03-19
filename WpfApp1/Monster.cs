@@ -127,13 +127,7 @@ namespace BasicsOfGame
         }
         private Random rnd=new Random();
 
-        private void collisionResolution(System.Windows.Point playerCenter,ref double moveX,ref double moveY,double friction)
-        {
-            int y=rnd.Next(-1,2);
-            moveY = y*Speed*friction;
-            int x = rnd.Next(-1, 2);
-            moveX=x*Speed*friction;
-        }
+        
         public void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
@@ -146,8 +140,7 @@ namespace BasicsOfGame
 
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
 
-            double tryMovingByX=0;
-            double tryMovingByY=0;
+            
             if (playerCenter.X > Canvas.GetLeft(body) + body.Width + attackRange / 2)
             {
                 moveMonsterByX = Speed * friction;
@@ -164,21 +157,11 @@ namespace BasicsOfGame
             {
                 moveMonsterByY = Speed * friction;
             }
-            tryMovingByX = moveMonsterByX;
-            tryMovingByY = moveMonsterByY;
+           
 
 
-            checkCollisions(ref moveMonsterByX, ref moveMonsterByY);
-            if(tryMovingByX!=moveMonsterByX) 
-            {
-                if (tryMovingByY == moveMonsterByY && tryMovingByY != 0) { }
-                else { collisionResolution(playerCenter,ref moveMonsterByX,ref moveMonsterByY, friction); } 
-            }
-            else if (tryMovingByY != moveMonsterByY)
-            {
-                if (tryMovingByX == moveMonsterByX && tryMovingByX != 0) { }
-                else { collisionResolution(playerCenter,ref moveMonsterByX,ref moveMonsterByY, friction); }
-            }
+            checkCollisions(ref moveMonsterByX, ref moveMonsterByY,friction);
+           
             if ((moveMonsterByY != 0|| moveMonsterByX != 0 )&& ticks >= 10 / Speed)
             {
 
@@ -273,7 +256,7 @@ namespace BasicsOfGame
             }
             else return false;
         }
-        private void checkCollisions(ref double coordinateX,ref double coordinateY)
+        private void checkCollisions(ref double coordinateX,ref double coordinateY,double friction)
         {
             Rect tryGoingUp = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) - 2 * Speed, body.Width, body.Height);
             Rect tryGoingDown = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body) + 2 * Speed, body.Width, body.Height);
@@ -287,27 +270,49 @@ namespace BasicsOfGame
                 Rect hitBoxOfObject;
                 if ((string)x.Tag == "enemy") { hitBoxOfObject = new Rect(Canvas.GetLeft(x) + (9 * x.Width / 20), Canvas.GetTop(x) + (9 * x.Height / 20), x.Width / 10, x.Height / 10); }              
                 else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
-                
+                bool wentThroughY = false;
                 if (coordinateY != 0)
                 {
                     if (coordinateY > 0)
                     {
-                        if (determinateCollision(tryGoingDown, hitBoxOfObject)) coordinateY = 0;
+                        if (determinateCollision(tryGoingDown, hitBoxOfObject))
+                        {
+                            coordinateY = 0;
+                            if (coordinateX == 0) coordinateX = Speed  * friction;
+                            wentThroughY = true;
+                        }
                     }
                     else
                     {
-                        if (determinateCollision(tryGoingUp, hitBoxOfObject)) coordinateY = 0;
+                        if (determinateCollision(tryGoingUp, hitBoxOfObject))
+                        {
+                            coordinateY = 0;
+                            if (coordinateX == 0) coordinateX = Speed  * friction;
+                            wentThroughY = true;
+                        }
                     }
                 }
                 if (coordinateX != 0)
                 {
                     if (coordinateX > 0)
                     {
-                        if (determinateCollision(tryGoingRight, hitBoxOfObject)) coordinateX = 0;
+                        if (determinateCollision(tryGoingRight, hitBoxOfObject))
+                        {
+                            coordinateX = 0;
+                            if (coordinateY == 0 && !wentThroughY) coordinateY = Speed  * friction;
+                            
+
+                        }
                     }
                     else
                     {
-                        if (determinateCollision(tryGoingLeft, hitBoxOfObject)) coordinateX = 0;
+                        if (determinateCollision(tryGoingLeft, hitBoxOfObject))
+                        {
+                            coordinateX = 0;
+                            if (coordinateY == 0 && !wentThroughY) coordinateY = Speed  * friction;
+
+
+                        }
                     }
                 }
             }
