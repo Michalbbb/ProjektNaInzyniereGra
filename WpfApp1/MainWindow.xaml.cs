@@ -36,6 +36,7 @@ namespace BasicsOfGame
         private int enemies = 0;
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
         private TextBox[] boxes;
+        TextBox playerDmg;
         private const float Friction = 0.65f;
         private double SpeedX, SpeedY, Speed = 100, baseSpeed = 100;
         private int minDmg = 10;
@@ -161,8 +162,9 @@ namespace BasicsOfGame
             
             gameTick(sender, e);
             checkOpacity("enemy");
+            
             for (int i = 0; i < 2; i++)
-                goblins[i].moveToTarget(Player, deltaTime, Friction);
+                goblins[i].moveToTarget(Player, deltaTime, Friction,playerDmg);
 
         }
         private void checkOpacity(string tag)
@@ -184,8 +186,12 @@ namespace BasicsOfGame
 
 
             }
-            
-            
+            if (playerDmg.Opacity > 0) playerDmg.Opacity -= Speed / 2;
+            else playerDmg.Text = "0";
+            Canvas.SetLeft(playerDmg, Canvas.GetLeft(Player) + (Player.ActualWidth / 2) - (playerDmg.Width / 2));
+            Canvas.SetTop(playerDmg, (Canvas.GetTop(Player) - (Player.Height - Player.ActualHeight)) - playerDmg.Height);
+            i++;
+
         }
         private void generateTB(string tag) // Text Boxes
         {
@@ -219,6 +225,22 @@ namespace BasicsOfGame
                 Canvas.SetZIndex(boxes[j], 999);
 
             }
+            
+            playerDmg = new TextBox();
+            playerDmg.Width = 25;
+            playerDmg.Height = 35;
+            playerDmg.FontSize = 30;
+            playerDmg.Text = "0";
+            playerDmg.Opacity = 0;
+            playerDmg.Foreground = Brushes.Red;
+            
+            playerDmg.Background = Brushes.Black;
+            playerDmg.BorderBrush = Brushes.Transparent;
+
+            playerDmg.IsEnabled = false;
+            GameScreen.Children.Add(playerDmg);
+            Canvas.SetZIndex(playerDmg, 999);
+
         }
         private bool determinateCollision(Rect player, Rect obj)
         {
