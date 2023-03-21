@@ -539,6 +539,7 @@ namespace BasicsOfGame
             }
             if (inCollision)
             {
+                
                 if (gettingOut && collisionsDetected > 0)
                 {
                     gettingOut = false;
@@ -546,29 +547,69 @@ namespace BasicsOfGame
                 }
                 if (collisionsDetected == collisionsWithKin)
                 {
-                    if (rCol)
+                    Rect myBody=new Rect(Canvas.GetLeft(body),Canvas.GetTop(body),body.Width,body.Height);
+                    foreach (Goblin g in BelongTO.Children.OfType<Goblin>())
                     {
-                        Canvas.SetLeft(body, Canvas.GetLeft(body) - 10);
+                        if(body==g.body) continue;
+                        else
+                        {
+                            Rect gBody = new Rect(Canvas.GetLeft(g.body), Canvas.GetTop(g.body), g.body.Width, g.body.Height);
+                            if (determinateCollision(myBody,gBody))
+                            {
+
+                                if (Canvas.GetLeft(body) > Canvas.GetLeft(g.body))
+                                {
+                                    Canvas.SetLeft(body, Canvas.GetLeft(body) + 5);
+                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) - 5);
+                                }
+                                else
+                                {
+                                    Canvas.SetLeft(body, Canvas.GetLeft(body) - 5);
+                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) + 5);
+                                }
+                            }
+                           
+                        }
                     }
-                    if (lCol)
-                    {
-                        Canvas.SetLeft(body, Canvas.GetLeft(body) + 10);
-                    }
-                    if (uCol)
-                    {
-                        Canvas.SetTop(body, Canvas.GetTop(body) + 10);
-                    }
-                    if (dCol)
-                    {
-                        Canvas.SetTop(body, Canvas.GetTop(body) - 10);
-                    }
+                    
                 }
                 
                 coordinateY = savedDirectionY * Speed * friction;
                 coordinateX = savedDirectionX * Speed * friction;
             }
+            
             else if (axisX || axisY) // 1 side collision ( not stucked )
             {
+                if (collisionsDetected == collisionsWithKin&& collisionsDetected>0)
+                {
+                    
+                    
+                    Rect myBody = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body), body.Width, body.Height);
+                    foreach (Goblin g in BelongTO.Children.OfType<Goblin>())
+                    {
+                        if (body == g.body) continue;
+                        else
+                        {
+                            Rect gBody = new Rect(Canvas.GetLeft(g.body), Canvas.GetTop(g.body), g.body.Width, g.body.Height);
+                            if (determinateCollision(myBody, gBody))
+                            {
+
+                                if (Canvas.GetLeft(body) > Canvas.GetLeft(g.body))
+                                {
+                                    Canvas.SetLeft(body, Canvas.GetLeft(body) + Speed);
+                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) - Speed );
+                                }
+                                else
+                                {
+                                    Canvas.SetLeft(body, Canvas.GetLeft(body) - Speed );
+                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) + Speed );
+                                }
+                            }
+
+                        }
+                    }
+                    return;
+                }
                 if (!axisX && (left || right)) coordinateX = 0;
                 if (!axisY && (up || down)) coordinateY = 0;
                 return;
