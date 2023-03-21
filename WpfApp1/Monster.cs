@@ -559,14 +559,17 @@ namespace BasicsOfGame
 
                                 if (Canvas.GetLeft(body) > Canvas.GetLeft(g.body))
                                 {
-                                    Canvas.SetLeft(body, Canvas.GetLeft(body) + 5);
-                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) - 5);
+                                    Canvas.SetLeft(body, Canvas.GetLeft(body) + Speed);
+                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) - Speed);
                                 }
                                 else
                                 {
-                                    Canvas.SetLeft(body, Canvas.GetLeft(body) - 5);
-                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) + 5);
+                                    Canvas.SetLeft(body, Canvas.GetLeft(body) - Speed);
+                                    Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) + Speed);
                                 }
+                                coordinateX = 0;
+                                coordinateY = 0;
+                                return;
                             }
                            
                         }
@@ -604,11 +607,14 @@ namespace BasicsOfGame
                                     Canvas.SetLeft(body, Canvas.GetLeft(body) - Speed );
                                     Canvas.SetLeft(g.body, Canvas.GetLeft(g.body) + Speed );
                                 }
+                                coordinateX = 0;
+                                coordinateY = 0;
+                                return;
                             }
 
                         }
                     }
-                    return;
+                   
                 }
                 if (!axisX && (left || right)) coordinateX = 0;
                 if (!axisY && (up || down)) coordinateY = 0;
