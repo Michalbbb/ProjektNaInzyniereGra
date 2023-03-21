@@ -6,6 +6,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,7 +32,8 @@ namespace BasicsOfGame
 
     public partial class MainWindow : Window
     {
-
+        
+        
         private int ticksRemaining=0;
         private int enemies = 0;
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
@@ -109,8 +111,10 @@ namespace BasicsOfGame
 
         public MainWindow()
         {
-            InitializeComponent();
             
+            InitializeComponent();
+            WindowStyle = WindowStyle.None;
+            WindowState = WindowState.Maximized;
             goblins[0] = new Goblin(GameScreen, 200, 200);
             goblins[1] = new Goblin(GameScreen, 300, 700);
             GameScreen.Focus();
@@ -518,7 +522,7 @@ namespace BasicsOfGame
         private void animateAttack(System.Windows.Point mousePosition)
         {
 
-
+            GameScreen.Focus();
             double CenterXPlayer = Canvas.GetLeft(Player) + Player.Width / 2;
             double CenterYPlayer = Canvas.GetTop(Player) + Player.Height / 2;
             double DeltaX = CenterXPlayer - mousePosition.X;

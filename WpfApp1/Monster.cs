@@ -81,54 +81,51 @@ namespace BasicsOfGame
             BitmapImage goblinSprits = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/goblinsword.png", UriKind.Absolute));
             int spriteWidth = 64;
             int spriteHeight = 64;
-            int k;
-            int d = 0;
+            int howManyAnimations;
+            
             for (int i = spriteHeight; i < goblinSprits.Height; i += spriteHeight * 2)
             {
-                k = 0;
-                if (d == 23) break;
+                howManyAnimations = 0;
+                
                 for (int j = 0; j < goblinSprits.Width; j += spriteWidth)
                 {
-                    if (j > spriteWidth * 10) break;
-                    d++;
-                    if (d == 23) break;
+                    
+                    
                     Int32Rect spriteRect = new Int32Rect(j, i, spriteWidth, spriteHeight);
                     CroppedBitmap croppedBitmap = new CroppedBitmap(goblinSprits, spriteRect);
                     MemoryStream stream = new MemoryStream();
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
                     encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
                     encoder.Save(stream);
-
-                    // Create a new BitmapImage object and set its source to the MemoryStream
                     BitmapImage sprite = new BitmapImage();
                     sprite.BeginInit();
                     sprite.CacheOption = BitmapCacheOption.OnLoad;
                     sprite.StreamSource = stream;
                     sprite.EndInit();
-                    if (k < 5)
+                    if (howManyAnimations < 5) // 5 for movement 
                     {
                         if (i <= spriteWidth)
                         {
-                            goblinMovementRight[k] = sprite;
+                            goblinMovementRight[howManyAnimations] = sprite;
                         }
                         else
                         {
-                            goblinMovementLeft[k] = sprite;
+                            goblinMovementLeft[howManyAnimations] = sprite;
                         }
                     }
-                    else
+                    else // 6 for attack
                     {
                         if (i <= spriteWidth)
                         {
-                            goblinAttackRight[k - 5] = sprite;
+                            goblinAttackRight[howManyAnimations - 5] = sprite;
                         }
                         else
                         {
-                            goblinAttackLeft[k - 5] = sprite;
+                            goblinAttackLeft[howManyAnimations - 5] = sprite;
                         }
 
                     }
-                    k++;
+                    howManyAnimations++;
                 }
             }
            

@@ -34,8 +34,7 @@
 
             </Canvas>
         </ScrollViewer>
-        <TextBox x:Name="Write" Width="250" Height="100" IsEnabled="false" Background="Transparent" Foreground="White"  Margin="950,0,0,544">
-        </TextBox>
+       
 
 
     </Grid>
