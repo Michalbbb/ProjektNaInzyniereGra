@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <Nullable>warnings</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -41,6 +41,7 @@
     <None Remove="images\attAnimations\gobAtt6.png" />
     <None Remove="images\attAnimations\gobAtt6l.png" />
     <None Remove="images\backgrounds\bg1.png" />
+    <None Remove="images\backgrounds\bg2.png" />
     <None Remove="images\backgrounds\castle1Door.png" />
     <None Remove="images\backgrounds\castle2Doors.png" />
     <None Remove="images\backgrounds\castle2Doors2.png" />
@@ -111,6 +112,7 @@
     <Resource Include="images\attAnimations\gobAtt6.png" />
     <Resource Include="images\attAnimations\gobAtt6l.png" />
     <Resource Include="images\backgrounds\bg1.png" />
+    <Resource Include="images\backgrounds\bg2.png" />
     <Resource Include="images\bgdecorations\Flag.PNG" />
     <Resource Include="images\bgdecorations\Statue.PNG" />
     <Resource Include="images\bgdecorations\StatueDestroyed.PNG" />

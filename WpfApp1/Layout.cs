@@ -14,7 +14,7 @@ namespace BasicsOfGame
         public Layout() { 
         
         }
-        public void makeBackground(Canvas GameScreen, bool leftDoor, bool rightDoor, bool upDoor, bool downDoor, int tlo,ref bool leftDoorExist,ref bool rightDoorExist,ref bool upDoorExist,ref bool downDoorExist)
+        public void makeBackground(Canvas GameScreen, bool leftDoor, bool rightDoor, bool upDoor, bool downDoor, int tlo,ref bool leftDoorExist,ref bool rightDoorExist,ref bool upDoorExist,ref bool downDoorExist, int doorDirection)
         {
             ImageBrush noweTlo = new ImageBrush();
             noweTlo.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/backgrounds/bg{tlo}.png", UriKind.Absolute));
@@ -26,10 +26,36 @@ namespace BasicsOfGame
             downDoorExist = false;
             foreach (System.Windows.Shapes.Rectangle x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>()) // removing remains of doors
             {
-                if ((string)x.Tag == "door")
+                if((string)x.Name == "Player")
+                {
+                    switch (doorDirection)  //we substract 20 from the position of the door next to which we spawn the player
+                    {
+                        case 0: //when player enters top door spawn him at bottom door in next room
+                            Canvas.SetLeft(x, 540);  
+                            Canvas.SetTop(x, 594 - 109);
+                            break;
+                        case 1: //when player enters right door spawn him at left door in next room
+                            Canvas.SetLeft(x, 0 + 20);
+                            Canvas.SetTop(x, 288);
+                            break;
+                        case 2: //when player enters bottom door spawn him at top door in next room
+                            Canvas.SetLeft(x, 540);   
+                            Canvas.SetTop(x, 0 + 20);
+                            break;
+                        case 3: //when player enters left door spawn him at right door in next room
+                            Canvas.SetLeft(x, 1150 - 20);
+                            Canvas.SetTop(x, 288);
+                            break;
+                        case 4: //special case for spawning player at the beginning of the game
+                            Canvas.SetLeft(x, 540);   
+                            Canvas.SetTop(x, 288);
+                            break;
+                    }
+                }
+                /*if ((string)x.Tag == "door" || (string)x.Tag == "obstacle")
                 {
                     GameScreen.Children.Remove(x);
-                }
+                }*/
             }
             if (leftDoor)
             {
@@ -87,6 +113,7 @@ namespace BasicsOfGame
                 GameScreen.Children.Add(door);
                 downDoorExist = true;
             }
+
         }
     }
 }

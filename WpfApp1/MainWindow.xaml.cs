@@ -60,7 +60,14 @@ namespace BasicsOfGame
         private double unlockAttack = 0;
         Random getRand = new Random();
         bool leftDoorExist,rightDoorExist,upDoorExist,downDoorExist;
-       
+        //int doorDirection = 4;
+        Layout mapa = new Layout();
+        const int UPDOOR = 0;
+        const int RIGHTDOOR = 1;
+        const int DOWNDOOR = 2;
+        const int LEFTDOOR = 3;
+        const int NODOOR = 4;
+
 
 
 
@@ -115,8 +122,7 @@ namespace BasicsOfGame
             InitializeComponent();
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
-            Layout mapa = new Layout();
-            mapa.makeBackground(GameScreen,true, true, true, true, 1,ref leftDoorExist,ref rightDoorExist,ref upDoorExist,ref downDoorExist);
+            mapa.makeBackground(GameScreen,true, true, true, true, 1,ref leftDoorExist,ref rightDoorExist,ref upDoorExist,ref downDoorExist, NODOOR);
             goblins[0] = new Goblin(GameScreen, 200, 200);
             goblins[1] = new Goblin(GameScreen, 300, 700);
             GameScreen.Focus();
@@ -422,27 +428,55 @@ namespace BasicsOfGame
                 else playerSprite.ImageSource = leftRun[0];
             }
 
-
-            if (Canvas.GetTop(Player) < 10)
+            if (upDoorExist && Canvas.GetTop(Player) < 10 && Canvas.GetLeft(Player) > 540-50 && Canvas.GetLeft(Player) < 540 + 59 - 50)//info z DoorsInfo
+            {
+                if(Canvas.GetTop(Player) < -20)
+                {
+                    mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
+                }
+            }
+            else if (Canvas.GetTop(Player) < 10)
             {
                 Canvas.SetTop(Player, 10);
                 returnUp = true;
             }
-            if (Canvas.GetLeft(Player) < -11)
+            if (downDoorExist && Canvas.GetTop(Player) > 488 && Canvas.GetLeft(Player) > 540 - 50 && Canvas.GetLeft(Player) < 540 + 59 - 50)
             {
-                Canvas.SetLeft(Player, -11);
-                returnLeft = true;
+                if (Canvas.GetTop(Player) > 508)
+                {
+                    mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
+                }
             }
-            if (Canvas.GetLeft(Player) > 1100)
-            {
-                Canvas.SetLeft(Player, 1100);
-                returnRight = true;
-            }
-            if (Canvas.GetTop(Player) > 488)
+            else if (Canvas.GetTop(Player) > 488)
             {
                 Canvas.SetTop(Player, 488);
                 returnDown = true;
             }
+            if (leftDoorExist && Canvas.GetLeft(Player) < -11 && Canvas.GetTop(Player) > 288 - 75 && Canvas.GetTop(Player) < 288)
+            {
+                if (Canvas.GetLeft(Player) < -31)
+                {
+                    mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
+                }
+            }
+            else if (Canvas.GetLeft(Player) < -11)
+            {
+                Canvas.SetLeft(Player, -11);
+                returnLeft = true;
+            }
+            if (rightDoorExist && Canvas.GetLeft(Player) > 1100 && Canvas.GetTop(Player) > 288 - 75 && Canvas.GetTop(Player) < 288)
+            {
+                if (Canvas.GetLeft(Player) > 1130)
+                {
+                    mapa.makeBackground(GameScreen, true, true, true, true, 2, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
+                }
+            }
+            else if (Canvas.GetLeft(Player) > 1100)
+            {
+                Canvas.SetLeft(Player, 1100);
+                returnRight = true;
+            }
+            
 
 
             if (returnUp || Canvas.GetTop(Player) == 70)
