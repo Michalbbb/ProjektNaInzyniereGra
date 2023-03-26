@@ -67,6 +67,7 @@ namespace BasicsOfGame
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
         const int NODOOR = 4;
+        Grid map;
 
 
 
