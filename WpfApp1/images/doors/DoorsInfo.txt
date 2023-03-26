@@ -1,23 +1,23 @@
 Left: 
-X:1150   
-Y:288
-Width:50
-Height:75
+X:0   
+Y:288 -> 260
+Width:8
+Height:75 -> 130
 
 Right:
-X:0
-Y:288
-Width:8
-Height:75
+X:1150 
+Y:288 -> 250
+Width:50
+Height:75 -> 150
 
 Up:
-X:540
+X:540 -> 507
 Y:0
-Width:59
+Width:59->125
 Height:94
 
 Down:
-X:540
+X:540 -> 509
 Y:594
-Width:59
+Width:59->130
 Height:6

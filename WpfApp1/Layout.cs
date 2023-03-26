@@ -62,9 +62,10 @@ namespace BasicsOfGame
                 ImageBrush temporaryHolder = new ImageBrush();
                 System.Windows.Shapes.Rectangle door = new System.Windows.Shapes.Rectangle();
                 door.Width = 8;
-                door.Height = 75;
+                door.Height = 130;
                 Canvas.SetLeft(door, 0);
-                Canvas.SetTop(door, 288);
+                Canvas.SetTop(door, 260);
+                Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
                 temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/leftDoor.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
@@ -76,9 +77,10 @@ namespace BasicsOfGame
                 ImageBrush temporaryHolder = new ImageBrush();
                 System.Windows.Shapes.Rectangle door = new System.Windows.Shapes.Rectangle();
                 door.Width = 50;
-                door.Height = 75;
+                door.Height = 150;
                 Canvas.SetLeft(door, 1150);
-                Canvas.SetTop(door, 288);
+                Canvas.SetTop(door, 250);
+                Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
                 temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/rightDoor.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
@@ -89,10 +91,11 @@ namespace BasicsOfGame
             {
                 ImageBrush temporaryHolder = new ImageBrush();
                 System.Windows.Shapes.Rectangle door = new System.Windows.Shapes.Rectangle();
-                door.Width = 59;
+                door.Width = 125;
                 door.Height = 94;
-                Canvas.SetLeft(door, 540);
+                Canvas.SetLeft(door, 507);
                 Canvas.SetTop(door, 0);
+                Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
                 temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/upDoor.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
@@ -103,10 +106,11 @@ namespace BasicsOfGame
             {
                 ImageBrush temporaryHolder = new ImageBrush();
                 System.Windows.Shapes.Rectangle door = new System.Windows.Shapes.Rectangle();
-                door.Width = 59;
+                door.Width = 130;
                 door.Height = 6;
-                Canvas.SetLeft(door, 540);
+                Canvas.SetLeft(door, 509);
                 Canvas.SetTop(door, 594);
+                Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
                 temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/downDoor.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;

@@ -428,7 +428,7 @@ namespace BasicsOfGame
                 else playerSprite.ImageSource = leftRun[0];
             }
 
-            if (upDoorExist && Canvas.GetTop(Player) < 10 && Canvas.GetLeft(Player) > 540-50 && Canvas.GetLeft(Player) < 540 + 59 - 50)//info z DoorsInfo
+            if (upDoorExist && Canvas.GetTop(Player) < 10 && Canvas.GetLeft(Player) > 480 && Canvas.GetLeft(Player) < 480 + 100 )//info z DoorsInfo
             {
                 if(Canvas.GetTop(Player) < -20)
                 {
@@ -440,9 +440,9 @@ namespace BasicsOfGame
                 Canvas.SetTop(Player, 10);
                 returnUp = true;
             }
-            if (downDoorExist && Canvas.GetTop(Player) > 488 && Canvas.GetLeft(Player) > 540 - 50 && Canvas.GetLeft(Player) < 540 + 59 - 50)
+            if (downDoorExist && Canvas.GetTop(Player) > 488 && Canvas.GetLeft(Player) > 480  && Canvas.GetLeft(Player) < 480 + 115)
             {
-                if (Canvas.GetTop(Player) > 508)
+                if (Canvas.GetTop(Player) > 518)
                 {
                     mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
                 }
@@ -452,19 +452,20 @@ namespace BasicsOfGame
                 Canvas.SetTop(Player, 488);
                 returnDown = true;
             }
-            if (leftDoorExist && Canvas.GetLeft(Player) < -11 && Canvas.GetTop(Player) > 288 - 75 && Canvas.GetTop(Player) < 288)
+            if (leftDoorExist && Canvas.GetLeft(Player) < -11 && Canvas.GetTop(Player) > 250 - 40 && Canvas.GetTop(Player) < 290)
             {
-                if (Canvas.GetLeft(Player) < -31)
+                if (Canvas.GetLeft(Player) < -41)
                 {
                     mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
                 }
             }
             else if (Canvas.GetLeft(Player) < -11)
             {
+                
                 Canvas.SetLeft(Player, -11);
                 returnLeft = true;
             }
-            if (rightDoorExist && Canvas.GetLeft(Player) > 1100 && Canvas.GetTop(Player) > 288 - 75 && Canvas.GetTop(Player) < 288)
+            if (rightDoorExist && Canvas.GetLeft(Player) > 1100 && Canvas.GetTop(Player) > 250 - 40 && Canvas.GetTop(Player) < 305)
             {
                 if (Canvas.GetLeft(Player) > 1130)
                 {
@@ -477,26 +478,26 @@ namespace BasicsOfGame
                 returnRight = true;
             }
             
+            
 
-
-            if (returnUp || Canvas.GetTop(Player) == 70)
+            if (returnUp || Canvas.GetTop(Player) <= -30)
             {
                 if (SpeedY < 0) SpeedY = 0;
                 returnUp = false;
             }
-            if (returnDown || Canvas.GetTop(Player) == 488)
+            if (returnDown || Canvas.GetTop(Player) >= 528)
             {
                 if (SpeedY > 0)
                     SpeedY = 0;
                 returnDown = false;
             }
-            if (returnRight || Canvas.GetLeft(Player) == 1120)
+            if (returnRight || Canvas.GetLeft(Player) >= 1140)
             {
                 if (SpeedX > 0)
                     SpeedX = 0;
                 returnRight = false;
             }
-            if (returnLeft || Canvas.GetLeft(Player) == -11)
+            if (returnLeft || Canvas.GetLeft(Player) <= -41)
             {
                 if (SpeedX < 0)
                     SpeedX = 0;
