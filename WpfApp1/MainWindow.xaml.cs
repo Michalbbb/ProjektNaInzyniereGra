@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
+using System.Net.Mail;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -61,15 +62,15 @@ namespace BasicsOfGame
         Random getRand = new Random();
         bool leftDoorExist,rightDoorExist,upDoorExist,downDoorExist;
         //int doorDirection = 4;
-        Layout mapa = new Layout();
+        
         const int UPDOOR = 0;
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
         const int NODOOR = 4;
-        Grid map;
+        Grid map=new Grid();
 
-
+        TextBox helper;
 
 
 
@@ -94,10 +95,25 @@ namespace BasicsOfGame
             {
                 LeftKey = true;
             }
+            if (e.Key == Key.Tab)
+            {
+                helper.Opacity = 100;
+                
+            }
+            
 
 
         }
-
+        private void write()
+        {
+            map.ShowMap(helper);
+            helper.Width = 200;
+            helper.Height = 200;
+            helper.Background = Brushes.Black;
+            helper.Foreground = Brushes.White;
+        }
+        
+        
         private void KeyboardUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.W)
@@ -116,6 +132,11 @@ namespace BasicsOfGame
             {
                 LeftKey = false;
             }
+            if (e.Key == Key.Tab)
+            {
+                helper.Opacity = 0;
+            }
+            
         }
         
         public MainWindow()
@@ -123,19 +144,12 @@ namespace BasicsOfGame
             InitializeComponent();
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
-            TextBox c = new TextBox();
-            c.Width = 500;
-            c.Height = 500;
-            c.Background = Brushes.Black;
-            c.Foreground = Brushes.White;
-            GameScreen.Children.Add(c);
-            for (int i = 10000; i > 0; i--) // 10000 testowych generowan
-            {
-                Grid lay = new Grid();
-                c.Text = "";
-                lay.writeOut(c);
-            }
-            mapa.makeBackground(GameScreen,true, true, true, true, 1,ref leftDoorExist,ref rightDoorExist,ref upDoorExist,ref downDoorExist, NODOOR);
+            helper = new TextBox();
+            helper.Opacity = 0;
+            GameScreen.Children.Add(helper);
+            helper.IsEnabled= false;
+            write();
+            map.goTo(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, NODOOR);
             goblins[0] = new Goblin(GameScreen, 200, 200);
             goblins[1] = new Goblin(GameScreen, 300, 700);
             GameScreen.Focus();
@@ -445,7 +459,7 @@ namespace BasicsOfGame
             {
                 if(Canvas.GetTop(Player) < -20)
                 {
-                    mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
+                    map.goTo(-1,0,GameScreen,ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
                 }
             }
             else if (Canvas.GetTop(Player) < 10)
@@ -457,7 +471,7 @@ namespace BasicsOfGame
             {
                 if (Canvas.GetTop(Player) > 518)
                 {
-                    mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
+                    map.goTo(1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
                 }
             }
             else if (Canvas.GetTop(Player) > 488)
@@ -469,7 +483,7 @@ namespace BasicsOfGame
             {
                 if (Canvas.GetLeft(Player) < -41)
                 {
-                    mapa.makeBackground(GameScreen, true, true, true, true, 1, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
+                    map.goTo(0, -1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
                 }
             }
             else if (Canvas.GetLeft(Player) < -11)
@@ -482,7 +496,7 @@ namespace BasicsOfGame
             {
                 if (Canvas.GetLeft(Player) > 1130)
                 {
-                    mapa.makeBackground(GameScreen, true, true, true, true, 2, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
+                    map.goTo(0, 1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
                 }
             }
             else if (Canvas.GetLeft(Player) > 1100)

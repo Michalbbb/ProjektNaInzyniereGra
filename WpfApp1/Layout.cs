@@ -6,15 +6,47 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Windows;
 
 namespace BasicsOfGame
 {
-    internal class Layout
+
+    internal class Pokoj
     {
-        public Layout() { 
-        
+        int type, objectCount, enemyCount;
+        Random rnd = new Random();
+        bool left = false, up = false, right = false, down = false;
+
+
+
+        public Pokoj(int t)
+        {
+            type = t;                       //type determines background image for that room
+            objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
+            enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
         }
-        public void makeBackground(Canvas GameScreen, bool leftDoor, bool rightDoor, bool upDoor, bool downDoor, int tlo,ref bool leftDoorExist,ref bool rightDoorExist,ref bool upDoorExist,ref bool downDoorExist, int doorDirection)
+
+        public void setType(int t)
+        {
+            type = t;
+        }
+        public int getType()
+        {
+            return type;
+        }
+        public void setDoors(bool upDoors, bool leftDoors, bool downDoors, bool rightDoors)
+        {
+            left = leftDoors;
+            down = downDoors;
+            right = rightDoors;
+            up = upDoors;
+        }
+        public void makeMap(Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
+        {
+            makeBackground(GameScreen, left, right, up, down,type, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist,doorDirection);
+        }
+        
+        public void makeBackground(Canvas GameScreen, bool leftDoor, bool rightDoor, bool upDoor, bool downDoor, int tlo, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
             ImageBrush noweTlo = new ImageBrush();
             noweTlo.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/backgrounds/bg{tlo}.png", UriKind.Absolute));
@@ -29,12 +61,12 @@ namespace BasicsOfGame
 
             foreach (System.Windows.Shapes.Rectangle x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>()) // removing remains of doors
             {
-                if((string)x.Name == "Player")
+                if ((string)x.Name == "Player")
                 {
                     switch (doorDirection)  //we substract 20 from the position of the door next to which we spawn the player
                     {
                         case 0: //when player enters top door spawn him at bottom door in next room
-                            Canvas.SetLeft(x, 540);  
+                            Canvas.SetLeft(x, 540);
                             Canvas.SetTop(x, 594 - 109);
                             break;
                         case 1: //when player enters right door spawn him at left door in next room
@@ -42,7 +74,7 @@ namespace BasicsOfGame
                             Canvas.SetTop(x, 288);
                             break;
                         case 2: //when player enters bottom door spawn him at top door in next room
-                            Canvas.SetLeft(x, 540);   
+                            Canvas.SetLeft(x, 540);
                             Canvas.SetTop(x, 0 + 20);
                             break;
                         case 3: //when player enters left door spawn him at right door in next room
@@ -50,7 +82,7 @@ namespace BasicsOfGame
                             Canvas.SetTop(x, 288);
                             break;
                         case 4: //special case for spawning player at the beginning of the game
-                            Canvas.SetLeft(x, 540);   
+                            Canvas.SetLeft(x, 540);
                             Canvas.SetTop(x, 288);
                             break;
                     }
@@ -122,38 +154,12 @@ namespace BasicsOfGame
             }
             int j = toRemove.Count() - 1;
 
-            for (int i=j; i>-1; --i)
+            for (int i = j; i > -1; --i)
             {
                 GameScreen.Children.Remove(toRemove[i]);    //deleting objects when changing rooms
                 toRemove.RemoveAt(i);
             }
-        }
-    }
 
-    internal class Pokoj
-    {
-        int type, objectCount, enemyCount;
-        Random rnd = new Random();
-        bool left=false, up=false, right=false, down=false, seal=false;
-
-        public Pokoj(int t)
-        {
-            type = t;                       //type determines background image for that room
-            objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
-            enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
-        }
-
-        public void setType(int t)
-        {
-            type = t;
-        }
-        public int rType()
-        {
-            return type;
-        }
-        public int getType()
-        {
-            return type;
         }
     }
 
@@ -166,12 +172,13 @@ namespace BasicsOfGame
         static int gridMid = gridSize / 2;
         Random rnd = new Random();
         int direction;
+        int firstDoor = -1, lastDoor;
         public Grid()
         {
-            grid = new Pokoj[gridSize, gridSize] ; //if 0 then no room and 1,2,3,etc. mean different types of rooms
-            for(int i=0; i<gridSize; i++)
+            grid = new Pokoj[gridSize, gridSize]; //if 0 then no room and 1,2,3,etc. mean different types of rooms
+            for (int i = 0; i < gridSize; i++)
             {
-                for(int j=0; j<gridSize; j++)
+                for (int j = 0; j < gridSize; j++)
                 {
                     grid[i, j] = new Pokoj(0);
                 }
@@ -192,7 +199,7 @@ namespace BasicsOfGame
                         {
                             if (!CheckRoom(currX - 1, currY))//check to left
                             {
-                                grid[currX-1, currY ].setType(type);
+                                grid[currX - 1, currY].setType(type);
                                 roomCount--;
                                 currX -= 1;
                             }
@@ -205,7 +212,7 @@ namespace BasicsOfGame
                         {
                             if (!CheckRoom(currX, currY - 1))//check) to up
                             {
-                                grid[currX, currY -1].setType(type);
+                                grid[currX, currY - 1].setType(type);
                                 roomCount--;
                                 currY -= 1;
                             }
@@ -214,11 +221,11 @@ namespace BasicsOfGame
                         }
                         break;
                     case 2:
-                        if (currX < gridSize-1)
+                        if (currX < gridSize - 1)
                         {
                             if (!CheckRoom(currX + 1, currY))//check to right
                             {
-                                grid[currX+1, currY].setType(type);
+                                grid[currX + 1, currY].setType(type);
                                 roomCount--;
                                 currX += 1;
                             }
@@ -227,7 +234,7 @@ namespace BasicsOfGame
                         }
                         break;
                     case 3:
-                        if (currY < gridSize-1)
+                        if (currY < gridSize - 1)
                         {
                             if (!CheckRoom(currX, currY + 1))//check to down
                             {
@@ -240,20 +247,61 @@ namespace BasicsOfGame
                         }
                         break;
                 }
+
             }
+            generateDoors();
         }
-        public void writeOut(TextBox c)
+        public void ShowMap(TextBox c)
         {
-            for(int i=0;i<gridSize; i++)
+            for (int i = 0; i < gridSize; i++)
             {
-                for(int j=0;j<gridSize;j++)
+                for(int j = 0; j < gridSize; j++)
                 {
-                    c.Text += grid[i, j].rType();
+                    c.Text += grid[i, j].getType().ToString();
                 }
                 c.Text += "\n";
             }
+            
         }
+        public void goTo(Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
+        {
+            currX = firstDoor / 10;
+            currY = firstDoor % 10;
+            grid[currX,currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist,ref upDoorExist, ref downDoorExist, doorDirection);
+        }
+        public void goTo(int xAxis,int yAxis, Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
+        {
+            if(xAxis==1 || xAxis == -1) { currX += xAxis; }
+            else if(yAxis==1 || yAxis == -1) { currY += yAxis; }
+            grid[currX, currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, doorDirection);
+        }
+        private void generateDoors()
+        {
+            for (int i = 0; i < gridSize; i++)
+            {
+                for (int j = 0; j < gridSize; j++)
+                {
+                    if (firstDoor == -1 && grid[i, j].getType() != 0)
+                    {
+                        firstDoor = i * 10 + j;
+                        grid[i, j].setType(2);
 
+                    }
+                    if (grid[i, j].getType() != 0)
+                    {
+                        bool left = false, right = false, down = false, up = false;
+                        lastDoor = i * 10 + j;
+                        if (i > 0) { if (grid[i - 1, j].getType() != 0) up = true; } // up
+                        if (j > 0) { if (grid[i, j - 1].getType() != 0) left = true; } // left
+                        if (i < gridSize - 1) { if (grid[i + 1, j].getType() != 0) down = true; } // down
+                        if (j < gridSize - 1) { if (grid[i, j + 1].getType() != 0) right = true; ; } // right
+                        grid[i, j].setDoors(up, left, down, right);
+                    }
+
+                }
+            }
+            grid[lastDoor/10,lastDoor%10].setType(2);
+        }
         private bool CheckRoom(int x, int y)
         {
             if (grid[x, y].getType() != 0)
@@ -265,6 +313,7 @@ namespace BasicsOfGame
         }
     }
 }
+
 
 // 0 0 0 0 2 0 0 0 0
 // 0 0 0 0 1 0 0 0 0
