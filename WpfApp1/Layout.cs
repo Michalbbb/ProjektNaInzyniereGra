@@ -16,14 +16,22 @@ namespace BasicsOfGame
         int type, objectCount, enemyCount;
         Random rnd = new Random();
         bool left = false, up = false, right = false, down = false;
-
-
+        MapsObjects [] roomContent;
 
         public Pokoj(int t)
         {
             type = t;                       //type determines background image for that room
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
             enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
+            
+            //below we generate an array of objects and then to the array we randomize the exact object
+            int temp;
+            roomContent = new MapsObjects[objectCount];
+            for (int i = 0; i < objectCount; ++i)
+            {
+                temp = rnd.Next(0, 3);
+                roomContent[i] = temp;
+            }
         }
 
         public void setType(int t)
@@ -160,6 +168,40 @@ namespace BasicsOfGame
                 toRemove.RemoveAt(i);
             }
 
+
+            int newCoord;
+            int[] restrictedX = new int[objectCount] { 0 };
+            int[] restrictedY = new int[objectCount] { 0 };
+            bool pass;
+            foreach (MapsObjects obj in roomContent)
+            {
+                pass = true;
+                do
+                {
+                    newCoord = rnd.Next(100, 1151);
+                    for (int i = 0; i < objectCount; ++i)
+                    {
+                        if (newCoord < restrictedX[i] + 50 || newCoord > restrictedX[i] - 50)
+                        {
+                            pass = false;
+                        }
+                    }
+                } while (!pass);
+                Canvas.SetLeft(obj, newCoord);
+                pass = true;
+                do
+                {
+                    newCoord = rnd.Next(100, 495);
+                    for (int i = 0; i < objectCount; ++i)
+                    {
+                        if (obj < restrictedY[i] + 50 || obj > restrictedY[i] - 50)
+                        {
+                            pass = false;
+                        }
+                    }
+                } while (!pass);
+                Canvas.SetTop(obj, newCoord);
+            }
         }
     }
 
