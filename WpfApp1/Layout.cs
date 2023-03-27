@@ -147,7 +147,10 @@ namespace BasicsOfGame
         {
             type = t;
         }
-
+        public int rType()
+        {
+            return type;
+        }
         public int getType()
         {
             return type;
@@ -163,12 +166,12 @@ namespace BasicsOfGame
         static int gridMid = gridSize / 2;
         Random rnd = new Random();
         int direction;
-        Grid()
+        public Grid()
         {
             grid = new Pokoj[gridSize, gridSize] ; //if 0 then no room and 1,2,3,etc. mean different types of rooms
             for(int i=0; i<gridSize; i++)
             {
-                for(int j=0; j<gridSize; ++i)
+                for(int j=0; j<gridSize; j++)
                 {
                     grid[i, j] = new Pokoj(0);
                 }
@@ -189,8 +192,9 @@ namespace BasicsOfGame
                         {
                             if (!CheckRoom(currX - 1, currY))//check to left
                             {
-                                grid[currX, currY + 1].setType(type);
+                                grid[currX-1, currY ].setType(type);
                                 roomCount--;
+                                currX -= 1;
                             }
                             else
                                 currX -= 1;
@@ -201,38 +205,52 @@ namespace BasicsOfGame
                         {
                             if (!CheckRoom(currX, currY - 1))//check) to up
                             {
-                                grid[currX, currY + 1].setType(type);
+                                grid[currX, currY -1].setType(type);
                                 roomCount--;
+                                currY -= 1;
                             }
                             else
                                 currY -= 1;
                         }
                         break;
                     case 2:
-                        if (currX < gridSize)
+                        if (currX < gridSize-1)
                         {
                             if (!CheckRoom(currX + 1, currY))//check to right
                             {
-                                grid[currX, currY + 1].setType(type);
+                                grid[currX+1, currY].setType(type);
                                 roomCount--;
+                                currX += 1;
                             }
                             else
                                 currX += 1;
                         }
                         break;
                     case 3:
-                        if (currY < gridSize)
+                        if (currY < gridSize-1)
                         {
                             if (!CheckRoom(currX, currY + 1))//check to down
                             {
                                 grid[currX, currY + 1].setType(type);
                                 roomCount--;
+                                currY += 1;
                             }
                             else
                                 currY += 1;
                         }
                         break;
                 }
+            }
+        }
+        public void writeOut(TextBox c)
+        {
+            for(int i=0;i<gridSize; i++)
+            {
+                for(int j=0;j<gridSize;j++)
+                {
+                    c.Text += grid[i, j].rType();
+                }
+                c.Text += "\n";
             }
         }
 

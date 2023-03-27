@@ -123,6 +123,18 @@ namespace BasicsOfGame
             InitializeComponent();
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
+            TextBox c = new TextBox();
+            c.Width = 500;
+            c.Height = 500;
+            c.Background = Brushes.Black;
+            c.Foreground = Brushes.White;
+            GameScreen.Children.Add(c);
+            for (int i = 10000; i > 0; i--) // 10000 testowych generowan
+            {
+                Grid lay = new Grid();
+                c.Text = "";
+                lay.writeOut(c);
+            }
             mapa.makeBackground(GameScreen,true, true, true, true, 1,ref leftDoorExist,ref rightDoorExist,ref upDoorExist,ref downDoorExist, NODOOR);
             goblins[0] = new Goblin(GameScreen, 200, 200);
             goblins[1] = new Goblin(GameScreen, 300, 700);
