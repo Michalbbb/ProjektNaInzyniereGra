@@ -1,0 +1,25 @@
+Statue: 
+Width:100
+Height:150
+Col:
+Left: +14
+Top: +105
+WidthCol=70;
+HeightCol=3;
+
+StatueDestroyed:
+Width:100
+Height:140
+Col:
+Left: +14
+Top: +105
+WidthCol=70;
+HeightCol=3;
+
+Flag:
+Width:44
+Height:98
+
+Flag Tarnished:
+Width:51
+Height:100

@@ -27,10 +27,15 @@ namespace BasicsOfGame
             //below we generate an array of objects and then to the array we randomize the exact object
             int temp;
             roomContent = new MapsObjects[objectCount];
+            int x=150, y=200;
             for (int i = 0; i < objectCount; ++i)
             {
-                temp = rnd.Next(0, 3);
-                roomContent[i] = temp;
+                temp = rnd.Next(0, 4);
+               
+                roomContent[i] = new MapsObjects(temp,x,y);
+                x += 200;
+                if (y == 200) y += 100;
+                else y -= 100;
             }
         }
 
@@ -53,6 +58,7 @@ namespace BasicsOfGame
         {
             makeBackground(GameScreen, left, right, up, down,type, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist,doorDirection);
         }
+        
         
         public void makeBackground(Canvas GameScreen, bool leftDoor, bool rightDoor, bool upDoor, bool downDoor, int tlo, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
@@ -167,41 +173,14 @@ namespace BasicsOfGame
                 GameScreen.Children.Remove(toRemove[i]);    //deleting objects when changing rooms
                 toRemove.RemoveAt(i);
             }
-
-
-            int newCoord;
-            int[] restrictedX = new int[objectCount] { 0 };
-            int[] restrictedY = new int[objectCount] { 0 };
-            bool pass;
-            foreach (MapsObjects obj in roomContent)
+            foreach(MapsObjects obj in roomContent)
             {
-                pass = true;
-                do
-                {
-                    newCoord = rnd.Next(100, 1151);
-                    for (int i = 0; i < objectCount; ++i)
-                    {
-                        if (newCoord < restrictedX[i] + 50 || newCoord > restrictedX[i] - 50)
-                        {
-                            pass = false;
-                        }
-                    }
-                } while (!pass);
-                Canvas.SetLeft(obj, newCoord);
-                pass = true;
-                do
-                {
-                    newCoord = rnd.Next(100, 495);
-                    for (int i = 0; i < objectCount; ++i)
-                    {
-                        if (obj < restrictedY[i] + 50 || obj > restrictedY[i] - 50)
-                        {
-                            pass = false;
-                        }
-                    }
-                } while (!pass);
-                Canvas.SetTop(obj, newCoord);
+                obj.Add(GameScreen);
+
             }
+
+
+            
         }
     }
 
