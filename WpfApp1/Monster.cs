@@ -166,7 +166,7 @@ namespace BasicsOfGame
         }
         
 
-        private void attack(System.Windows.Shapes.Rectangle player, double delta,TextBox dmg)
+        private void attack(System.Windows.Shapes.Rectangle player, double delta,TextBox dmg,System.Windows.Shapes.Rectangle hpBar,ref int hp,ref int maxHp,TextBox hpVisualization)
         {
             if (attackTicks == 6)
             {
@@ -303,13 +303,19 @@ namespace BasicsOfGame
                 {
                     
                         int obecnyDmg = Convert.ToInt32(dmg.Text);
-                        obecnyDmg += rnd.Next(minDmg, maxDmg + 1);
+                        int dealtDamage= rnd.Next(minDmg, maxDmg + 1);
+                        obecnyDmg += dealtDamage;
                         dmg.Text = obecnyDmg.ToString();
                         dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
                         dmg.Opacity = 100;
                         Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                         Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
-
+                         hp -= dealtDamage;
+                    hpVisualization.Text = hp + "/" + maxHp;
+                    double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
+                    if (w < 0) w = 0;
+                    hpBar.Width = Convert.ToInt32(w);
+                   
                     
                 }
                 body.Fill = goblinSprite;
@@ -320,7 +326,7 @@ namespace BasicsOfGame
 
 
         }
-        public void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction,TextBox dmg)
+        public void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction,TextBox dmg, System.Windows.Shapes.Rectangle hpBar,ref int hp,ref int maxHp,TextBox hpVisualization)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
             
@@ -331,7 +337,7 @@ namespace BasicsOfGame
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {
-                attack(name, delta,dmg);
+                attack(name, delta,dmg,hpBar,ref hp,ref maxHp, hpVisualization);
                 return;
             }
 

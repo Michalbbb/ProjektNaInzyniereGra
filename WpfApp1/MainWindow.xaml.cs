@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -22,6 +23,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Xml;
 using static System.Net.Mime.MediaTypeNames; // Nie mam pojecia co to robi i jak sie tu znalazlo
 
 namespace BasicsOfGame
@@ -40,6 +42,7 @@ namespace BasicsOfGame
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
         private TextBox[] boxes;
         TextBox playerDmg;
+        TextBox hpVisualization;
         private const float Friction = 0.65f;
         private double SpeedX, SpeedY, Speed = 100, baseSpeed = 100;
         private int minDmg = 10;
@@ -61,13 +64,16 @@ namespace BasicsOfGame
         private double unlockAttack = 0;
         Random getRand = new Random();
         bool leftDoorExist,rightDoorExist,upDoorExist,downDoorExist;
-        //int doorDirection = 4;
+        System.Windows.Shapes.Rectangle hpBar;
+        System.Windows.Shapes.Rectangle hpBarWindow;
+        int healthPoints=200;
+        int maxHealthPoints = 200;
         
         const int UPDOOR = 0;
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
-        const int NODOOR = 4;
+        
         Grid map=new Grid();
 
         TextBox helper;
@@ -142,8 +148,10 @@ namespace BasicsOfGame
         public MainWindow()
         {     
             InitializeComponent();
+            
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
+            createHpBar();
             helper = new TextBox();
             helper.Opacity = 0;
             GameScreen.Children.Add(helper);
@@ -204,7 +212,7 @@ namespace BasicsOfGame
             checkOpacity("enemy");
             
             for (int i = 0; i < 2; i++)
-                goblins[i].moveToTarget(Player, deltaTime, Friction,playerDmg);
+                goblins[i].moveToTarget(Player, deltaTime, Friction,playerDmg,hpBar,ref healthPoints, ref maxHealthPoints, hpVisualization);
 
         }
         private void checkOpacity(string tag)
@@ -402,6 +410,41 @@ namespace BasicsOfGame
 
 
             }
+        }
+        private void createHpBar()
+        {
+
+            hpBar = new System.Windows.Shapes.Rectangle();
+            hpBar.Width = 200;
+            hpBar.Height = 25;
+            hpBar.Fill = Brushes.Red;
+            Canvas.SetLeft(hpBar, 10);
+            Canvas.SetTop(hpBar, 10);
+            Canvas.SetZIndex(hpBar, 910);
+            hpBarWindow = new System.Windows.Shapes.Rectangle();
+            hpBarWindow.Width = 210;
+            hpBarWindow.Height = 35;
+            ImageBrush sprite = new ImageBrush();
+            sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/playerAssets/hpBar.png", UriKind.Absolute));
+            hpBarWindow.Fill = sprite;
+            Canvas.SetLeft(hpBarWindow, 5);
+            Canvas.SetTop(hpBarWindow, 5);
+            Canvas.SetZIndex(hpBarWindow, 880);
+            hpVisualization = new TextBox();
+            Canvas.SetLeft(hpVisualization, 65);
+            Canvas.SetTop(hpVisualization, 5);
+            Canvas.SetZIndex(hpVisualization, 990);
+            hpVisualization.IsEnabled = false;
+            hpVisualization.Foreground = new SolidColorBrush(Colors.White);
+            hpVisualization.Background = Brushes.Transparent;
+            hpVisualization.BorderThickness = new Thickness(0,0,0,0);
+            hpVisualization.FontSize = 25;
+            hpVisualization.FontWeight = FontWeights.Bold;
+            hpVisualization.Opacity = 100;
+            hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
+            GameScreen.Children.Add(hpVisualization);
+            GameScreen.Children.Add(hpBar);
+            GameScreen.Children.Add(hpBarWindow);
         }
         private void gameTick(object sender, EventArgs e)
         {

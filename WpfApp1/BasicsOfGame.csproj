@@ -73,6 +73,8 @@
     <None Remove="images\mainCharacter05l.png" />
     <None Remove="images\mainCharacter06.png" />
     <None Remove="images\mainCharacter06l.png" />
+    
+    <None Remove="images\playerAssets\hpBar.png" />
    
    
     <None Remove="images\PrzykladoweTlo.png" />
@@ -80,6 +82,10 @@
     <None Remove="images\tlo.png" />
    
     <None Remove="images\tlo1Obstacle.PNG" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\playerAssets\hpBar.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -137,6 +143,7 @@
     <Resource Include="images\mainCharacter05l.png" />
     <Resource Include="images\mainCharacter06.png" />
     <Resource Include="images\mainCharacter06l.png" />
+  
   </ItemGroup>
 
 </Project>
