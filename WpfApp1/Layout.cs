@@ -27,18 +27,47 @@ namespace BasicsOfGame
             //below we generate an array of objects and then to the array we randomize the exact object
             int temp;
             roomContent = new MapsObjects[objectCount];
-            int x=150, y=200;
+            int x, y;
+            int[] takenX=new int[objectCount];
+            int[] takenY= new int[objectCount];
+            int[] restrictedByDoorsX = new int[] {0,1150,507,509};
+            int[] restrictedByDoorsY = new int[] {260, 250, 0, 594 };
             for (int i = 0; i < objectCount; ++i)
             {
                 temp = rnd.Next(0, 4);
-               
-                roomContent[i] = new MapsObjects(temp,x,y);
-                x += 200;
-                if (y == 200) y += 100;
-                else y -= 100;
+                bool pass;
+                do
+                {
+                    pass = true;
+                    
+                    x = rnd.Next(100, 1100);
+                    y = rnd.Next(100, 450);
+                    for(int j = 0; j < 4; j++)
+                    {
+                        if (abs(x- restrictedByDoorsX[i]) > 150&& abs(y - restrictedByDoorsY[i]) > 150) continue;
+                       
+                        pass = false;
+                        break;
+                    }
+                    if (!pass) continue;
+                    for(int j = 0; j < i; j++)
+                    {
+                        if (abs(x-takenX[i]) > 230) continue;
+                        if (abs(y-takenY[i]) > 230) continue;
+                        pass = false;
+                        break;
+                    }
+                } while (!pass);
+                roomContent[i] = new MapsObjects(temp, x, y);
+                takenX[i] = roomContent[i].getWidth();
+                takenY[i] = roomContent[i].getHeight();
             }
         }
-
+        private int abs(int x)
+        {
+            if (x > 0) return x;
+            else return -x;
+        }
         public void setType(int t)
         {
             type = t;
@@ -336,24 +365,4 @@ namespace BasicsOfGame
 }
 
 
-// 0 0 0 0 2 0 0 0 0
-// 0 0 0 0 1 0 0 0 0
-// 1 0 0 0 1 0 0 0 0
-// 2 0 0 0 1 0 0 2 0
-// 2 1 1 2 1 2 1 1 0
-// 0 0 0 0 1 0 0 1 0
-// 0 0 0 2 1 0 0 0 0
-// 0 0 0 1 0 0 0 0 0
-// 0 0 0 0 0 0 0 0 0
-
-//tablica z gridem na którym będą pomieszczenia 9x9
-//np lista
-//random(2)+5+level*2.6
-
-//pokój startowy
-//  badamy sąsiadów
-//  jeżeli już jest pokój to spadówa
-//  jeżeli sąsiad ma więcej niż 1 sąsiada zajętego to spadówa
-//  jeżeli mamy wystarczająco pokojów to spadówa
-//  w innym wypadku zaznaczamy sąsiada jako pokój i dodajemy go do kolejki
 

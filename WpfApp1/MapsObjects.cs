@@ -29,11 +29,13 @@ namespace BasicsOfGame
                 objectCollision.Height = 3;
                 objectCollision.Fill = Brushes.Transparent;
                 objectCollision.Tag = "collision";
-                Canvas.SetLeft(mapObject, x);
-                Canvas.SetTop(mapObject, y);
-                Canvas.SetLeft(objectCollision, x + 14);
-                Canvas.SetTop(objectCollision, y + 115);
-               
+                Canvas.SetLeft(mapObject, x - 14);
+                Canvas.SetTop(mapObject, y - 115);
+                Canvas.SetLeft(objectCollision, x );
+                Canvas.SetTop(objectCollision, y );
+                int z = Convert.ToInt32((mapObject.Height + Canvas.GetTop(mapObject)) / 100);
+                Canvas.SetZIndex(mapObject, z);
+
             }
             else if (number == 1) //Destroyed Statue
             {
@@ -46,11 +48,13 @@ namespace BasicsOfGame
                 objectCollision.Height = 3;
                 objectCollision.Fill = Brushes.Transparent;
                 objectCollision.Tag = "collision";
-                Canvas.SetLeft(mapObject, x);
-                Canvas.SetTop(mapObject, y);
-                Canvas.SetLeft(objectCollision, x + 14);
-                Canvas.SetTop(objectCollision, y + 105);
-              
+                Canvas.SetLeft(mapObject, x- 14);
+                Canvas.SetTop(mapObject, y-105);
+                Canvas.SetLeft(objectCollision, x );
+                Canvas.SetTop(objectCollision, y );
+                int z = Convert.ToInt32((mapObject.Height + Canvas.GetTop(mapObject)) / 100);
+                Canvas.SetZIndex(mapObject, z);
+
             }
             else if (number == 2) //Flag
             {
@@ -63,11 +67,13 @@ namespace BasicsOfGame
                 objectCollision.Height = 3;
                 objectCollision.Fill = Brushes.Transparent;
                 objectCollision.Tag = "collision";
-                Canvas.SetLeft(mapObject, x);
-                Canvas.SetTop(mapObject, y);
-                Canvas.SetLeft(objectCollision, x + 24);
-                Canvas.SetTop(objectCollision, y + 80);
-             
+                Canvas.SetLeft(mapObject, x-24);
+                Canvas.SetTop(mapObject, y-80);
+                Canvas.SetLeft(objectCollision, x );
+                Canvas.SetTop(objectCollision, y );
+                int z = Convert.ToInt32((mapObject.Height + Canvas.GetTop(mapObject)) / 100);
+                Canvas.SetZIndex(mapObject, z);
+
             }
             else if (number == 3) //Tarnished Flag 
             {
@@ -80,11 +86,13 @@ namespace BasicsOfGame
                 objectCollision.Height = 3;
                 objectCollision.Fill = Brushes.Transparent;
                 objectCollision.Tag = "collision";
-                Canvas.SetLeft(mapObject, x);
-                Canvas.SetTop(mapObject, y);
-                Canvas.SetLeft(objectCollision, x + 24);
-                Canvas.SetTop(objectCollision, y + 80);
-               
+                Canvas.SetLeft(mapObject, x - 24);
+                Canvas.SetTop(mapObject, y - 80);
+                Canvas.SetLeft(objectCollision, x );
+                Canvas.SetTop(objectCollision, y );
+                int z = Convert.ToInt32((mapObject.Height + Canvas.GetTop(mapObject)) / 100);
+                Canvas.SetZIndex(mapObject, z);
+
             }
             else // Statue
             {
@@ -97,10 +105,12 @@ namespace BasicsOfGame
                 objectCollision.Height = 3;
                 objectCollision.Fill = Brushes.Transparent;
                 objectCollision.Tag = "collision";
-                Canvas.SetLeft(mapObject, x);
-                Canvas.SetTop(mapObject, y);
-                Canvas.SetLeft(objectCollision, x + 14);
-                Canvas.SetTop(objectCollision, y + 105);
+                Canvas.SetLeft(mapObject, x- 14);
+                Canvas.SetTop(mapObject, y - 105);
+                Canvas.SetLeft(objectCollision, x );
+                Canvas.SetTop(objectCollision, y );
+                int z = Convert.ToInt32((mapObject.Height + Canvas.GetTop(mapObject))/100);
+                Canvas.SetZIndex(mapObject, z);
                 
             }
 
@@ -109,6 +119,14 @@ namespace BasicsOfGame
         {
             canv.Children.Add(mapObject);
             canv.Children.Add(objectCollision);
+        }
+        public int getWidth()
+        {
+            return Convert.ToInt32(Canvas.GetLeft(objectCollision));
+        }
+        public int getHeight()
+        {
+            return Convert.ToInt32(Canvas.GetTop(objectCollision));
         }
         
     }

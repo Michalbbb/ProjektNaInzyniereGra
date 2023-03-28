@@ -149,7 +149,7 @@ namespace BasicsOfGame
             GameScreen.Children.Add(helper);
             helper.IsEnabled= false;
             write();
-            map.goTo(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, NODOOR);
+            map.goTo(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
             goblins[0] = new Goblin(GameScreen, 200, 200);
             goblins[1] = new Goblin(GameScreen, 300, 700);
             GameScreen.Focus();
