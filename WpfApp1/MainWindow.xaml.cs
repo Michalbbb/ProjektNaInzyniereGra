@@ -56,7 +56,7 @@ namespace BasicsOfGame
         BitmapImage[] attackAnimationsD = new BitmapImage[4];
         BitmapImage[] attackAnimationsL = new BitmapImage[4];
         BitmapImage[] attackAnimationsR = new BitmapImage[4];
-        Goblin [] goblins=new Goblin[2];
+       
         private int intervalForAttackAnimations = 30;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
@@ -73,8 +73,8 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
-        
-        Grid map=new Grid();
+
+        Grid map;
 
         TextBox helper;
 
@@ -151,6 +151,8 @@ namespace BasicsOfGame
             
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
+            makePlayerTB();
+            map = new Grid(GameScreen);
             createHpBar();
             helper = new TextBox();
             helper.Opacity = 0;
@@ -158,10 +160,9 @@ namespace BasicsOfGame
             helper.IsEnabled= false;
             write();
             map.goTo(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
-            goblins[0] = new Goblin(GameScreen, 200, 200);
-            goblins[1] = new Goblin(GameScreen, 300, 700);
-            GameScreen.Focus();
             generateTB("enemy");
+            GameScreen.Focus();
+            
             
 
             for (int i = 0; i < animations; i++)                                                                                                                                                                                                                         
@@ -210,9 +211,9 @@ namespace BasicsOfGame
             
             gameTick(sender, e);
             checkOpacity("enemy");
-            
-            for (int i = 0; i < 2; i++)
-                goblins[i].moveToTarget(Player, deltaTime, Friction,playerDmg,hpBar,ref healthPoints, ref maxHealthPoints, hpVisualization);
+
+            foreach(Monster monster in map.rMon())
+                monster.moveToTarget(Player, deltaTime, Friction,playerDmg,hpBar,ref healthPoints, ref maxHealthPoints, hpVisualization);
 
         }
         private void checkOpacity(string tag)
@@ -223,8 +224,9 @@ namespace BasicsOfGame
                 if ((string)x.Tag == tag)
                 {
                         
-                        if (boxes[i].Opacity > 0) boxes[i].Opacity -= Speed / 2;
+                       if (boxes[i].Opacity > 0) boxes[1].Opacity -= Speed / 2;
                         else boxes[i].Text = "0"; 
+                        
                         Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width / 2));
                         Canvas.SetTop(boxes[i], (Canvas.GetTop(x) - (x.Height - x.ActualHeight)) - boxes[i].Height);
                         i++;
@@ -241,17 +243,41 @@ namespace BasicsOfGame
             i++;
 
         }
+        private void makePlayerTB()
+        {
+            playerDmg = new TextBox();
+            playerDmg.Width = 25;
+            playerDmg.Height = 35;
+            playerDmg.FontSize = 30;
+            playerDmg.Text = "0";
+            playerDmg.Opacity = 0;
+            playerDmg.Foreground = Brushes.Red;
+
+            playerDmg.Background = Brushes.Black;
+            playerDmg.BorderBrush = Brushes.Transparent;
+
+            playerDmg.IsEnabled = false;
+            GameScreen.Children.Add(playerDmg);
+            Canvas.SetZIndex(playerDmg, 999);
+        }
         private void generateTB(string tag) // Text Boxes
         {
-            int i = 0;
-            foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
+            List<TextBox> removeTB=new List<TextBox>();
+            int howMany = 0;
+            foreach(TextBox x in GameScreen.Children.OfType<TextBox>())
             {
-                if ((string)x.Tag == tag)
-                {
-                    i++;
+                if ((string)x.Tag == "dmgTakenByEnemy") { removeTB.Add(x); howMany++; }
+            }
+            for(int j = howMany - 1; j >= 0; j--)
+            {
+                GameScreen.Children.Remove(removeTB[j]);
 
-                }
-                    
+            }
+            
+            int i = 0;
+            foreach(System.Windows.Shapes.Rectangle x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
+            {
+               if((string)x.Tag==tag) i++;
             }
             boxes = new TextBox[i];
             enemies = i;
@@ -264,6 +290,7 @@ namespace BasicsOfGame
             
                 boxes[j].Text = "0";
                 boxes[j].Opacity = 0;
+                boxes[j].Tag = "dmgTakenByEnemy";
                 boxes[j].Foreground = Brushes.BlanchedAlmond;
                 boxes[j].Background = Brushes.Transparent;
                 boxes[j].BorderBrush= Brushes.Transparent;
@@ -274,20 +301,7 @@ namespace BasicsOfGame
 
             }
             
-            playerDmg = new TextBox();
-            playerDmg.Width = 25;
-            playerDmg.Height = 35;
-            playerDmg.FontSize = 30;
-            playerDmg.Text = "0";
-            playerDmg.Opacity = 0;
-            playerDmg.Foreground = Brushes.Red;
             
-            playerDmg.Background = Brushes.Black;
-            playerDmg.BorderBrush = Brushes.Transparent;
-
-            playerDmg.IsEnabled = false;
-            GameScreen.Children.Add(playerDmg);
-            Canvas.SetZIndex(playerDmg, 999);
 
         }
         private bool determinateCollision(Rect player, Rect obj)
@@ -503,6 +517,7 @@ namespace BasicsOfGame
                 if(Canvas.GetTop(Player) < -20)
                 {
                     map.goTo(-1,0,GameScreen,ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
+                    generateTB("enemy");
                 }
             }
             else if (Canvas.GetTop(Player) < 10)
@@ -515,6 +530,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(Player) > 518)
                 {
                     map.goTo(1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
+                    generateTB("enemy");
                 }
             }
             else if (Canvas.GetTop(Player) > 488)
@@ -527,6 +543,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(Player) < -41)
                 {
                     map.goTo(0, -1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
+                    generateTB("enemy");
                 }
             }
             else if (Canvas.GetLeft(Player) < -11)
@@ -540,6 +557,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(Player) > 1130)
                 {
                     map.goTo(0, 1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
+                    generateTB("enemy");
                 }
             }
             else if (Canvas.GetLeft(Player) > 1100)

@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
+using System.Numerics;
 
 namespace BasicsOfGame
 {
@@ -17,8 +18,10 @@ namespace BasicsOfGame
         Random rnd = new Random();
         bool left = false, up = false, right = false, down = false;
         MapsObjects [] roomContent;
+        Monster[] monsters;
+       
 
-        public Pokoj(int t)
+        public Pokoj(Canvas canv,int t)
         {
             type = t;                       //type determines background image for that room
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
@@ -27,6 +30,7 @@ namespace BasicsOfGame
             //below we generate an array of objects and then to the array we randomize the exact object
             int temp;
             roomContent = new MapsObjects[objectCount];
+            monsters = new Monster[enemyCount];
             int x, y;
             int[] takenX=new int[objectCount];
             int[] takenY= new int[objectCount];
@@ -62,7 +66,26 @@ namespace BasicsOfGame
                 takenX[i] = roomContent[i].getWidth();
                 takenY[i] = roomContent[i].getHeight();
             }
+            int x1=150, y1=150;
+            for(int i=0;i<enemyCount;i++)
+            {
+                monsters[i] = new Goblin(canv,x1, y1);
+                y1 += 50;
+                x1 += 100;
+            }
         }
+        public void setDiff(double plusDiff)
+        {
+            
+            for (int i = 0; i < enemyCount; i++)
+            {
+                monsters[i].setDiff(plusDiff);
+            }
+        }
+        public Monster[] monArr()
+        {
+            return monsters;
+        } 
         private int abs(int x)
         {
             if (x > 0) return x;
@@ -135,6 +158,7 @@ namespace BasicsOfGame
                     toRemove.Add(x);
                 }
             }
+           
             if (leftDoor)
             {
                 ImageBrush temporaryHolder = new ImageBrush();
@@ -207,6 +231,10 @@ namespace BasicsOfGame
                 obj.Add(GameScreen);
 
             }
+            foreach(Monster monster in monsters)
+            {
+                monster.add();
+            }
 
 
             
@@ -223,14 +251,16 @@ namespace BasicsOfGame
         Random rnd = new Random();
         int direction;
         int firstDoor = -1, lastDoor;
-        public Grid()
+        
+        public Grid(Canvas canv)
         {
             grid = new Pokoj[gridSize, gridSize]; //if 0 then no room and 1,2,3,etc. mean different types of rooms
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    grid[i, j] = new Pokoj(0);
+                    grid[i, j] = new Pokoj(canv,0);
+                    
                 }
             }
             grid[gridMid, gridMid].setType(1);
@@ -317,22 +347,35 @@ namespace BasicsOfGame
         {
             currX = firstDoor / 10;
             currY = firstDoor % 10;
+            
             grid[currX,currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist,ref upDoorExist, ref downDoorExist, doorDirection);
+        }
+        public Monster[] rMon()
+        {
+            return grid[currX, currY].monArr();
         }
         public void goTo(int xAxis,int yAxis, Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
-            if(xAxis==1 || xAxis == -1) { currX += xAxis; }
+            foreach (Monster x in grid[currX, currY].monArr())
+            {
+                x.remove();
+            }
+            if (xAxis==1 || xAxis == -1) { currX += xAxis; }
             else if(yAxis==1 || yAxis == -1) { currY += yAxis; }
             grid[currX, currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, doorDirection);
         }
         private void generateDoors()
         {
+            bool unlock = false;
+            double diff=0.00;
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
+                    
                     if (firstDoor == -1 && grid[i, j].getType() != 0)
                     {
+                        unlock = true;
                         firstDoor = i * 10 + j;
                         grid[i, j].setType(2);
 
@@ -347,10 +390,12 @@ namespace BasicsOfGame
                         if (j < gridSize - 1) { if (grid[i, j + 1].getType() != 0) right = true; ; } // right
                         grid[i, j].setDoors(up, left, down, right);
                     }
-
+                    if(unlock)grid[i, j].setDiff(diff);
                 }
+                if(unlock)diff += 0.05;
             }
             grid[lastDoor/10,lastDoor%10].setType(2);
+            grid[lastDoor / 10, lastDoor % 10].setDiff(0.20);
         }
         private bool CheckRoom(int x, int y)
         {
