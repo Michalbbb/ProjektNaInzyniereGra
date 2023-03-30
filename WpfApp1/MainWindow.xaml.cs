@@ -40,7 +40,7 @@ namespace BasicsOfGame
         private int ticksRemaining=0;
         private int enemies = 0;
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
-        private TextBox[] boxes;
+        private List<TextBox> boxes;
         TextBox playerDmg;
         TextBox hpVisualization;
         private const float Friction = 0.65f;
@@ -224,7 +224,7 @@ namespace BasicsOfGame
                 if ((string)x.Tag == tag)
                 {
                         
-                       if (boxes[i].Opacity > 0) boxes[1].Opacity -= Speed / 2;
+                       if (boxes[i].Opacity > 0) boxes[i].Opacity -= Speed / 2;
                         else boxes[i].Text = "0"; 
                         
                         Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width / 2));
@@ -279,25 +279,28 @@ namespace BasicsOfGame
             {
                if((string)x.Tag==tag) i++;
             }
-            boxes = new TextBox[i];
+            boxes = new List<TextBox>();
             enemies = i;
+            
             for(int j=0;j<i; j++)
             {
-                boxes[j] = new TextBox();
-                boxes[j].Width = 30;  
-                boxes[j].Height = 25;
-                boxes[j].FontSize = 20;
+                 
+                TextBox addMeToList = new TextBox();
+                addMeToList.Width = 30;
+                addMeToList.Height = 25;
+                addMeToList.FontSize = 20;
             
-                boxes[j].Text = "0";
-                boxes[j].Opacity = 0;
-                boxes[j].Tag = "dmgTakenByEnemy";
-                boxes[j].Foreground = Brushes.BlanchedAlmond;
-                boxes[j].Background = Brushes.Transparent;
-                boxes[j].BorderBrush= Brushes.Transparent;
+               addMeToList.Text = "0";
+                addMeToList.Opacity = 0;
+               addMeToList.Tag = "dmgTakenByEnemy";
+               addMeToList.Foreground = Brushes.BlanchedAlmond;
+               addMeToList.Background = Brushes.Transparent;
+               addMeToList.BorderBrush= Brushes.Transparent;
                
-                boxes[j].IsEnabled = false;
-                GameScreen.Children.Add(boxes[j]);
-                Canvas.SetZIndex(boxes[j], 999);
+               addMeToList.IsEnabled = false;
+                GameScreen.Children.Add(addMeToList);
+                Canvas.SetZIndex(addMeToList, 999);
+                boxes.Add(addMeToList);
 
             }
             
@@ -393,36 +396,43 @@ namespace BasicsOfGame
 
 
         }
-        private void checkCollision(string tag)
+       
+        private void checkAttackCollision()
         {
             int i = 0;
-            foreach (var x in GameScreen.Children.OfType<System.Windows.Shapes.Rectangle>())
+            List<Monster> updateState = map.rMon();
+            foreach (Monster x in updateState)
             {
-                if ((string)x.Tag == tag) 
-                {
+                
 
-                   
-                    Rect hitbox=new Rect(Canvas.GetLeft(Weapon),Canvas.GetTop(Weapon),Weapon.ActualWidth, Weapon.ActualHeight);    
-                    Rect collisionChecker = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.ActualWidth, x.ActualHeight);
+
+                    Rect hitbox = new Rect(Canvas.GetLeft(Weapon), Canvas.GetTop(Weapon), Weapon.ActualWidth, Weapon.ActualHeight);
+                    Rect collisionChecker = new Rect(Canvas.GetLeft(x.getBody()), Canvas.GetTop(x.getBody()), x.getBody().ActualWidth, x.getBody().ActualHeight);
                     if (determinateCollision(hitbox, collisionChecker))
                     {
+                        int dealtDmg = getRand.Next(minDmg, maxDmg + 1);
                         int obecnyDmg = Convert.ToInt32(boxes[i].Text);
-                        obecnyDmg += getRand.Next(minDmg,maxDmg+1);
-                        boxes[i].Text = obecnyDmg.ToString();              
-                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length)*15;
+                        obecnyDmg += dealtDmg;
+                        x.damageTaken(dealtDmg);
+                        boxes[i].Text = obecnyDmg.ToString();
+                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 15;
                         boxes[i].Opacity = 100;
-                        Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width/2));
-                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x)-(x.Height-x.ActualHeight))-boxes[i].Height);
-
-                    }
+                        Canvas.SetLeft(boxes[i], Canvas.GetLeft(x.getBody()) + (x.getBody().ActualWidth / 2) - (boxes[i].Width / 2));
+                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x.getBody()) - (x.getBody().Height - x.getBody().ActualHeight)) - boxes[i].Height);
                     
+                    }
+
 
                     i++;
 
+            }
 
+            for(int j = i - 1; j >= 0; j--)
+            {
+                if(map.grid[map.getX(), map.getY()].checkIfDead(updateState[j])){
+                    GameScreen.Children.Remove(boxes[j]);
+                    boxes.RemoveAt(j);
                 }
-
-
             }
         }
         private void createHpBar()
@@ -610,7 +620,7 @@ namespace BasicsOfGame
         {
             if (ticksRemaining == 1)
             {
-                checkCollision("enemy");
+                checkAttackCollision();
 
                 ticksRemaining--;
                 Weapon.Fill = new SolidColorBrush(Colors.Transparent);

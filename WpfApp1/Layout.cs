@@ -18,7 +18,7 @@ namespace BasicsOfGame
         Random rnd = new Random();
         bool left = false, up = false, right = false, down = false;
         MapsObjects [] roomContent;
-        Monster[] monsters;
+        List<Monster> monsters;
        
 
         public Pokoj(Canvas canv,int t)
@@ -30,7 +30,7 @@ namespace BasicsOfGame
             //below we generate an array of objects and then to the array we randomize the exact object
             int temp;
             roomContent = new MapsObjects[objectCount];
-            monsters = new Monster[enemyCount];
+            monsters = new List<Monster>();
             int x, y;
             int[] takenX=new int[objectCount];
             int[] takenY= new int[objectCount];
@@ -69,9 +69,11 @@ namespace BasicsOfGame
             int x1=150, y1=150;
             for(int i=0;i<enemyCount;i++)
             {
-                monsters[i] = new Goblin(canv,x1, y1);
+                Monster addMeToList;
+                addMeToList = new Goblin(canv,x1, y1);
                 y1 += 50;
                 x1 += 100;
+                monsters.Add(addMeToList);
             }
         }
         public void setDiff(double plusDiff)
@@ -82,7 +84,18 @@ namespace BasicsOfGame
                 monsters[i].setDiff(plusDiff);
             }
         }
-        public Monster[] monArr()
+        public bool checkIfDead(Monster y)
+        {
+            if (y.IsDead())
+            {
+                y.remove();
+                monsters.Remove(y);
+                return true;
+            }
+            return false;
+
+        } 
+        public List<Monster> monArr()
         {
             return monsters;
         } 
@@ -343,6 +356,14 @@ namespace BasicsOfGame
             }
             
         }
+        public int getX()
+        {
+            return currX;
+        }
+        public int getY()
+        {
+            return currY;
+        }
         public void goTo(Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
             currX = firstDoor / 10;
@@ -350,7 +371,7 @@ namespace BasicsOfGame
             
             grid[currX,currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist,ref upDoorExist, ref downDoorExist, doorDirection);
         }
-        public Monster[] rMon()
+        public List<Monster> rMon()
         {
             return grid[currX, currY].monArr();
         }

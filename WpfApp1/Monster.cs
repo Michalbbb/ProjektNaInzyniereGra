@@ -15,6 +15,7 @@ using System.Windows.Automation.Text;
 using System.Windows.Media.Animation;
 using System.Security.Cryptography.Pkcs;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace BasicsOfGame
 {
@@ -35,6 +36,7 @@ namespace BasicsOfGame
         protected double attackTimer = 0;
         protected Canvas BelongTO;
         protected double ticks = 0;
+        protected System.Windows.Shapes.Rectangle monsterHpBar;
         protected BitmapImage[] monsterMovementRight;
         protected BitmapImage[] monsterMovementLeft;
         protected BitmapImage[] monsterAttackRight;
@@ -49,7 +51,10 @@ namespace BasicsOfGame
         protected int maxDmg ;
         protected int animations;
         protected int currentAnimation ;
-        protected double diffMulti = 1.0; 
+        protected double diffMulti = 1.0;
+        protected double healthPoints;
+        protected double maxHealthPoints;
+        protected bool dead = false;
         public bool determinateCollision(Rect player, Rect obj)
         {
             if (obj.X < (player.X + player.Width) && (obj.X + obj.Width) > player.X)
@@ -295,18 +300,56 @@ namespace BasicsOfGame
         {
             BelongTO.Children.Add(weapon);
             BelongTO.Children.Add(body);
+            BelongTO.Children.Add(monsterHpBar);
         }
         public void remove()
         {
             BelongTO.Children.Remove(weapon);
             BelongTO.Children.Remove(body);
+            BelongTO.Children.Remove(monsterHpBar);
         }
         public void setDiff(double plus)
         {
             diffMulti += plus;
-            minDmg = Convert.ToInt32(5 * diffMulti);
-            maxDmg = Convert.ToInt32(15 * diffMulti);
+            minDmg = Convert.ToInt32(minDmg * diffMulti);
+            maxDmg = Convert.ToInt32(maxDmg * diffMulti);
+            healthPoints = healthPoints * diffMulti;
+            maxHealthPoints=maxHealthPoints * diffMulti;
         }
+        protected void hpBar()
+        {
+            monsterHpBar = new System.Windows.Shapes.Rectangle();
+            monsterHpBar.Width = (body.Width*4)/5;
+            monsterHpBar.Height = 8;
+            monsterHpBar.Fill = Brushes.Red;
+            Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body)+(body.Width * 1) / 10);
+            Canvas.SetTop(monsterHpBar,Canvas.GetTop(body)-2);
+            
+        }
+        public void damageTaken(int dmg)
+        {
+            healthPoints -= dmg;
+            if(healthPoints>0)
+            {
+                double width = (healthPoints / maxHealthPoints) * (body.Width * 4) / 5;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
+        public bool IsDead()
+        {
+            return dead;
+        }
+        public System.Windows.Shapes.Rectangle getBody()
+        {
+            return body;
+        }
+            
+            
     }
     internal class Goblin:Monster
     {
@@ -320,6 +363,8 @@ namespace BasicsOfGame
             attackRange = 50;
             Speed = 130;
             baseSpeed = 130;
+            healthPoints = 100*diffMulti;
+            maxHealthPoints = healthPoints;
             body.Height = 64;
             body.Width = 64;
             body.Fill = Brushes.Blue;
@@ -336,6 +381,7 @@ namespace BasicsOfGame
             loadImages();
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
+            hpBar();
 
 
 
@@ -714,7 +760,8 @@ namespace BasicsOfGame
             Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93-(body.Height*3/4))Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
-            
+            Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body) + (body.Width * 1) / 10);
+            Canvas.SetTop(monsterHpBar, Canvas.GetTop(body) - 15);
 
 
 
