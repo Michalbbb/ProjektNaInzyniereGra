@@ -70,7 +70,7 @@ namespace BasicsOfGame
             for(int i=0;i<enemyCount;i++)
             {
                 Monster addMeToList;
-                addMeToList = new Golem(canv,x1, y1);
+                addMeToList = new Imp(canv,x1, y1);
                 y1 += 50;
                 x1 += 100;
                 monsters.Add(addMeToList);
