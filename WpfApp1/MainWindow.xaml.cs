@@ -441,7 +441,7 @@ namespace BasicsOfGame
             hpBar = new System.Windows.Shapes.Rectangle();
             hpBar.Width = 200;
             hpBar.Height = 25;
-            hpBar.Fill = Brushes.Red;
+            hpBar.Fill = Brushes.DarkRed;
             Canvas.SetLeft(hpBar, 10);
             Canvas.SetTop(hpBar, 10);
             Canvas.SetZIndex(hpBar, 910);
@@ -459,7 +459,7 @@ namespace BasicsOfGame
             Canvas.SetTop(hpVisualization, 5);
             Canvas.SetZIndex(hpVisualization, 990);
             hpVisualization.IsEnabled = false;
-            hpVisualization.Foreground = new SolidColorBrush(Colors.White);
+            hpVisualization.Foreground = new SolidColorBrush(Colors.LightBlue);
             hpVisualization.Background = Brushes.Transparent;
             hpVisualization.BorderThickness = new Thickness(0,0,0,0);
             hpVisualization.FontSize = 25;

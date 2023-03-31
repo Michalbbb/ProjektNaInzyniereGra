@@ -73,6 +73,11 @@
     <None Remove="images\mainCharacter05l.png" />
     <None Remove="images\mainCharacter06.png" />
     <None Remove="images\mainCharacter06l.png" />
+    <None Remove="images\MonsterSprites\goblinsword.png" />
+    <None Remove="images\MonsterSprites\golemAttack.png" />
+    <None Remove="images\MonsterSprites\golemMovement.png" />
+    <None Remove="images\MonsterSprites\impAttack.png" />
+    <None Remove="images\MonsterSprites\impMovement.png" />
     
     <None Remove="images\playerAssets\hpBar.png" />
    
@@ -85,6 +90,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\MonsterSprites\goblinsword.png" />
+    <Resource Include="images\MonsterSprites\golemAttack.png" />
+    <Resource Include="images\MonsterSprites\golemMovement.png" />
+    <Resource Include="images\MonsterSprites\impAttack.png" />
+    <Resource Include="images\MonsterSprites\impMovement.png" />
     <Resource Include="images\playerAssets\hpBar.png" />
   </ItemGroup>
 
@@ -128,7 +138,6 @@
     <Resource Include="images\doors\leftDoor.PNG" />
     <Resource Include="images\doors\rightDoor.PNG" />
     <Resource Include="images\doors\upDoor.PNG" />
-    <Resource Include="images\goblinsword.png" />
     <Resource Include="images\icon.ico" />
     <Resource Include="images\icon2.ico" />
     <Resource Include="images\mainCharacter01.png" />
