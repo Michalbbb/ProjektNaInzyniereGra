@@ -40,6 +40,9 @@
     <None Remove="images\attAnimations\gobAtt5l.png" />
     <None Remove="images\attAnimations\gobAtt6.png" />
     <None Remove="images\attAnimations\gobAtt6l.png" />
+    <None Remove="images\attAnimations\golAtt1.PNG" />
+    <None Remove="images\attAnimations\golAtt2.PNG" />
+    <None Remove="images\attAnimations\golAtt3.PNG" />
     <None Remove="images\backgrounds\bg1.png" />
     <None Remove="images\backgrounds\bg2.png" />
     <None Remove="images\backgrounds\castle1Door.png" />
@@ -90,6 +93,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\attAnimations\golAtt1.PNG" />
+    <Resource Include="images\attAnimations\golAtt2.PNG" />
+    <Resource Include="images\attAnimations\golAtt3.PNG" />
     <Resource Include="images\MonsterSprites\goblinsword.png" />
     <Resource Include="images\MonsterSprites\golemAttack.png" />
     <Resource Include="images\MonsterSprites\golemMovement.png" />
