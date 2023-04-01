@@ -38,7 +38,7 @@ namespace BasicsOfGame
         
         
         private int ticksRemaining=0;
-        private int enemies = 0;
+       
         private bool UpKey, DownKey, LeftKey, RightKey, rightD, returnUp, returnDown, returnLeft, returnRight, blockAttack;
         private List<TextBox> boxes;
         TextBox playerDmg;
@@ -56,7 +56,7 @@ namespace BasicsOfGame
         BitmapImage[] attackAnimationsD = new BitmapImage[4];
         BitmapImage[] attackAnimationsL = new BitmapImage[4];
         BitmapImage[] attackAnimationsR = new BitmapImage[4];
-       
+        int exp=0; 
         private int intervalForAttackAnimations = 30;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
@@ -68,7 +68,8 @@ namespace BasicsOfGame
         System.Windows.Shapes.Rectangle hpBarWindow;
         int healthPoints=200;
         int maxHealthPoints = 200;
-        
+        List <Tuple<double,double,double,double>> DamagePerMilliseconds = new List <Tuple<double,double,double, double>>();
+        // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list
         const int UPDOOR = 0;
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
@@ -211,9 +212,65 @@ namespace BasicsOfGame
             
             gameTick(sender, e);
             checkOpacity("enemy");
-
+            dotUpdate();
             foreach(Monster monster in map.rMon())
                 monster.moveToTarget(Player, deltaTime, Friction,playerDmg,hpBar,ref healthPoints, ref maxHealthPoints, hpVisualization);
+
+        }
+        private void dealDotDmg(int x)
+        {
+            healthPoints -= x;
+            hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
+            double w = Convert.ToDouble(healthPoints) / Convert.ToDouble(maxHealthPoints) * 200;
+            if (w < 0) w = 0;
+            hpBar.Width = Convert.ToInt32(w);
+        }
+        private void dotUpdate()
+        {
+            List <Tuple<int,double>> dotUpdater= new List<Tuple<int,double>>();
+            Monster.update(dotUpdater);
+            double dmg;
+            double time;
+            
+            foreach(var x in dotUpdater)
+            {
+                dmg = x.Item1;
+                time= x.Item2;
+                double dmgPerMs = dmg / 1000;
+                DamagePerMilliseconds.Add(new Tuple<double, double, double,double>(dmgPerMs, 0,0, time));
+            }
+            if(DamagePerMilliseconds.Count > 0)
+            {
+                hpBar.Fill = Brushes.DarkGreen;
+                List<Tuple<double, double, double, double>> toRemove = new List<Tuple<double, double, double, double>>();
+                for (int i = 0;i< DamagePerMilliseconds.Count; i++)
+                {
+                    double currentDmg = DamagePerMilliseconds[i].Item2 + DamagePerMilliseconds[i].Item1 * deltaTime * 1000;
+                    if(currentDmg >= 1)
+                    {
+                        int substractMe = Convert.ToInt32(currentDmg);
+                        dealDotDmg(substractMe);
+                        currentDmg -= substractMe;
+
+                    }
+                    double dmgPerMs = DamagePerMilliseconds[i].Item1;
+                    double timeElapsed = DamagePerMilliseconds[i].Item3+deltaTime * 1000;
+                    double maxTime = DamagePerMilliseconds[i].Item4;
+                    DamagePerMilliseconds[i]=new Tuple<double, double, double, double>(dmgPerMs,currentDmg,timeElapsed,maxTime);
+                    if (maxTime <= timeElapsed) toRemove.Add(DamagePerMilliseconds[i]);
+                }
+                
+                foreach(var x in toRemove)
+                {
+                    DamagePerMilliseconds.Remove(x);
+                }
+
+            }
+            else
+            {
+                hpBar.Fill = Brushes.DarkRed;
+            }
+           
 
         }
         private void checkOpacity(string tag)
@@ -280,7 +337,7 @@ namespace BasicsOfGame
                if((string)x.Tag==tag) i++;
             }
             boxes = new List<TextBox>();
-            enemies = i;
+            
             
             for(int j=0;j<i; j++)
             {
@@ -429,7 +486,8 @@ namespace BasicsOfGame
 
             for(int j = i - 1; j >= 0; j--)
             {
-                if(map.grid[map.getX(), map.getY()].checkIfDead(updateState[j])){
+                if(map.grid[map.getX(), map.getY()].checkIfDead(updateState[j],ref exp)){
+                    
                     GameScreen.Children.Remove(boxes[j]);
                     boxes.RemoveAt(j);
                 }
@@ -522,7 +580,7 @@ namespace BasicsOfGame
                 else playerSprite.ImageSource = leftRun[0];
             }
 
-            if (upDoorExist && Canvas.GetTop(Player) < 10 && Canvas.GetLeft(Player) > 480 && Canvas.GetLeft(Player) < 480 + 100 )//info z DoorsInfo
+            if (map.grid[map.getX(), map.getY()].isCleared()&& upDoorExist && Canvas.GetTop(Player) < 10 && Canvas.GetLeft(Player) > 480 && Canvas.GetLeft(Player) < 480 + 100 )//info z DoorsInfo
             {
                 if(Canvas.GetTop(Player) < -20)
                 {
@@ -535,7 +593,7 @@ namespace BasicsOfGame
                 Canvas.SetTop(Player, 10);
                 returnUp = true;
             }
-            if (downDoorExist && Canvas.GetTop(Player) > 488 && Canvas.GetLeft(Player) > 480  && Canvas.GetLeft(Player) < 480 + 115)
+            if (map.grid[map.getX(), map.getY()].isCleared()&&downDoorExist && Canvas.GetTop(Player) > 488 && Canvas.GetLeft(Player) > 480  && Canvas.GetLeft(Player) < 480 + 115)
             {
                 if (Canvas.GetTop(Player) > 518)
                 {
@@ -548,7 +606,7 @@ namespace BasicsOfGame
                 Canvas.SetTop(Player, 488);
                 returnDown = true;
             }
-            if (leftDoorExist && Canvas.GetLeft(Player) < -11 && Canvas.GetTop(Player) > 250 - 40 && Canvas.GetTop(Player) < 290)
+            if (map.grid[map.getX(), map.getY()].isCleared() && leftDoorExist && Canvas.GetLeft(Player) < -11 && Canvas.GetTop(Player) > 250 - 40 && Canvas.GetTop(Player) < 290)
             {
                 if (Canvas.GetLeft(Player) < -41)
                 {
@@ -562,7 +620,7 @@ namespace BasicsOfGame
                 Canvas.SetLeft(Player, -11);
                 returnLeft = true;
             }
-            if (rightDoorExist && Canvas.GetLeft(Player) > 1100 && Canvas.GetTop(Player) > 250 - 40 && Canvas.GetTop(Player) < 305)
+            if (map.grid[map.getX(), map.getY()].isCleared() && rightDoorExist && Canvas.GetLeft(Player) > 1100 && Canvas.GetTop(Player) > 250 - 40 && Canvas.GetTop(Player) < 305)
             {
                 if (Canvas.GetLeft(Player) > 1130)
                 {

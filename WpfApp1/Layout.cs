@@ -19,14 +19,14 @@ namespace BasicsOfGame
         bool left = false, up = false, right = false, down = false;
         MapsObjects [] roomContent;
         List<Monster> monsters;
-       
+        Canvas BelongTo;
 
         public Pokoj(Canvas canv,int t)
         {
             type = t;                       //type determines background image for that room
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
             enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
-            
+            BelongTo = canv;
             //below we generate an array of objects and then to the array we randomize the exact object
             int temp;
             roomContent = new MapsObjects[objectCount];
@@ -70,11 +70,20 @@ namespace BasicsOfGame
             for(int i=0;i<enemyCount;i++)
             {
                 Monster addMeToList;
-                addMeToList = new Imp(canv,x1, y1);
+                int whichOne = rnd.Next(0, 4);
+                if(whichOne==0)addMeToList = new Spider(canv,x1, y1);
+                else if (whichOne == 1) addMeToList = new Imp(canv, x1, y1);
+                else if (whichOne == 2) addMeToList = new Golem(canv, x1, y1);
+                else addMeToList = new Goblin(canv, x1, y1);
                 y1 += 50;
                 x1 += 100;
                 monsters.Add(addMeToList);
             }
+        }
+        public bool isCleared()
+        {
+            if (monsters.Count == 0) return true;
+            return false;
         }
         public void setDiff(double plusDiff)
         {
@@ -84,12 +93,44 @@ namespace BasicsOfGame
                 monsters[i].setDiff(plusDiff);
             }
         }
-        public bool checkIfDead(Monster y)
+        public bool checkIfDead(Monster y,ref int exp)
         {
             if (y.IsDead())
             {
+                exp += y.expOnDeath();
                 y.remove();
                 monsters.Remove(y);
+                if (monsters.Count == 0)
+                {
+                    ImageBrush tempHolder = new ImageBrush(); 
+                    foreach(System.Windows.Shapes.Rectangle rect in BelongTo.Children.OfType<System.Windows.Shapes.Rectangle>())
+                    {
+                        if ((string)rect.Tag == "door")
+                        {
+                            if (rect.Width == 8)
+                            {
+                                tempHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/leftDoor.png", UriKind.Absolute));
+                                rect.Fill = tempHolder;
+
+                            }
+                            if(rect.Width == 50)
+                            {
+                                tempHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/rightDoor.png", UriKind.Absolute));
+                                rect.Fill = tempHolder;
+                            }
+                            if (rect.Width == 125)
+                            {
+                                tempHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/upDoor.png", UriKind.Absolute));
+                                rect.Fill = tempHolder;
+                            }
+                            if (rect.Width == 130)
+                            {
+                                tempHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/DownDoor.png", UriKind.Absolute));
+                                rect.Fill = tempHolder;
+                            }
+                        }
+                    }
+                }
                 return true;
             }
             return false;
@@ -121,6 +162,7 @@ namespace BasicsOfGame
         }
         public void makeMap(Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
+           
             makeBackground(GameScreen, left, right, up, down,type, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist,doorDirection);
         }
         
@@ -182,7 +224,8 @@ namespace BasicsOfGame
                 Canvas.SetTop(door, 260);
                 Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
-                temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/leftDoor.png", UriKind.Absolute));
+                if(isCleared())temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/leftDoor.png", UriKind.Absolute));
+                else temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/leftDoorB.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
                 GameScreen.Children.Add(door);
                 leftDoorExist = true;
@@ -197,7 +240,8 @@ namespace BasicsOfGame
                 Canvas.SetTop(door, 250);
                 Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
-                temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/rightDoor.png", UriKind.Absolute));
+                if (isCleared()) temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/rightDoor.png", UriKind.Absolute));
+                else temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/rightDoorB.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
                 GameScreen.Children.Add(door);
                 rightDoorExist = true;
@@ -212,7 +256,8 @@ namespace BasicsOfGame
                 Canvas.SetTop(door, 0);
                 Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
-                temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/upDoor.png", UriKind.Absolute));
+                if (isCleared()) temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/upDoor.png", UriKind.Absolute));
+                else temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/upDoorB.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
                 GameScreen.Children.Add(door);
                 upDoorExist = true;
@@ -227,7 +272,8 @@ namespace BasicsOfGame
                 Canvas.SetTop(door, 594);
                 Canvas.SetZIndex(door, -1);
                 door.Tag = "door";
-                temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/downDoor.png", UriKind.Absolute));
+                if (isCleared()) temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/downDoor.png", UriKind.Absolute));
+                else temporaryHolder.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/doors/downDoorB.png", UriKind.Absolute));
                 door.Fill = temporaryHolder;
                 GameScreen.Children.Add(door);
                 downDoorExist = true;

@@ -1,3 +1,12 @@
 Goblin : 64x64
+2,4 row
+1-5 movement
+6-11 attack
 Golem : 64x72
+-- each have own frames, all in usage
 Imp: 80x68
+-- each have own frames, all in usage
+Spider: 64x50
+All rows
+1-4 attack
+5-10 movement

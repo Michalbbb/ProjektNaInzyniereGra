@@ -55,6 +55,14 @@
     <None Remove="images\attAnimations\impAtt5l.PNG" />
     <None Remove="images\attAnimations\impAtt6.PNG" />
     <None Remove="images\attAnimations\impAtt6l.PNG" />
+    <None Remove="images\attAnimations\spiAtt1.PNG" />
+    <None Remove="images\attAnimations\spiAtt1l.PNG" />
+    <None Remove="images\attAnimations\spiAtt2.PNG" />
+    <None Remove="images\attAnimations\spiAtt2l.PNG" />
+    <None Remove="images\attAnimations\spiAtt3.PNG" />
+    <None Remove="images\attAnimations\spiAtt3l.PNG" />
+    <None Remove="images\attAnimations\spiAtt4.PNG" />
+    <None Remove="images\attAnimations\spiAtt4l.PNG" />
     <None Remove="images\backgrounds\bg1.png" />
     <None Remove="images\backgrounds\bg2.png" />
     <None Remove="images\backgrounds\castle1Door.png" />
@@ -69,9 +77,13 @@
     <None Remove="images\bgdecorations\TarnishedFlag.PNG" />
     <None Remove="images\bgdecorations\tlo1Obstacle.PNG" />
     <None Remove="images\doors\downDoor.PNG" />
+    <None Remove="images\doors\downDoorB.PNG" />
     <None Remove="images\doors\leftDoor.PNG" />
+    <None Remove="images\doors\leftDoorB.PNG" />
     <None Remove="images\doors\rightDoor.PNG" />
+    <None Remove="images\doors\rightDoorB.PNG" />
     <None Remove="images\doors\upDoor.PNG" />
+    <None Remove="images\doors\upDoorB.PNG" />
     <None Remove="images\dusted.png" />
     <None Remove="images\goblinsword.png" />
     <None Remove="images\icon.ico" />
@@ -93,6 +105,7 @@
     <None Remove="images\MonsterSprites\golemMovement.png" />
     <None Remove="images\MonsterSprites\impAttack.png" />
     <None Remove="images\MonsterSprites\impMovement.png" />
+    <None Remove="images\MonsterSprites\spiderFullAnimation.png" />
     
     <None Remove="images\playerAssets\hpBar.png" />
    
@@ -102,6 +115,13 @@
     <None Remove="images\tlo.png" />
    
     <None Remove="images\tlo1Obstacle.PNG" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\doors\downDoorB.PNG" />
+    <Resource Include="images\doors\leftDoorB.PNG" />
+    <Resource Include="images\doors\rightDoorB.PNG" />
+    <Resource Include="images\doors\upDoorB.PNG" />
   </ItemGroup>
 
   <ItemGroup>
@@ -120,11 +140,20 @@
     <Resource Include="images\attAnimations\impAtt5l.PNG" />
     <Resource Include="images\attAnimations\impAtt6.PNG" />
     <Resource Include="images\attAnimations\impAtt6l.PNG" />
+    <Resource Include="images\attAnimations\spiAtt1.PNG" />
+    <Resource Include="images\attAnimations\spiAtt1l.PNG" />
+    <Resource Include="images\attAnimations\spiAtt2.PNG" />
+    <Resource Include="images\attAnimations\spiAtt2l.PNG" />
+    <Resource Include="images\attAnimations\spiAtt3.PNG" />
+    <Resource Include="images\attAnimations\spiAtt3l.PNG" />
+    <Resource Include="images\attAnimations\spiAtt4.PNG" />
+    <Resource Include="images\attAnimations\spiAtt4l.PNG" />
     <Resource Include="images\MonsterSprites\goblinsword.png" />
     <Resource Include="images\MonsterSprites\golemAttack.png" />
     <Resource Include="images\MonsterSprites\golemMovement.png" />
     <Resource Include="images\MonsterSprites\impAttack.png" />
     <Resource Include="images\MonsterSprites\impMovement.png" />
+    <Resource Include="images\MonsterSprites\spiderFullAnimation.png" />
     <Resource Include="images\playerAssets\hpBar.png" />
   </ItemGroup>
 
