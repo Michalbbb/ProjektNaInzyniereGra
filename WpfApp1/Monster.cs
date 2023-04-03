@@ -389,7 +389,7 @@ namespace BasicsOfGame
             weapon.Height = 40;
             weapon.Width = 40;
             weapon.Fill = Brushes.Transparent;
-            Canvas.SetZIndex(weapon, 15);
+            Canvas.SetZIndex(weapon, 0);
             BelongTO = canv;
             body.SetValue(Canvas.TopProperty, (double)x);
             body.SetValue(Canvas.LeftProperty, (double)y);

@@ -20,6 +20,8 @@ namespace BasicsOfGame
         MapsObjects [] roomContent;
         List<Monster> monsters;
         Canvas BelongTo;
+        Point[,] objectGrid;
+        bool[,] availableOnGrid;
 
         public Pokoj(Canvas canv,int t)
         {
@@ -27,56 +29,106 @@ namespace BasicsOfGame
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
             enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
             BelongTo = canv;
+
+            //below we setup a grid for spawning objects
+            int gridX = 7, gridY = 3, gridBlockSizeX=162, gridBlockSizeY=166;
+            int tempGridX=(gridBlockSizeX/2), tempGridY;
+
+            objectGrid = new Point[gridX, gridY];
+            for (int i = 0; i < gridX; ++i)
+            {
+                tempGridY = (94 + (gridBlockSizeY / 2));
+                for (int j = 0; j < gridY; ++j)
+                {
+                    objectGrid[i, j] = new Point(tempGridX, tempGridY);
+                    tempGridY += gridBlockSizeY;
+                }
+                tempGridX += gridBlockSizeX;
+            }
+
+            availableOnGrid = new bool[gridX, gridY]; //defining array of taken slots in object grid
+            for (int i = 0; i < gridX; ++i)
+            {
+                for (int j = 0; j < gridY; ++j)
+                {
+                    availableOnGrid[i, j] = true;
+                    if (i == gridX/2)                   //block of "if" statements below is used to automatically restrict grid spaces near door from being used
+                    {
+                        if(j == 0 || j == gridY - 1)
+                        {
+                            availableOnGrid[i, j] = false;
+                        }
+                    }
+                    else if (j == 1)
+                    {
+                        if(i==0 || i == gridX - 1)
+                        {
+                            availableOnGrid[i, j] = false;
+                        }
+                    }
+                }
+            }
+
             //below we generate an array of objects and then to the array we randomize the exact object
-            int temp;
             roomContent = new MapsObjects[objectCount];
             monsters = new List<Monster>();
-            int x, y;
-            int[] takenX=new int[objectCount];
-            int[] takenY= new int[objectCount];
-            int[] restrictedByDoorsX = new int[] {0,1150,507,509};
-            int[] restrictedByDoorsY = new int[] {260, 250, 0, 594 };
-            for (int i = 0; i < objectCount; ++i)
+            int objectType, objectPlacementX, objectPlacementY;
+            bool correctPlacement;
+
+            //here we decide the initial object placement in the room
+            for(int i=0; i < objectCount; ++i)
             {
-                temp = rnd.Next(0, 4);
-                bool pass;
+                objectType = rnd.Next(0, 4);
                 do
                 {
-                    pass = true;
-                    
-                    x = rnd.Next(100, 1100);
-                    y = rnd.Next(100, 450);
-                    for(int j = 0; j < 4; j++)
+                    objectPlacementX = rnd.Next(0, gridX);
+                    objectPlacementY = rnd.Next(0, gridY);
+
+                    if (availableOnGrid[objectPlacementX, objectPlacementY])
                     {
-                        if (abs(x- restrictedByDoorsX[i]) > 150&& abs(y - restrictedByDoorsY[i]) > 150) continue;
-                       
-                        pass = false;
-                        break;
+                        correctPlacement = true;
+                        availableOnGrid[objectPlacementX, objectPlacementY] = false;
                     }
-                    if (!pass) continue;
-                    for(int j = 0; j < i; j++)
-                    {
-                        if (abs(x-takenX[i]) > 230) continue;
-                        if (abs(y-takenY[i]) > 230) continue;
-                        pass = false;
-                        break;
-                    }
-                } while (!pass);
-                roomContent[i] = new MapsObjects(temp, x, y);
-                takenX[i] = roomContent[i].getWidth();
-                takenY[i] = roomContent[i].getHeight();
+                    else
+                        correctPlacement = false;
+
+
+                } while (!correctPlacement);
+                roomContent[i] = new MapsObjects(objectType, (int)objectGrid[objectPlacementX,objectPlacementY].X, (int)objectGrid[objectPlacementX,objectPlacementY].Y);
             }
-            int x1=150, y1=150;
-            for(int i=0;i<enemyCount;i++)
+
+
+            //below we do the same for monsters (placement)
+            int x1, y1;
+
+            for (int i=0;i<enemyCount;i++)
             {
                 Monster addMeToList;
                 int whichOne = rnd.Next(0, 4);
-                if(whichOne==0)addMeToList = new Spider(canv,x1, y1);
+
+                do
+                {
+                    objectPlacementX = rnd.Next(0, gridX);
+                    objectPlacementY = rnd.Next(0, gridY);
+
+                    if (availableOnGrid[objectPlacementX, objectPlacementY])
+                    {
+                        correctPlacement = true;
+                        availableOnGrid[objectPlacementX, objectPlacementY] = false;
+                    }
+                    else
+                        correctPlacement = false;
+
+
+                } while (!correctPlacement);
+                x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
+                y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
+
+                if (whichOne == 0) addMeToList = new Spider(canv, x1, y1);
                 else if (whichOne == 1) addMeToList = new Imp(canv, x1, y1);
                 else if (whichOne == 2) addMeToList = new Golem(canv, x1, y1);
                 else addMeToList = new Goblin(canv, x1, y1);
-                y1 += 50;
-                x1 += 100;
+
                 monsters.Add(addMeToList);
             }
         }
