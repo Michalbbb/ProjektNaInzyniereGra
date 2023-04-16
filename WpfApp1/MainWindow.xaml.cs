@@ -77,7 +77,7 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
-        bool isGameRunning = false;
+        public static bool isGameRunning = false;
         Menu gameMenu;
 
 
@@ -115,7 +115,7 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Escape)
             {
-                switchState();
+                StopGame();
             }
             
             
@@ -156,7 +156,8 @@ namespace BasicsOfGame
             }
             
         }
-        private void switchState()
+        
+        private void StopGame()
         {
             if (isGameRunning)
             {
@@ -164,17 +165,26 @@ namespace BasicsOfGame
                 isGameRunning = false;
                 GameScreen.Children.Remove(BlackScreenOverlay);
                 GameScreen.Children.Add(BlackScreenOverlay);
+                BlackScreenOverlay.Width = this.Width;
+                BlackScreenOverlay.Height = this.Height;
+                BlackScreenOverlay.Opacity = 0.3;
+                BlackScreenOverlay.Fill = Brushes.Black;
                 Canvas.SetLeft(BlackScreenOverlay, 0);
                 Canvas.SetTop(BlackScreenOverlay, 0);
                 Canvas.SetZIndex(BlackScreenOverlay, 50);
                 BlackScreenOverlay.Visibility = Visibility.Visible;
+               
+                gameMenu.pauseGameMenu();
+                
 
             }
             else
             {
-
-                BlackScreenOverlay.Visibility = Visibility.Hidden;
-                gameMenu.ShowMenu();
+                
+                isGameRunning = true;
+                gameMenu.unpause();
+                
+               
             }
         }
         public void startGame()
@@ -246,25 +256,29 @@ namespace BasicsOfGame
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
             gameMenu = new Menu(GameScreen,startGame);
+            
+            
+            
             gameMenu.ShowMenu();
+            
+            
 
-            BlackScreenOverlay.Width = this.Width;
-            BlackScreenOverlay.Height = this.Height;
-            BlackScreenOverlay.Opacity = 0.3;
-            BlackScreenOverlay.Fill = Brushes.Black;
-            
-            
-             CompositionTarget.Rendering += CompositionTarget_Rendering;
+
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
             
         }
         private DateTime _lastRenderTime = DateTime.MinValue;
         double deltaTime;
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
+            
             DateTime now = DateTime.Now;
             deltaTime = (now - _lastRenderTime).TotalSeconds;
             _lastRenderTime = now;
-            if (!isGameRunning) return;
+            if (!isGameRunning)  return;
+            
+            else GameScreen.Children.Remove(BlackScreenOverlay);
+
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed/2 * deltaTime;
             

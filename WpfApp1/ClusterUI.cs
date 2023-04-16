@@ -32,6 +32,7 @@ namespace BasicsOfGame
             noweTlo.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/MenuBG.png", UriKind.Absolute));
             canvas = canv;
             act = x;
+            generatePauseMenu();
           
         }
         private void setButtons()
@@ -76,11 +77,77 @@ namespace BasicsOfGame
            
 
         }
-        
-        
+
+        GroupBox globalBox;
         private void exitGame(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
+        }
+        
+        private void generatePauseMenu()
+        {
+            GroupBox a = new GroupBox();
+            a.Header = "Game paused";
+            a.Foreground = Brushes.WhiteSmoke;
+            a.Background = Brushes.DarkBlue;
+            Canvas.SetLeft(a, 440);
+            Canvas.SetTop(a, 240);
+            Canvas.SetZIndex(a, 999);
+            a.Width = 320;
+            a.FontFamily = new FontFamily("Algerian");
+            a.FontSize = 40;
+            StackPanel buttonHolder = new StackPanel();
+            Button optionOne = new Button();
+            optionOne.Content = "Continue";
+            optionOne.FontFamily = new FontFamily("Algerian");
+            Button optionTwo = new Button();
+            optionTwo.Content = "Exit to menu";
+            optionTwo.FontFamily = new FontFamily("Algerian");
+            Button optionThree = new Button();
+            optionThree.Content = "Exit game";
+            optionThree.FontFamily = new FontFamily("Algerian");
+            optionOne.FontSize = 30;
+            optionThree.FontSize = 30;
+            optionTwo.FontSize = 30;
+            optionOne.Background = Brushes.LightCyan;
+            optionTwo.Background = Brushes.LightCyan;
+            optionThree.Background = Brushes.LightCyan;
+            buttonHolder.Children.Add(optionOne);
+            buttonHolder.Children.Add(optionTwo);
+            buttonHolder.Children.Add(optionThree);
+            optionOne.Click += cont;
+            optionTwo.Click += exMenu;
+            optionThree.Click += exitGame;
+            a.Content = buttonHolder;
+            globalBox = a;
+        }
+
+        private void cont(object sender, RoutedEventArgs e)
+        {
+            MainWindow.isGameRunning = true;
+            canvas.Focus();
+            unpause();
+
+        }
+
+        private void exMenu(object sender, RoutedEventArgs e)
+        {
+            ShowMenu();
+        }
+
+       
+
+        public void pauseGameMenu()
+        {
+
+            globalBox.IsEnabled = true;
+            canvas.Children.Add(globalBox);
+        }
+        public void unpause()
+        {
+            
+            globalBox.IsEnabled = false;
+            canvas.Children.Remove(globalBox);
         }
 
         public void ShowMenu()
