@@ -1,0 +1,7 @@
+Background : 1200x600
+Buttons: 300x79 - > 300x65
+
+Placement :
+1st button : 510x160
+2nd button : 510x295 -> 510x275
+3rd button : 510x430 -> 510x390

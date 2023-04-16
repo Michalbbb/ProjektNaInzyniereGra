@@ -115,6 +115,28 @@
     <None Remove="images\tlo.png" />
    
     <None Remove="images\tlo1Obstacle.PNG" />
+   
+    <None Remove="images\UI\Authors.PNG" />
+   
+    <None Remove="images\UI\AuthorsH.PNG" />
+   
+    <None Remove="images\UI\Exit.PNG" />
+   
+    <None Remove="images\UI\ExitH.PNG" />
+   
+    <None Remove="images\UI\loadingBG.png" />
+   
+    <None Remove="images\UI\MenuBG.PNG" />
+   
+    <None Remove="images\UI\Paint Layer 1.PNG" />
+   
+    <None Remove="images\UI\Start.PNG" />
+   
+    <None Remove="images\UI\StartH.PNG" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\UI\loadingBG.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -211,6 +233,13 @@
     <Resource Include="images\mainCharacter05l.png" />
     <Resource Include="images\mainCharacter06.png" />
     <Resource Include="images\mainCharacter06l.png" />
+    <Resource Include="images\UI\Authors.PNG" />
+    <Resource Include="images\UI\AuthorsH.PNG" />
+    <Resource Include="images\UI\Exit.PNG" />
+    <Resource Include="images\UI\ExitH.PNG" />
+    <Resource Include="images\UI\MenuBG.PNG" />
+    <Resource Include="images\UI\Start.PNG" />
+    <Resource Include="images\UI\StartH.PNG" />
   
   </ItemGroup>
 

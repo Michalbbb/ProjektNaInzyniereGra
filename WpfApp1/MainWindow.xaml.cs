@@ -43,6 +43,9 @@ namespace BasicsOfGame
         private List<TextBox> boxes;
         TextBox playerDmg;
         TextBox hpVisualization;
+        System.Windows.Shapes.Rectangle Player=new System.Windows.Shapes.Rectangle();
+        System.Windows.Shapes.Rectangle Weapon=new System.Windows.Shapes.Rectangle();
+        System.Windows.Shapes.Rectangle BlackScreenOverlay = new System.Windows.Shapes.Rectangle();
         private const float Friction = 0.65f;
         private double SpeedX, SpeedY, Speed = 100, baseSpeed = 100;
         private int minDmg = 10;
@@ -74,12 +77,15 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
+        bool isGameRunning = false;
+        Menu gameMenu;
+
 
         Grid map;
 
         TextBox helper;
 
-
+        
 
         private void KeyboardDown(object sender, KeyEventArgs e)
         {
@@ -107,6 +113,11 @@ namespace BasicsOfGame
                 helper.Opacity = 100;
                 
             }
+            if (e.Key == Key.Escape)
+            {
+                switchState();
+            }
+            
             
 
 
@@ -145,33 +156,77 @@ namespace BasicsOfGame
             }
             
         }
-        
-        public MainWindow()
-        {     
-            InitializeComponent();
+        private void switchState()
+        {
+            if (isGameRunning)
+            {
+
+                isGameRunning = false;
+                GameScreen.Children.Remove(BlackScreenOverlay);
+                GameScreen.Children.Add(BlackScreenOverlay);
+                Canvas.SetLeft(BlackScreenOverlay, 0);
+                Canvas.SetTop(BlackScreenOverlay, 0);
+                Canvas.SetZIndex(BlackScreenOverlay, 50);
+                BlackScreenOverlay.Visibility = Visibility.Visible;
+
+            }
+            else
+            {
+
+                BlackScreenOverlay.Visibility = Visibility.Hidden;
+                gameMenu.ShowMenu();
+            }
+        }
+        public void startGame()
+        {
             
-            WindowStyle = WindowStyle.None;
-            WindowState = WindowState.Maximized;
+            List<UIElement>toRemove=new List<UIElement>();
+            foreach(System.Windows.UIElement x in GameScreen.Children)
+            {
+                toRemove.Add(x);
+            }
+            for(int i=toRemove.Count-1; i>=0; i--)
+            {
+                GameScreen.Children.Remove(toRemove[i]);
+            }
+            
+            healthPoints = 200;
+            maxHealthPoints = 200;
+            Player.Name = "Player";
+            Player.Width = 88;
+            Player.Height = 109;
+            Canvas.SetLeft(Player, 276);
+            Canvas.SetTop(Player, 170);
+            GameScreen.Children.Add(Player);
+            Weapon.Name = "Weapon";
+            Weapon.Width = 1;
+            Weapon.Height = 1;
+            Canvas.SetLeft(Weapon, 0);
+            Canvas.SetTop(Weapon, 0);
+            Canvas.SetZIndex(Weapon, 15);
+            Weapon.Fill = Brushes.Transparent;
+            GameScreen.Children.Add(Weapon);
+
             makePlayerTB();
             map = new Grid(GameScreen);
             createHpBar();
             helper = new TextBox();
             helper.Opacity = 0;
             GameScreen.Children.Add(helper);
-            helper.IsEnabled= false;
+            helper.IsEnabled = false;
             write();
             map.goTo(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
             generateTB("enemy");
             GameScreen.Focus();
-            
-            
 
-            for (int i = 0; i < animations; i++)                                                                                                                                                                                                                         
+
+
+            for (int i = 0; i < animations; i++)
             {
-                leftRun[i] = new BitmapImage();                                                                                                                                                                                                                         
-                leftRun[i].BeginInit();                                                                                                                                                                                                                                
-                leftRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1 + i}l.png", UriKind.Absolute);                                                                                                                     
-                leftRun[i].EndInit();                                                                                                                                                                                                                                 
+                leftRun[i] = new BitmapImage();
+                leftRun[i].BeginInit();
+                leftRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1 + i}l.png", UriKind.Absolute);
+                leftRun[i].EndInit();
                 rightRun[i] = new BitmapImage();
                 rightRun[i].BeginInit();
                 rightRun[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/mainCharacter0{1 + i}.png", UriKind.Absolute);
@@ -179,12 +234,28 @@ namespace BasicsOfGame
 
             }
             initializeAnimationsForAttack();
-            
+
             playerSprite.ImageSource = rightRun[0];
             rightD = true;
             Player.Fill = playerSprite;
-            CompositionTarget.Rendering += CompositionTarget_Rendering; 
+            isGameRunning = true;
+        }
+        public MainWindow()
+        {     
+            InitializeComponent();
+            WindowStyle = WindowStyle.None;
+            WindowState = WindowState.Maximized;
+            gameMenu = new Menu(GameScreen,startGame);
+            gameMenu.ShowMenu();
 
+            BlackScreenOverlay.Width = this.Width;
+            BlackScreenOverlay.Height = this.Height;
+            BlackScreenOverlay.Opacity = 0.3;
+            BlackScreenOverlay.Fill = Brushes.Black;
+            
+            
+             CompositionTarget.Rendering += CompositionTarget_Rendering;
+            
         }
         private DateTime _lastRenderTime = DateTime.MinValue;
         double deltaTime;
@@ -193,6 +264,7 @@ namespace BasicsOfGame
             DateTime now = DateTime.Now;
             deltaTime = (now - _lastRenderTime).TotalSeconds;
             _lastRenderTime = now;
+            if (!isGameRunning) return;
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed/2 * deltaTime;
             
@@ -775,6 +847,11 @@ namespace BasicsOfGame
 
         private void RightClick(object sender, MouseButtonEventArgs e) // CHWILOWE PRZYPISANE DO OBYDWU KLIKNIEC ( PRAWO, LEWO )
         {
+            if (!isGameRunning)
+            {
+                e.Handled = true;
+                return;
+            }
             if (blockAttack)
             {
                 e.Handled = true;
