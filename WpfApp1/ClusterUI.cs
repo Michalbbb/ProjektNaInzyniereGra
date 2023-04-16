@@ -23,6 +23,7 @@ namespace BasicsOfGame
         Button exit = new Button();
         Button authors = new Button();
         Button start = new Button();
+        Button back = new Button();
         Action act = null;
         ImageBrush noweTlo = new ImageBrush();
         DispatcherTimer timer = new DispatcherTimer();
@@ -37,27 +38,24 @@ namespace BasicsOfGame
         }
         private void setButtons()
         {
-            ImageBrush temp = new ImageBrush();
+            
             exit.Width = 300;
             exit.Height = 65;
-            temp.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/Exit.png", UriKind.Absolute));
             exit.Background = Brushes.LightGray;
             exit.Content = "EXIT";
             exit.FontFamily = new FontFamily("Algerian");
             exit.FontSize = 50;
+
             authors.Width = 300;
             authors.Height = 65;
-            temp = new ImageBrush();
-            temp.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/Authors.png", UriKind.Absolute));
             authors.Background = Brushes.LightGray;
-            authors.Content = "AUTHORS";
+            authors.Content = "CREDITS";
             authors.FontFamily = new FontFamily("Algerian");
             authors.FontSize = 50;
+
             start.Width = 300;
             start.Height = 65;
             start.FontSize = 50;
-            temp = new ImageBrush();
-            temp.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/Start.png", UriKind.Absolute));
             start.Background = Brushes.LightGray;
             start.Content = "START";
             start.FontFamily = new FontFamily("Algerian");
@@ -65,7 +63,7 @@ namespace BasicsOfGame
             Canvas.SetTop(start,160); Canvas.SetTop(authors,275); Canvas.SetTop(exit,390);
             start.Click += setGame;
             exit.Click += exitGame;
-            authors.Click += exitGame;
+            authors.Click += authorsPage;
             
 
 
@@ -76,6 +74,38 @@ namespace BasicsOfGame
            
            
 
+        }
+
+        private void authorsPage(object sender, RoutedEventArgs e)
+        {
+            List<UIElement> toRemove = new List<UIElement>();
+            foreach (UIElement x in canvas.Children)
+            {
+                toRemove.Add(x);
+            }
+            for (int i = toRemove.Count - 1; i >= 0; i--)
+            {
+                canvas.Children.Remove(toRemove[i]);
+            }
+            ImageBrush auBG=new ImageBrush();
+            auBG.ImageSource=new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/Credits.png", UriKind.Absolute));
+            canvas.Background = auBG;
+            back.Width = 170;
+            back.Height = 65;
+            back.FontSize = 50;
+            back.Background = Brushes.LightGray;
+            back.Content = "BACK";
+            back.FontFamily = new FontFamily("Algerian");
+            Canvas.SetLeft(back, 20);
+            Canvas.SetTop(back, 20);
+            back.Click += goToMenu;
+            canvas.Children.Add(back);
+
+        }
+
+        private void goToMenu(object sender, RoutedEventArgs e)
+        {
+            ShowMenu();
         }
 
         GroupBox globalBox;

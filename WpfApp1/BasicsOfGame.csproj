@@ -120,6 +120,8 @@
    
     <None Remove="images\UI\AuthorsH.PNG" />
    
+    <None Remove="images\UI\Credits.png" />
+   
     <None Remove="images\UI\Exit.PNG" />
    
     <None Remove="images\UI\ExitH.PNG" />
@@ -136,6 +138,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\UI\Credits.png" />
     <Resource Include="images\UI\loadingBG.png" />
   </ItemGroup>
 
