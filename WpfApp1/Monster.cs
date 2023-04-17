@@ -17,6 +17,7 @@ using System.Security.Cryptography.Pkcs;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
+using System.Windows.Controls.Primitives;
 
 namespace BasicsOfGame
 {
@@ -58,6 +59,10 @@ namespace BasicsOfGame
         protected double maxHealthPoints;
         protected bool dead = false;
         protected static List<Tuple<int,Double>> damageOverTime=new List<Tuple<int,Double>>();
+        public static string killedBy="Damage over time";
+        public static bool isDead=false;
+        public static int lastDamage = 1;
+
         public static void update(List<Tuple<int, Double>> listOfDots)
         {
              foreach(var x in damageOverTime)
@@ -391,8 +396,8 @@ namespace BasicsOfGame
             weapon.Fill = Brushes.Transparent;
             Canvas.SetZIndex(weapon, 0);
             BelongTO = canv;
-            body.SetValue(Canvas.TopProperty, (double)x);
-            body.SetValue(Canvas.LeftProperty, (double)y);
+            body.SetValue(Canvas.TopProperty, (double)y);
+            body.SetValue(Canvas.LeftProperty, (double)x);
             loadImages();
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
@@ -527,6 +532,12 @@ namespace BasicsOfGame
                 Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                 Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                 hp -= dealtDamage;
+                if (hp <= 0)
+                {
+                    isDead = true;
+                    killedBy = "Golem";
+                    lastDamage = dealtDamage;
+                }
                 hpVisualization.Text = hp + "/" + maxHp;
                 double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                 if (w < 0) w = 0;
@@ -885,8 +896,8 @@ namespace BasicsOfGame
             weapon.Fill = Brushes.Transparent;
             Canvas.SetZIndex(weapon, 15);
             BelongTO = canv;
-            body.SetValue(Canvas.TopProperty, (double)x);
-            body.SetValue(Canvas.LeftProperty, (double)y);
+            body.SetValue(Canvas.TopProperty, (double)y);
+            body.SetValue(Canvas.LeftProperty, (double)x);
             loadImages();
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
@@ -1125,7 +1136,13 @@ namespace BasicsOfGame
                         Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                         Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                          hp -= dealtDamage;
-                        hpVisualization.Text = hp + "/" + maxHp;
+                            if (hp <= 0)
+                        {
+                        isDead = true;
+                        killedBy = "Goblin";
+                        lastDamage = dealtDamage;
+                    }
+                    hpVisualization.Text = hp + "/" + maxHp;
                         double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                         if (w < 0) w = 0;
                         hpBar.Width = Convert.ToInt32(w);
@@ -1305,8 +1322,8 @@ namespace BasicsOfGame
             weapon.Fill = Brushes.Transparent;
             Canvas.SetZIndex(weapon, 15);
             BelongTO = canv;
-            body.SetValue(Canvas.TopProperty, (double)x);
-            body.SetValue(Canvas.LeftProperty, (double)y);
+            body.SetValue(Canvas.TopProperty, (double)y);
+            body.SetValue(Canvas.LeftProperty, (double)x);
             loadImages();
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
@@ -1566,6 +1583,12 @@ namespace BasicsOfGame
                     Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                     Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                     hp -= dealtDamage;
+                    if (hp <= 0)
+                    {
+                        isDead = true;
+                        killedBy = "Imp";
+                        lastDamage = dealtDamage;
+                    }
                     hpVisualization.Text = hp + "/" + maxHp;
                     double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                     if (w < 0) w = 0;
@@ -1753,8 +1776,8 @@ namespace BasicsOfGame
             weapon.Fill = Brushes.Transparent;
             Canvas.SetZIndex(weapon, 15);
             BelongTO = canv;
-            body.SetValue(Canvas.TopProperty, (double)x);
-            body.SetValue(Canvas.LeftProperty, (double)y);
+            body.SetValue(Canvas.TopProperty, (double)y);
+            body.SetValue(Canvas.LeftProperty, (double)x);
             loadImages();
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
@@ -1949,6 +1972,12 @@ namespace BasicsOfGame
                     Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                     Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                     hp -= dealtDamage;
+                    if (hp <= 0)
+                    {
+                        isDead = true;
+                        killedBy = "Spider";
+                        lastDamage = dealtDamage;
+                    }
                     hpVisualization.Text = hp + "/" + maxHp;
                     double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                     if (w < 0) w = 0;

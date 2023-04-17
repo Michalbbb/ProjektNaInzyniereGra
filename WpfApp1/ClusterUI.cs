@@ -75,6 +75,80 @@ namespace BasicsOfGame
            
 
         }
+        public void deathScreen(string name,int dealtDmg)
+        {
+            canvas.Children.Clear();
+            ImageBrush deathBG = new ImageBrush();
+            deathBG.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/Death.png", UriKind.Absolute));
+            canvas.Background = deathBG;
+            TextBox info = new TextBox();
+            TextBox importantInfo = new TextBox();
+            info.Text = $"You were killed by\n\nLethal hit dealt";
+            importantInfo.Text = $"{name}\n\n{dealtDmg} damage.";
+            info.IsEnabled = false;
+            info.FontFamily = new FontFamily("Algerian");
+            info.FontSize = 40;
+            info.BorderBrush = Brushes.Transparent;
+            info.Background = Brushes.Transparent; 
+            info.Foreground=Brushes.Crimson;
+            importantInfo.IsEnabled = false;
+            importantInfo.FontFamily = new FontFamily("Algerian");
+            importantInfo.FontSize = 40;
+            importantInfo.BorderBrush = Brushes.Transparent;
+            importantInfo.Background = Brushes.Transparent;
+            importantInfo.Foreground = Brushes.Black;
+            importantInfo.FontWeight = FontWeights.Bold;
+            Canvas.SetLeft(info, 560);
+            Canvas.SetTop(info, 260);
+            Canvas.SetLeft(importantInfo, 560);
+            Canvas.SetTop(importantInfo, 300);
+            canvas.Children.Add(info);
+            canvas.Children.Add(importantInfo);
+            GroupBox a = new GroupBox();
+            a.Header = "What you gonna do ?";
+            a.Foreground = Brushes.WhiteSmoke;
+            a.Background = Brushes.DarkBlue;
+            Canvas.SetLeft(a, 50);
+            Canvas.SetTop(a, 190);
+            Canvas.SetZIndex(a, 999);
+            a.Width = 440;
+            a.FontFamily = new FontFamily("Algerian");
+            a.FontSize = 40;
+            StackPanel buttonHolder = new StackPanel();
+            Button optionOne = new Button();
+            optionOne.Content = "Try again";
+            optionOne.FontFamily = new FontFamily("Algerian");
+            Button optionTwo = new Button();
+            optionTwo.Content = "Exit to menu";
+            optionTwo.FontFamily = new FontFamily("Algerian");
+            Button optionThree = new Button();
+            optionThree.Content = "Exit game";
+            optionThree.FontFamily = new FontFamily("Algerian");
+            System.Windows.Shapes.Rectangle sep=new System.Windows.Shapes.Rectangle();
+            sep.Height = 30;
+            sep.Fill = Brushes.Transparent;
+            System.Windows.Shapes.Rectangle sep2 = new System.Windows.Shapes.Rectangle();
+            sep2.Height = 30;
+            sep2.Fill = Brushes.Transparent;
+            optionOne.FontSize = 40;
+            optionThree.FontSize = 40;
+            optionTwo.FontSize = 40;
+            optionOne.Background = Brushes.LightCyan;
+            optionTwo.Background = Brushes.LightCyan;
+            optionThree.Background = Brushes.LightCyan;
+            buttonHolder.Children.Add(optionOne);
+            buttonHolder.Children.Add(sep);
+            buttonHolder.Children.Add(optionTwo);
+            buttonHolder.Children.Add(sep2);
+            buttonHolder.Children.Add(optionThree);
+            optionOne.Click += setGame;
+            optionTwo.Click += exMenu;
+            optionThree.Click += exitGame;
+             a.Content = buttonHolder;
+            canvas.Children.Add(a);
+           
+
+        }
 
         private void authorsPage(object sender, RoutedEventArgs e)
         {

@@ -244,7 +244,7 @@ namespace BasicsOfGame
 
             }
             initializeAnimationsForAttack();
-
+            DamagePerMilliseconds = new List<Tuple<double, double, double, double>>();
             playerSprite.ImageSource = rightRun[0];
             rightD = true;
             Player.Fill = playerSprite;
@@ -301,6 +301,12 @@ namespace BasicsOfGame
             dotUpdate();
             foreach(Monster monster in map.rMon())
                 monster.moveToTarget(Player, deltaTime, Friction,playerDmg,hpBar,ref healthPoints, ref maxHealthPoints, hpVisualization);
+            if (Monster.isDead||healthPoints<=0)
+            {
+                isGameRunning = false;
+                Monster.isDead = false;
+                gameMenu.deathScreen(Monster.killedBy,Monster.lastDamage);
+            }
 
         }
         private void dealDotDmg(int x)
