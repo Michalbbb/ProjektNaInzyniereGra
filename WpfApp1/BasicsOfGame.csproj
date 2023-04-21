@@ -131,6 +131,8 @@
    
     <None Remove="images\UI\ExitH.PNG" />
    
+    <None Remove="images\UI\guideBG.png" />
+   
     <None Remove="images\UI\loadingBG.png" />
    
     <None Remove="images\UI\MenuBG.PNG" />
@@ -151,6 +153,7 @@
     <Resource Include="images\Buffs_Debuffs\buff3.png" />
     <Resource Include="images\UI\Credits.png" />
     <Resource Include="images\UI\Death.png" />
+    <Resource Include="images\UI\guideBG.png" />
     <Resource Include="images\UI\loadingBG.png" />
   </ItemGroup>
 

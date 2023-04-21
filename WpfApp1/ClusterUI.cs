@@ -22,6 +22,7 @@ namespace BasicsOfGame
     {
         Button exit = new Button();
         Button authors = new Button();
+        Button help= new Button();
         Button start = new Button();
         Button back = new Button();
         Action act = null;
@@ -59,20 +60,30 @@ namespace BasicsOfGame
             start.Background = Brushes.LightGray;
             start.Content = "START";
             start.FontFamily = new FontFamily("Algerian");
-            Canvas.SetLeft(start,510); Canvas.SetLeft(authors,510); Canvas.SetLeft(exit,510);
-            Canvas.SetTop(start,160); Canvas.SetTop(authors,275); Canvas.SetTop(exit,390);
+
+            help.Width = 300;
+            help.Height = 65;
+            help.FontSize = 50;
+            help.Background = Brushes.LightGray;
+            help.Content = "GUIDE";
+            help.FontFamily = new FontFamily("Algerian");
+
+            Canvas.SetLeft(start,510); Canvas.SetLeft(authors,510); Canvas.SetLeft(help, 510); Canvas.SetLeft(exit, 510);
+            Canvas.SetTop(start,160); Canvas.SetTop(authors,245); Canvas.SetTop(help, 330); Canvas.SetTop(exit, 415);
             start.Click += setGame;
             exit.Click += exitGame;
             authors.Click += authorsPage;
-            
+            help.Click += guidePage;
+
+         
 
 
 
 
-            
-            canvas.Children.Add(exit); canvas.Children.Add(start);canvas.Children.Add(authors);
-           
-           
+
+            canvas.Children.Add(exit); canvas.Children.Add(start);canvas.Children.Add(authors); canvas.Children.Add(help);
+
+
 
         }
         public void deathScreen(string name,int dealtDmg)
@@ -174,6 +185,55 @@ namespace BasicsOfGame
             Canvas.SetTop(back, 20);
             back.Click += goToMenu;
             canvas.Children.Add(back);
+
+        }
+        private void guidePage(object sender, RoutedEventArgs e)
+        {
+            canvas.Children.Clear();
+            ImageBrush auBG = new ImageBrush();
+            auBG.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/guideBG.png", UriKind.Absolute));
+            canvas.Background = auBG;
+            back.Width = 170;
+            back.Height = 65;
+            back.FontSize = 50;
+            back.Background = Brushes.LightGray;
+            back.Content = "BACK";
+            back.FontFamily = new FontFamily("Algerian");
+            Canvas.SetLeft(back, 20);
+            Canvas.SetTop(back, 20);
+            back.Click += goToMenu;
+
+         
+            TextBox boldInfo= new TextBox();
+            boldInfo.Text = "\t\t\t\t\t[ENEMIES]";
+            boldInfo.Text += "\nCurrently in game there are 4 types of monsters that player can face:\n1.Goblin - Low hp,low dmg and no special attack makes him easy opponent.";
+            boldInfo.Text += "\n2.Imp - Moderate hp,attacks in sequence of 3 weak hits and inflict ignite.";
+            boldInfo.Text += "\n3.Spider - Very low hp.Weak hits, but inflicts deadly poison. Extremaly fast.";
+            boldInfo.Text += "\n4.Golem - High hp. Slow, but powerful hits in sequence of 3 aoe hits.\n each of his attacks inflicts stun. Slow.";
+            boldInfo.Text += "\n\t\t\t\t         [STATUS EFFECTS]";
+            boldInfo.Text += "\nThere are 3 types of status effect that player can be inflicted with:";
+            boldInfo.Text += "\n1.Poison - stackable debuff that deal high dot.";
+            boldInfo.Text += "\n2.Ignite - Deals low dot and causes player to deal 20% less damage.\nEvery new instance of ignite prolongs existing one by its duration.";
+            boldInfo.Text += "\n3.Stun - debuff, that prevent player from taking any action.\nNew stuns while stunned do not increase or refresh current stun duration.";
+            boldInfo.Text += "\n\n*dot stands for \"damage over time\"\n*aoe stands for \"area of effect\"";
+            boldInfo.Width = 890; 
+            boldInfo.Height = 450;
+            
+            boldInfo.IsEnabled = false;
+            boldInfo.FontFamily = new FontFamily("Algerian");
+            boldInfo.FontSize = 20;
+            boldInfo.BorderBrush = Brushes.Transparent;
+           boldInfo.Background = Brushes.Yellow;
+            boldInfo.Foreground = Brushes.Black;
+            boldInfo.FontWeight= FontWeights.Bold;
+            Canvas.SetLeft(boldInfo, 200);
+            Canvas.SetTop(boldInfo, 150);
+            Canvas.SetZIndex(boldInfo, 40000);
+            canvas.Children.Add(back);
+            
+     
+            canvas.Children.Add(boldInfo);
+
 
         }
 
