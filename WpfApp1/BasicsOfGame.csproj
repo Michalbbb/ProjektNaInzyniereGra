@@ -78,7 +78,7 @@
     <None Remove="images\bgdecorations\tlo1Obstacle.PNG" />
     <None Remove="images\Buffs_Debuffs\buff1.png" />
     <None Remove="images\Buffs_Debuffs\buff2.png" />
-    <None Remove="images\Buffs_Debuffs\Ignite.png" />
+    <None Remove="images\Buffs_Debuffs\buff3.png" />
     <None Remove="images\doors\downDoor.PNG" />
     <None Remove="images\doors\downDoorB.PNG" />
     <None Remove="images\doors\leftDoor.PNG" />
@@ -148,7 +148,7 @@
 
   <ItemGroup>
     <Resource Include="images\Buffs_Debuffs\buff1.png" />
-    <Resource Include="images\Buffs_Debuffs\Ignite.png" />
+    <Resource Include="images\Buffs_Debuffs\buff3.png" />
     <Resource Include="images\UI\Credits.png" />
     <Resource Include="images\UI\Death.png" />
     <Resource Include="images\UI\loadingBG.png" />

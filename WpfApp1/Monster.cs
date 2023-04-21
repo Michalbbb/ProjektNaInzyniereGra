@@ -497,23 +497,28 @@ namespace BasicsOfGame
         {
             int min;
             int max;
+            double stunDuration=600;
             if(stage==1)
             {
                 min = minDmg;
                 max = maxDmg;
+                
             }
             else if (stage == 2)
             {
                 min = Convert.ToInt16(minDmg*2/3);
                 max = Convert.ToInt16(maxDmg * 2/3);
+                
             }
             else if (stage == 3)
             {
                 min = Convert.ToInt16(minDmg * 1 / 3);
                 max = Convert.ToInt16(maxDmg * 1 / 3);
+                
             }
             else
             {
+                
                 min = minDmg;
                 max = maxDmg;
             }
@@ -542,6 +547,8 @@ namespace BasicsOfGame
                 double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                 if (w < 0) w = 0;
                 hpBar.Width = Convert.ToInt32(w);
+                string statusEffect = "Stun";
+                Monster.damageOverTime.Add(new Tuple<int, double, string>(0, stunDuration, statusEffect));
 
 
             }

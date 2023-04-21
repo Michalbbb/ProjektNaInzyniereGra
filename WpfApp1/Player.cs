@@ -24,6 +24,7 @@ namespace BasicsOfGame
     {
         int level;
         bool ignited;
+        bool stunned ;
         int poisonStacks;
         bool returnUp, returnDown, returnLeft, returnRight, blockAttack;
         TextBox playerDmg;
@@ -71,6 +72,7 @@ namespace BasicsOfGame
         public Player(Canvas GS)
         {
             level = 1;
+            stunned = false;
             poisonStacks = 0;
             GameScreen = GS;
             healthPoints = 200;
@@ -230,7 +232,7 @@ namespace BasicsOfGame
         {
             
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
             {
                 buffsContainer[i] = new System.Windows.Shapes.Rectangle();
                 buffsContainer[i].Width = 30;
@@ -402,6 +404,29 @@ namespace BasicsOfGame
                         ignited = true;
                     }
                 }
+                else if (dotName == "Stun")
+                { 
+                        if (!stunned)
+                        {
+                            DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(0, 0, 0, time, dotName));
+                            Canvas.SetZIndex(buffsContainer[2], 1000);
+                            stunned = true;
+                             if (rightD)
+                            {
+                            currentMovementAnimation=0;
+                            
+                            playerSprite.ImageSource = rightRun[currentMovementAnimation];
+                            }
+                            else
+                            {
+                            currentMovementAnimation = 0;
+                            
+                            playerSprite.ImageSource = leftRun[currentMovementAnimation];
+
+                            }
+                    }
+
+                }
                 else { DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName)); }
             }
             
@@ -413,7 +438,7 @@ namespace BasicsOfGame
                 {
 
                     if (DamagePerMilliseconds[i].Item5 == "Poison") Canvas.SetZIndex(buffsContainer[0], 1000);
-                    if (DamagePerMilliseconds[i].Item5 == "Ignite") { Canvas.SetZIndex(buffsContainer[1], 1000); }
+                    if (DamagePerMilliseconds[i].Item5 == "Ignite") Canvas.SetZIndex(buffsContainer[1], 1000);
                     double currentDmg = DamagePerMilliseconds[i].Item2 + DamagePerMilliseconds[i].Item1 * deltaTime * 1000;
                     if (currentDmg >= 1)
                     {
@@ -432,16 +457,26 @@ namespace BasicsOfGame
 
                 foreach (var x in toRemove)
                 {
+                    
+                    if (x.Item5 == "Poison")
+                    {
+                        poisonStacks--;
+                        if (poisonStacks == 0) Canvas.SetZIndex(buffsContainer[0], 800);
+                    }
                     if (x.Item5 == "Ignite")
                     {
                         ignited = false;
                         Canvas.SetZIndex(buffsContainer[1], 800);
                     }
-                    if (x.Item5 == "Poison") poisonStacks--;
+                    if (x.Item5 == "Stun")
+                    {
+                        stunned = false;
+                        Canvas.SetZIndex(buffsContainer[2], 800);
+                    }
                     DamagePerMilliseconds.Remove(x);
 
                 }
-                if(poisonStacks==0) Canvas.SetZIndex(buffsContainer[0], 800);
+               
 
 
 
@@ -457,7 +492,7 @@ namespace BasicsOfGame
         {
             if (Speed == 0) return;
 
-            if (UpKey)
+            if (UpKey&&!stunned)
             {
                 if (((Canvas.GetLeft(player) > 960) && (Canvas.GetTop(player) < 170)) && (Canvas.GetLeft(player) - Canvas.GetTop(player) > 1000))
                 {
@@ -467,13 +502,13 @@ namespace BasicsOfGame
                 else SpeedY -= Speed;
             }
 
-            if (DownKey)
+            if (DownKey && !stunned)
             {
 
                 SpeedY += Speed;
             }
 
-            if (RightKey)
+            if (RightKey && !stunned)
             {
                 if (((Canvas.GetLeft(player) > 960) && (Canvas.GetTop(player) < 170)) && (Canvas.GetLeft(player) - Canvas.GetTop(player) > 1000))
                 {
@@ -493,7 +528,7 @@ namespace BasicsOfGame
                 }
 
             }
-            if (LeftKey)
+            if (LeftKey && !stunned)
             {
 
                 SpeedX -= Speed;
@@ -586,7 +621,7 @@ namespace BasicsOfGame
 
             if (blockAttack)
             {
-
+                
                 unlockAttack += Convert.ToDouble(1000 * deltaTime);
 
                 if (unlockAttack / (intervalForAttackAnimations * (6 - ticksRemaining)) >= 1 && ticksRemaining > 0)
@@ -615,7 +650,7 @@ namespace BasicsOfGame
             Camera.ScrollToHorizontalOffset(horizontalOffset);
             Camera.ScrollToVerticalOffset(verticalOffset);
             checkCollision(UpKey,DownKey,RightKey,LeftKey);
-            if (UpKey || DownKey || RightKey || LeftKey)
+            if ((UpKey || DownKey || RightKey || LeftKey)&&!stunned)
             {
                 if (ticksDone >= 10 / Speed)
                 {
@@ -728,8 +763,8 @@ namespace BasicsOfGame
 
             SpeedX = SpeedX * Friction;
             SpeedY = SpeedY * Friction;
-            if (Speed != 0) Canvas.SetLeft(player, Canvas.GetLeft(player) + SpeedX);
-            if (Speed != 0) Canvas.SetTop(player, Canvas.GetTop(player) + SpeedY);
+            if (Speed != 0&&!stunned) Canvas.SetLeft(player, Canvas.GetLeft(player) + SpeedX);
+            if (Speed != 0&&!stunned) Canvas.SetTop(player, Canvas.GetTop(player) + SpeedY);
 
             dotUpdate(deltaTime);
             foreach (Monster monster in map.rMon())
@@ -820,6 +855,13 @@ namespace BasicsOfGame
 
         private void attackOmni(double deltaTime,ref Grid map, ref List<TextBox> boxes)
         {
+            if (stunned)
+            {
+                ticksRemaining = 0;
+                weapon.Fill = new SolidColorBrush(Colors.Transparent);
+                Speed = baseSpeed * deltaTime;
+                return;
+            }
             if (ticksRemaining == 1)
             {
                 checkAttackCollision(ref map,ref boxes);
