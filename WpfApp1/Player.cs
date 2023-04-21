@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -50,6 +51,7 @@ namespace BasicsOfGame
         System.Windows.Shapes.Rectangle hpBarWindow;
         System.Windows.Shapes.Rectangle expBar;
         System.Windows.Shapes.Rectangle expBarWindow;
+        System.Windows.Shapes.Rectangle DotBar;
         TextBox expVisualization;
         int healthPoints;
         int maxHealthPoints;
@@ -109,6 +111,7 @@ namespace BasicsOfGame
             makePlayerTB();
             createHpBar();
             createExpBar();
+            createDotBar();
 
         }
         private void initializeAnimationsForAttack()
@@ -167,29 +170,29 @@ namespace BasicsOfGame
         { 
             expBar = new System.Windows.Shapes.Rectangle();
             expBar.Width = 0;
-            expBar.Height = 25;
-            expBar.Fill = Brushes.Blue;
-            Canvas.SetLeft(expBar, 10);
-            Canvas.SetTop(expBar, 55);
+            expBar.Height = 15;
+            expBar.Fill = Brushes.OrangeRed;
+            Canvas.SetLeft(expBar, 5);
+            Canvas.SetTop(expBar, 30);
             Canvas.SetZIndex(expBar, 910);
             expBarWindow = new System.Windows.Shapes.Rectangle();
             expBarWindow.Width = 210;
-            expBarWindow.Height = 35;
+            expBarWindow.Height = 25;
             ImageBrush sprite = new ImageBrush();
             sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/playerAssets/hpBar.png", UriKind.Absolute));
             expBarWindow.Fill = sprite;
-            Canvas.SetLeft(expBarWindow, 5);
-            Canvas.SetTop(expBarWindow, 50);
+            Canvas.SetLeft(expBarWindow, 0);
+            Canvas.SetTop(expBarWindow, 25);
             Canvas.SetZIndex(expBarWindow, 880);
             expVisualization = new TextBox();
             Canvas.SetLeft(expVisualization, 75);
-            Canvas.SetTop(expVisualization, 50);
+            Canvas.SetTop(expVisualization, 25);
             Canvas.SetZIndex(expVisualization, 990);
             expVisualization.IsEnabled = false;
-            expVisualization.Foreground = new SolidColorBrush(Colors.LightBlue);
+            expVisualization.Foreground = new SolidColorBrush(Colors.White);
             expVisualization.Background = Brushes.Transparent;
             expVisualization.BorderThickness = new Thickness(0, 0, 0, 0);
-            expVisualization.FontSize = 25;
+            expVisualization.FontSize = 15;
             expVisualization.FontWeight = FontWeights.Bold;
             expVisualization.Opacity = 1;
             expVisualization.Text = "lvl. " + level.ToString();
@@ -197,34 +200,56 @@ namespace BasicsOfGame
             GameScreen.Children.Add(expBarWindow);
             GameScreen.Children.Add(expVisualization);
         }
+         private void createDotBar()
+         {
+           /*
+            GroupBox DotBar = new GroupBox();
+            DotBar.Header = "Buffs & Debuffs";
+            DotBar.Foreground= new SolidColorBrush(Colors.Blue);
+            //DotBar.Background= new SolidColorBrush(Colors.Black);
+            DotBar.BorderBrush= new SolidColorBrush(Colors.Blue);
+            */
+            DotBar = new System.Windows.Shapes.Rectangle();
+             Canvas.SetLeft(DotBar, 210);
+             Canvas.SetTop(DotBar, 0);
+             Canvas.SetZIndex(DotBar, 880);
+             ImageBrush sprite = new ImageBrush();
+            sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/playerAssets/hpBar.png", UriKind.Absolute));
+             DotBar.Width = 210;
+             DotBar.Height = 50;
+             DotBar.Fill = sprite;
+            GameScreen.Children.Add(DotBar);
+        }
+        //private void 
+        
         private void createHpBar()
         {
 
             hpBar = new System.Windows.Shapes.Rectangle();
             hpBar.Width = 200;
-            hpBar.Height = 25;
+            hpBar.Height = 15;//60%
             hpBar.Fill = Brushes.DarkRed;
-            Canvas.SetLeft(hpBar, 10);
-            Canvas.SetTop(hpBar, 10);
+            Canvas.SetLeft(hpBar, 5);
+            Canvas.SetTop(hpBar, 5);
             Canvas.SetZIndex(hpBar, 910);
             hpBarWindow = new System.Windows.Shapes.Rectangle();
             hpBarWindow.Width = 210;
-            hpBarWindow.Height = 35;
+            hpBarWindow.Height = 25;//hpBarWindow.Height = 35
             ImageBrush sprite = new ImageBrush();
             sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/playerAssets/hpBar.png", UriKind.Absolute));
             hpBarWindow.Fill = sprite;
-            Canvas.SetLeft(hpBarWindow, 5);
-            Canvas.SetTop(hpBarWindow, 5);
+            Canvas.SetLeft(hpBarWindow, 0);
+            Canvas.SetTop(hpBarWindow, 0);
             Canvas.SetZIndex(hpBarWindow, 880);
             hpVisualization = new TextBox();
             Canvas.SetLeft(hpVisualization, 65);
-            Canvas.SetTop(hpVisualization, 5);
+            Canvas.SetTop(hpVisualization, 0);
             Canvas.SetZIndex(hpVisualization, 990);
             hpVisualization.IsEnabled = false;
             hpVisualization.Foreground = new SolidColorBrush(Colors.LightBlue);
             hpVisualization.Background = Brushes.Transparent;
             hpVisualization.BorderThickness = new Thickness(0, 0, 0, 0);
-            hpVisualization.FontSize = 25;
+            hpVisualization.FontSize = 15;
             hpVisualization.FontWeight = FontWeights.Bold;
             hpVisualization.Opacity = 1;
             hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
