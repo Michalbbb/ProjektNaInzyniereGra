@@ -58,12 +58,12 @@ namespace BasicsOfGame
         protected double healthPoints;
         protected double maxHealthPoints;
         protected bool dead = false;
-        protected static List<Tuple<int,Double>> damageOverTime=new List<Tuple<int,Double>>();
+        protected static List<Tuple<int,Double,string>> damageOverTime=new List<Tuple<int,Double,string>>();
         public static string killedBy="Damage over time";
         public static bool isDead=false;
         public static int lastDamage = 1;
 
-        public static void update(List<Tuple<int, Double>> listOfDots)
+        public static void update(List<Tuple<int, Double,string>> listOfDots)
         {
              foreach(var x in damageOverTime)
             {
@@ -528,7 +528,7 @@ namespace BasicsOfGame
                 obecnyDmg += dealtDamage;
                 dmg.Text = obecnyDmg.ToString();
                 dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                dmg.Opacity = 100;
+                dmg.Opacity = 1;
                 Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                 Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                 hp -= dealtDamage;
@@ -1132,7 +1132,7 @@ namespace BasicsOfGame
                         obecnyDmg += dealtDamage;
                         dmg.Text = obecnyDmg.ToString();
                         dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                        dmg.Opacity = 100;
+                        dmg.Opacity = 1;
                         Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                         Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                          hp -= dealtDamage;
@@ -1579,7 +1579,7 @@ namespace BasicsOfGame
                     obecnyDmg += dealtDamage;
                     dmg.Text = obecnyDmg.ToString();
                     dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                    dmg.Opacity = 100;
+                    dmg.Opacity = 1;
                     Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                     Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                     hp -= dealtDamage;
@@ -1968,7 +1968,7 @@ namespace BasicsOfGame
                     obecnyDmg += dealtDamage;
                     dmg.Text = obecnyDmg.ToString();
                     dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                    dmg.Opacity = 100;
+                    dmg.Opacity = 1;
                     Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
                     Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
                     hp -= dealtDamage;
@@ -1982,7 +1982,8 @@ namespace BasicsOfGame
                     double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                     if (w < 0) w = 0;
                     hpBar.Width = Convert.ToInt32(w);
-                    Monster.damageOverTime.Add(new Tuple<int,double>(poisonDot, dotDuration));
+                    string dotName = "Poison";
+                    Monster.damageOverTime.Add(new Tuple<int,double,string>(poisonDot, dotDuration,dotName));
 
 
                 }

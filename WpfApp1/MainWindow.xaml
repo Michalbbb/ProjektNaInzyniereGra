@@ -12,7 +12,7 @@
     
     <Grid>
         <Grid.Background>#000000</Grid.Background>
-        <ScrollViewer x:Name="Camera" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+        <ScrollViewer x:Name="cam" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
             <Canvas ClipToBounds="True"  x:Name="GameScreen" Focusable="true" MouseRightButtonDown="RightClick" MouseLeftButtonDown="RightClick" KeyUp="KeyboardUp" KeyDown="KeyboardDown" Height="600" Width="1200" MaxHeight="600" MaxWidth="1200">
 
 
