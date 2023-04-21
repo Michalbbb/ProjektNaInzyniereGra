@@ -1299,9 +1299,12 @@ namespace BasicsOfGame
     internal class Imp : Monster
     {
         int howManyTimesDidTryToAttack = 0;
-       
+        double dotDuration;
+        int igniteDot;
         public Imp(Canvas canv, int x, int y)
         {
+            igniteDot = Convert.ToInt32(2 * diffMulti);
+            dotDuration = 2000;
             expGiven = 300;
             attackTicks = 0;
             animations = 4;
@@ -1593,6 +1596,8 @@ namespace BasicsOfGame
                     double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
                     if (w < 0) w = 0;
                     hpBar.Width = Convert.ToInt32(w);
+                    string dotName = "Ignite";
+                    Monster.damageOverTime.Add(new Tuple<int, double, string>(igniteDot, dotDuration, dotName));
 
 
                 }

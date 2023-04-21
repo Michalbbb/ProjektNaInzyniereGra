@@ -23,6 +23,8 @@ namespace BasicsOfGame
     internal class Player
     {
         int level;
+        bool ignited;
+        int poisonStacks;
         bool returnUp, returnDown, returnLeft, returnRight, blockAttack;
         TextBox playerDmg;
         TextBox hpVisualization;
@@ -69,6 +71,7 @@ namespace BasicsOfGame
         public Player(Canvas GS)
         {
             level = 1;
+            poisonStacks = 0;
             GameScreen = GS;
             healthPoints = 200;
             maxHealthPoints = 200;
@@ -227,7 +230,7 @@ namespace BasicsOfGame
         {
             
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 2; i++)
             {
                 buffsContainer[i] = new System.Windows.Shapes.Rectangle();
                 buffsContainer[i].Width = 30;
@@ -357,24 +360,60 @@ namespace BasicsOfGame
             double dmg;
             double time;
             string dotName;
+            
             foreach (var x in dotUpdater)
             {
                 dmg = x.Item1;
                 time = x.Item2;
                 double dmgPerMs = dmg / 1000;
+               
                 dotName = x.Item3;
-                DamagePerMilliseconds.Add(new Tuple<double, double, double, double,string>(dmgPerMs, 0, 0, time,dotName));
+                if (dotName == "Poison")
+                {
+                    DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName));
+                    poisonStacks++;
+                }
+                else if (dotName == "Ignite")
+                {
+                    double currentDmg;
+                    double elapsedTime;
+                    bool foundIgnite = false;
+                    for (int i = 0; i < DamagePerMilliseconds.Count; i++)
+                    {
+
+                        if (DamagePerMilliseconds[i].Item5 == "Ignite")
+                        {
+                            foundIgnite = true;
+                            time += DamagePerMilliseconds[i].Item4;
+                            currentDmg = DamagePerMilliseconds[i].Item2;
+                            elapsedTime = DamagePerMilliseconds[i].Item3;
+                            if (DamagePerMilliseconds[i].Item1 < dmgPerMs)
+                            {
+                                dmgPerMs = DamagePerMilliseconds[i].Item1 + dmgPerMs / 2;
+                            }
+
+                            DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(dmgPerMs, currentDmg, elapsedTime, time, dotName);
+
+                        }
+                    }
+                    if (!foundIgnite)
+                    {
+                        DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName));
+                        ignited = true;
+                    }
+                }
+                else { DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName)); }
             }
-            //foreach (var x in buffsContainer) Canvas.SetZIndex(x, 1);
+            
             if (DamagePerMilliseconds.Count > 0)
             {
-                hpBar.Fill = Brushes.DarkGreen;
+                
                 List<Tuple<double, double, double, double,string>> toRemove = new List<Tuple<double, double, double, double,string>>();
                 for (int i = 0; i < DamagePerMilliseconds.Count; i++)
                 {
-                    //CYGAN
-                    if (DamagePerMilliseconds[i].Item5=="Poison") Canvas.SetZIndex(buffsContainer[0], 1000);
-                   // if (DamagePerMilliseconds[i].Item5 == "Ignite") Canvas.SetZIndex(buffsContainer[i], 1000);
+
+                    if (DamagePerMilliseconds[i].Item5 == "Poison") Canvas.SetZIndex(buffsContainer[0], 1000);
+                    if (DamagePerMilliseconds[i].Item5 == "Ignite") { Canvas.SetZIndex(buffsContainer[1], 1000); }
                     double currentDmg = DamagePerMilliseconds[i].Item2 + DamagePerMilliseconds[i].Item1 * deltaTime * 1000;
                     if (currentDmg >= 1)
                     {
@@ -393,17 +432,21 @@ namespace BasicsOfGame
 
                 foreach (var x in toRemove)
                 {
+                    if (x.Item5 == "Ignite")
+                    {
+                        ignited = false;
+                        Canvas.SetZIndex(buffsContainer[1], 800);
+                    }
+                    if (x.Item5 == "Poison") poisonStacks--;
                     DamagePerMilliseconds.Remove(x);
+
                 }
+                if(poisonStacks==0) Canvas.SetZIndex(buffsContainer[0], 800);
+
+
 
             }
-            else
-            {
-                hpBar.Fill = Brushes.DarkRed;
-                //CYGAN
-                Canvas.SetZIndex(buffsContainer[0], 800);
-            }
-
+           
 
         }
         public void startPosition(ref Grid map)
@@ -711,6 +754,13 @@ namespace BasicsOfGame
         private void checkAttackCollision(ref Grid map,ref List<TextBox> boxes)
         {
             int i = 0;
+            int minDmgAfterCalc=minDmg;
+            int maxDmgAfterCalc=maxDmg;
+            if (ignited)
+            {
+                minDmgAfterCalc = Convert.ToInt32(minDmg * 0.8);
+                maxDmgAfterCalc = Convert.ToInt32(maxDmg * 0.8);
+            }
             List<Monster> updateState = map.rMon();
             foreach (Monster x in updateState)
             {
@@ -721,7 +771,7 @@ namespace BasicsOfGame
                 Rect collisionChecker = new Rect(Canvas.GetLeft(x.getBody()), Canvas.GetTop(x.getBody()), x.getBody().ActualWidth, x.getBody().ActualHeight);
                 if (determinateCollision(hitbox, collisionChecker))
                 {
-                    int dealtDmg = getRand.Next(minDmg, maxDmg + 1);
+                    int dealtDmg = getRand.Next(minDmgAfterCalc, maxDmgAfterCalc + 1);
                     int obecnyDmg = Convert.ToInt32(boxes[i].Text);
                     obecnyDmg += dealtDmg;
                     x.damageTaken(dealtDmg);
