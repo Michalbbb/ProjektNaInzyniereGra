@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -52,6 +53,7 @@ namespace BasicsOfGame
         System.Windows.Shapes.Rectangle expBar;
         System.Windows.Shapes.Rectangle expBarWindow;
         System.Windows.Shapes.Rectangle DotBar;
+        System.Windows.Shapes.Rectangle[] buffsContainer =new System.Windows.Shapes.Rectangle[14] ;
         TextBox expVisualization;
         int healthPoints;
         int maxHealthPoints;
@@ -112,6 +114,7 @@ namespace BasicsOfGame
             createHpBar();
             createExpBar();
             createDotBar();
+            activeBuffs();
 
         }
         private void initializeAnimationsForAttack()
@@ -220,7 +223,27 @@ namespace BasicsOfGame
              DotBar.Fill = sprite;
             GameScreen.Children.Add(DotBar);
         }
-        //private void 
+        private void activeBuffs()//poison
+        {
+            
+
+            for (int i = 0; i < 1; i++)
+            {
+                buffsContainer[i] = new System.Windows.Shapes.Rectangle();
+                buffsContainer[i].Width = 30;
+                buffsContainer[i].Height = 15;
+                Canvas.SetLeft(buffsContainer[i],210+i*30 );
+                Canvas.SetTop(buffsContainer[i], 5);
+                Canvas.SetZIndex(buffsContainer[i], 800);
+                ImageBrush sprite = new ImageBrush();
+                sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Buffs_Debuffs/buff{i+1}.png", UriKind.Absolute));
+                buffsContainer[i].Fill = sprite;
+                GameScreen.Children.Add(buffsContainer[i]);
+
+            }
+            
+
+        }
         
         private void createHpBar()
         {
@@ -342,12 +365,16 @@ namespace BasicsOfGame
                 dotName = x.Item3;
                 DamagePerMilliseconds.Add(new Tuple<double, double, double, double,string>(dmgPerMs, 0, 0, time,dotName));
             }
+            //foreach (var x in buffsContainer) Canvas.SetZIndex(x, 1);
             if (DamagePerMilliseconds.Count > 0)
             {
                 hpBar.Fill = Brushes.DarkGreen;
                 List<Tuple<double, double, double, double,string>> toRemove = new List<Tuple<double, double, double, double,string>>();
                 for (int i = 0; i < DamagePerMilliseconds.Count; i++)
                 {
+                    //CYGAN
+                    if (DamagePerMilliseconds[i].Item5=="Poison") Canvas.SetZIndex(buffsContainer[0], 1000);
+                   // if (DamagePerMilliseconds[i].Item5 == "Ignite") Canvas.SetZIndex(buffsContainer[i], 1000);
                     double currentDmg = DamagePerMilliseconds[i].Item2 + DamagePerMilliseconds[i].Item1 * deltaTime * 1000;
                     if (currentDmg >= 1)
                     {
@@ -373,6 +400,8 @@ namespace BasicsOfGame
             else
             {
                 hpBar.Fill = Brushes.DarkRed;
+                //CYGAN
+                Canvas.SetZIndex(buffsContainer[0], 800);
             }
 
 
