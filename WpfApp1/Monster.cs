@@ -23,6 +23,7 @@ namespace BasicsOfGame
 {
     public class Monster
     {
+        protected string nameOfMonster;
         protected int expGiven;
         protected System.Windows.Shapes.Rectangle body = new System.Windows.Shapes.Rectangle();
         protected System.Windows.Shapes.Rectangle weapon = new System.Windows.Shapes.Rectangle();
@@ -59,9 +60,7 @@ namespace BasicsOfGame
         protected double maxHealthPoints;
         protected bool dead = false;
         protected static List<Tuple<int,Double,string>> damageOverTime=new List<Tuple<int,Double,string>>();
-        public static string killedBy="Damage over time";
-        public static bool isDead=false;
-        public static int lastDamage = 1;
+        
 
         public static void update(List<Tuple<int, Double,string>> listOfDots)
         {
@@ -300,7 +299,7 @@ namespace BasicsOfGame
             BelongTO = Canv;
         }
         public virtual void loadImages() { }
-        public virtual void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization) { }
+        public virtual void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction,Action<int,string> dealDmg) { }
         protected void setRelativeVisibility()
         {
             Canvas.SetZIndex(body, Convert.ToInt32((Canvas.GetTop(body) + body.Height) / 100) - 1);
@@ -376,6 +375,7 @@ namespace BasicsOfGame
         int hitboxTicks=0;
         public Golem(Canvas canv, int x, int y)
         {
+            nameOfMonster = "Golem";
             expGiven = 500;
             attackTicks = 0;
             animations = 7;
@@ -493,7 +493,8 @@ namespace BasicsOfGame
             }
 
         }
-        private void Smash(System.Windows.Shapes.Rectangle player, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization,int stage)
+        
+        private void Smash(System.Windows.Shapes.Rectangle player, Action<int, string> dealDmg, int stage)
         {
             int min;
             int max;
@@ -506,14 +507,14 @@ namespace BasicsOfGame
             }
             else if (stage == 2)
             {
-                min = Convert.ToInt16(minDmg*2/3);
-                max = Convert.ToInt16(maxDmg * 2/3);
+                min = Convert.ToInt16(minDmg* 3 / 4);
+                max = Convert.ToInt16(maxDmg * 3 / 4);
                 
             }
             else if (stage == 3)
             {
-                min = Convert.ToInt16(minDmg * 1 / 3);
-                max = Convert.ToInt16(maxDmg * 1 / 3);
+                min = Convert.ToInt16(minDmg * 1 / 2);
+                max = Convert.ToInt16(maxDmg * 1 / 2);
                 
             }
             else
@@ -528,32 +529,16 @@ namespace BasicsOfGame
             if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
             {
 
-                int obecnyDmg = Convert.ToInt32(dmg.Text);
+                
                 int dealtDamage = rnd.Next(min, max + 1);
-                obecnyDmg += dealtDamage;
-                dmg.Text = obecnyDmg.ToString();
-                dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                dmg.Opacity = 1;
-                Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
-                Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
-                hp -= dealtDamage;
-                if (hp <= 0)
-                {
-                    isDead = true;
-                    killedBy = "Golem";
-                    lastDamage = dealtDamage;
-                }
-                hpVisualization.Text = hp + "/" + maxHp;
-                double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
-                if (w < 0) w = 0;
-                hpBar.Width = Convert.ToInt32(w);
+                dealDmg(dealtDamage,nameOfMonster);
                 string statusEffect = "Stun";
                 Monster.damageOverTime.Add(new Tuple<int, double, string>(0, stunDuration, statusEffect));
 
 
             }
         }
-        private void attack(System.Windows.Shapes.Rectangle player, double delta, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization)
+        private void attack(System.Windows.Shapes.Rectangle player, double delta, Action<int, string> dealDmg)
         {
             if (attackTicks == 7&&attackTimer/200>1)
             {
@@ -670,7 +655,7 @@ namespace BasicsOfGame
                 attackTicks++;
                 hitboxTicks++;
                 attackTimer = 0;
-                Smash(player, dmg, hpBar, ref hp, ref maxHp, hpVisualization,1);
+                Smash(player, dealDmg, 1);
                 return;
             }
             if (attackTicks == 5 && attackTimer / 300 > 1)
@@ -701,7 +686,7 @@ namespace BasicsOfGame
                 attackTicks++;
                 hitboxTicks++;
                 attackTimer = 0;
-                Smash(player, dmg, hpBar, ref hp, ref maxHp, hpVisualization,2);
+                Smash(player, dealDmg, 2);
                 return;
             }
             if(attackTicks==6 &&attackTimer/ 300 > 1)
@@ -732,14 +717,14 @@ namespace BasicsOfGame
                 attackTicks++;
                 hitboxTicks++;
                 attackTimer = 0;
-                Smash(player, dmg, hpBar, ref hp, ref maxHp, hpVisualization,3);
-                
+                Smash(player, dealDmg, 3);
+
                 return;
             }
 
 
         }
-        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization)
+        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction,Action<int, string> dealDmg)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
 
@@ -750,7 +735,7 @@ namespace BasicsOfGame
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name)+(name.Width/2) , Canvas.GetTop(name));
             if (prepareToAttack)
             {
-                attack(name, delta, dmg, hpBar, ref hp, ref maxHp, hpVisualization);
+                attack(name, delta, dealDmg);
                 return;
             }
 
@@ -883,6 +868,7 @@ namespace BasicsOfGame
         
         public Goblin(Canvas canv,int x, int y)
         {
+            nameOfMonster = "Goblin";
             expGiven = 150;
             attackTicks = 0;
             animations = 5;
@@ -998,7 +984,7 @@ namespace BasicsOfGame
         
         
 
-        private void attack(System.Windows.Shapes.Rectangle player, double delta,TextBox dmg,System.Windows.Shapes.Rectangle hpBar,ref int hp,ref int maxHp,TextBox hpVisualization)
+        private void attack(System.Windows.Shapes.Rectangle player, double delta,Action<int,string> dealDmg)
         {
             if (attackTicks == 6)
             {
@@ -1134,25 +1120,9 @@ namespace BasicsOfGame
                 if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
                 {
                     
-                        int obecnyDmg = Convert.ToInt32(dmg.Text);
+                       
                         int dealtDamage= rnd.Next(minDmg, maxDmg + 1);
-                        obecnyDmg += dealtDamage;
-                        dmg.Text = obecnyDmg.ToString();
-                        dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                        dmg.Opacity = 1;
-                        Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
-                        Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
-                         hp -= dealtDamage;
-                            if (hp <= 0)
-                        {
-                        isDead = true;
-                        killedBy = "Goblin";
-                        lastDamage = dealtDamage;
-                    }
-                    hpVisualization.Text = hp + "/" + maxHp;
-                        double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
-                        if (w < 0) w = 0;
-                        hpBar.Width = Convert.ToInt32(w);
+                        dealDmg(dealtDamage, nameOfMonster);
                    
                     
                 }
@@ -1164,7 +1134,8 @@ namespace BasicsOfGame
 
 
         }
-        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction,TextBox dmg, System.Windows.Shapes.Rectangle hpBar,ref int hp,ref int maxHp,TextBox hpVisualization)
+        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
+
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
             
@@ -1175,7 +1146,7 @@ namespace BasicsOfGame
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {
-                attack(name, delta,dmg,hpBar,ref hp,ref maxHp, hpVisualization);
+                attack(name, delta,dealDmg);
                 return;
             }
 
@@ -1310,6 +1281,7 @@ namespace BasicsOfGame
         int igniteDot;
         public Imp(Canvas canv, int x, int y)
         {
+            nameOfMonster = "Imp";
             igniteDot = Convert.ToInt32(2 * diffMulti);
             dotDuration = 2000;
             expGiven = 300;
@@ -1430,7 +1402,7 @@ namespace BasicsOfGame
 
 
 
-        private void attack(System.Windows.Shapes.Rectangle player, double delta, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization)
+        private void attack(System.Windows.Shapes.Rectangle player, double delta, Action<int, string> dealDmg)
         {
             if (attackTicks == 4&&attackTimer/200>1)
             {
@@ -1584,25 +1556,9 @@ namespace BasicsOfGame
                 if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
                 {
 
-                    int obecnyDmg = Convert.ToInt32(dmg.Text);
+                    
                     int dealtDamage = rnd.Next(minDmg, maxDmg + 1);
-                    obecnyDmg += dealtDamage;
-                    dmg.Text = obecnyDmg.ToString();
-                    dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                    dmg.Opacity = 1;
-                    Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
-                    Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
-                    hp -= dealtDamage;
-                    if (hp <= 0)
-                    {
-                        isDead = true;
-                        killedBy = "Imp";
-                        lastDamage = dealtDamage;
-                    }
-                    hpVisualization.Text = hp + "/" + maxHp;
-                    double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
-                    if (w < 0) w = 0;
-                    hpBar.Width = Convert.ToInt32(w);
+                    dealDmg(dealtDamage, nameOfMonster);
                     string dotName = "Ignite";
                     Monster.damageOverTime.Add(new Tuple<int, double, string>(igniteDot, dotDuration, dotName));
 
@@ -1624,7 +1580,7 @@ namespace BasicsOfGame
 
 
         }
-        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization)
+        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
 
@@ -1635,7 +1591,7 @@ namespace BasicsOfGame
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {
-                attack(name, delta, dmg, hpBar, ref hp, ref maxHp, hpVisualization);
+                attack(name, delta,dealDmg);
                 return;
             }
 
@@ -1766,6 +1722,7 @@ namespace BasicsOfGame
         private double dotDuration;
         public Spider(Canvas canv, int x, int y)
         {
+            nameOfMonster = "Spider";
             expGiven = 300;
             attackTicks = 0;
             animations = 6;
@@ -1879,7 +1836,7 @@ namespace BasicsOfGame
             }
 
         }
-        private void attack(System.Windows.Shapes.Rectangle player, double delta, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization)
+        private void attack(System.Windows.Shapes.Rectangle player, double delta, Action<int, string> dealDmg)
         {
             if (attackTicks == 4&&attackTimer/20>1)
             {
@@ -1975,25 +1932,9 @@ namespace BasicsOfGame
                 if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
                 {
 
-                    int obecnyDmg = Convert.ToInt32(dmg.Text);
+                    
                     int dealtDamage = rnd.Next(minDmg, maxDmg + 1);
-                    obecnyDmg += dealtDamage;
-                    dmg.Text = obecnyDmg.ToString();
-                    dmg.Width = Convert.ToInt16(dmg.Text.Length) * 20;
-                    dmg.Opacity = 1;
-                    Canvas.SetLeft(dmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (dmg.Width / 2));
-                    Canvas.SetTop(dmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - dmg.Height);
-                    hp -= dealtDamage;
-                    if (hp <= 0)
-                    {
-                        isDead = true;
-                        killedBy = "Spider";
-                        lastDamage = dealtDamage;
-                    }
-                    hpVisualization.Text = hp + "/" + maxHp;
-                    double w = Convert.ToDouble(hp) / Convert.ToDouble(maxHp) * 200;
-                    if (w < 0) w = 0;
-                    hpBar.Width = Convert.ToInt32(w);
+                    dealDmg(dealtDamage, nameOfMonster);
                     string dotName = "Poison";
                     Monster.damageOverTime.Add(new Tuple<int,double,string>(poisonDot, dotDuration,dotName));
 
@@ -2007,7 +1948,8 @@ namespace BasicsOfGame
 
 
         }
-        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, TextBox dmg, System.Windows.Shapes.Rectangle hpBar, ref int hp, ref int maxHp, TextBox hpVisualization)
+        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
+
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
 
@@ -2018,7 +1960,7 @@ namespace BasicsOfGame
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {
-                attack(name, delta, dmg, hpBar, ref hp, ref maxHp, hpVisualization);
+                attack(name, delta,dealDmg);
                 return;
             }
 

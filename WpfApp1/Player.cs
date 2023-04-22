@@ -24,7 +24,7 @@ namespace BasicsOfGame
     {
         int level;
         bool ignited;
-        bool stunned ;
+        bool stunned;
         int poisonStacks;
         bool returnUp, returnDown, returnLeft, returnRight, blockAttack;
         TextBox playerDmg;
@@ -49,14 +49,14 @@ namespace BasicsOfGame
         private int intervalForAttackAnimations;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
-        private int attackRange , attackDirection;
+        private int attackRange, attackDirection;
         private double unlockAttack = 0;
         System.Windows.Shapes.Rectangle hpBar;
         System.Windows.Shapes.Rectangle hpBarWindow;
         System.Windows.Shapes.Rectangle expBar;
         System.Windows.Shapes.Rectangle expBarWindow;
         System.Windows.Shapes.Rectangle DotBar;
-        System.Windows.Shapes.Rectangle[] buffsContainer =new System.Windows.Shapes.Rectangle[14] ;
+        System.Windows.Shapes.Rectangle[] buffsContainer = new System.Windows.Shapes.Rectangle[14];
         TextBox expVisualization;
         int healthPoints;
         int maxHealthPoints;
@@ -66,9 +66,12 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
-        List<Tuple<double, double, double, double,string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double,string>>();
+        List<Tuple<double, double, double, double, string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
         // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list 5.Name 
         Canvas GameScreen;
+        public static string killedBy = "Damage over time";
+        public static bool isDead = false;
+        public static int lastDamage = 1;
         public Player(Canvas GS)
         {
             level = 1;
@@ -111,7 +114,7 @@ namespace BasicsOfGame
 
             }
             initializeAnimationsForAttack();
-            DamagePerMilliseconds = new List<Tuple<double, double, double, double,string>>();
+            DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
             playerSprite.ImageSource = rightRun[0];
             rightD = true;
             player.Fill = playerSprite;
@@ -175,7 +178,7 @@ namespace BasicsOfGame
             Canvas.SetZIndex(playerDmg, 999);
         }
         private void createExpBar()
-        { 
+        {
             expBar = new System.Windows.Shapes.Rectangle();
             expBar.Width = 0;
             expBar.Height = 15;
@@ -208,48 +211,48 @@ namespace BasicsOfGame
             GameScreen.Children.Add(expBarWindow);
             GameScreen.Children.Add(expVisualization);
         }
-         private void createDotBar()
-         {
-           /*
-            GroupBox DotBar = new GroupBox();
-            DotBar.Header = "Buffs & Debuffs";
-            DotBar.Foreground= new SolidColorBrush(Colors.Blue);
-            //DotBar.Background= new SolidColorBrush(Colors.Black);
-            DotBar.BorderBrush= new SolidColorBrush(Colors.Blue);
-            */
+        private void createDotBar()
+        {
+            /*
+             GroupBox DotBar = new GroupBox();
+             DotBar.Header = "Buffs & Debuffs";
+             DotBar.Foreground= new SolidColorBrush(Colors.Blue);
+             //DotBar.Background= new SolidColorBrush(Colors.Black);
+             DotBar.BorderBrush= new SolidColorBrush(Colors.Blue);
+             */
             DotBar = new System.Windows.Shapes.Rectangle();
-             Canvas.SetLeft(DotBar, 210);
-             Canvas.SetTop(DotBar, 0);
-             Canvas.SetZIndex(DotBar, 880);
-             ImageBrush sprite = new ImageBrush();
+            Canvas.SetLeft(DotBar, 210);
+            Canvas.SetTop(DotBar, 0);
+            Canvas.SetZIndex(DotBar, 880);
+            ImageBrush sprite = new ImageBrush();
             sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/playerAssets/hpBar.png", UriKind.Absolute));
-             DotBar.Width = 210;
-             DotBar.Height = 50;
-             DotBar.Fill = sprite;
+            DotBar.Width = 210;
+            DotBar.Height = 50;
+            DotBar.Fill = sprite;
             GameScreen.Children.Add(DotBar);
         }
         private void activeBuffs()//poison
         {
-            
+
 
             for (int i = 0; i < 3; i++)
             {
                 buffsContainer[i] = new System.Windows.Shapes.Rectangle();
                 buffsContainer[i].Width = 30;
                 buffsContainer[i].Height = 15;
-                Canvas.SetLeft(buffsContainer[i],210+i*30 );
+                Canvas.SetLeft(buffsContainer[i], 210 + i * 30);
                 Canvas.SetTop(buffsContainer[i], 5);
                 Canvas.SetZIndex(buffsContainer[i], 800);
                 ImageBrush sprite = new ImageBrush();
-                sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Buffs_Debuffs/buff{i+1}.png", UriKind.Absolute));
+                sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Buffs_Debuffs/buff{i + 1}.png", UriKind.Absolute));
                 buffsContainer[i].Fill = sprite;
                 GameScreen.Children.Add(buffsContainer[i]);
 
             }
-            
+
 
         }
-        
+
         private void createHpBar()
         {
 
@@ -357,18 +360,18 @@ namespace BasicsOfGame
         }
         private void dotUpdate(double deltaTime)
         {
-            List<Tuple<int, double,string>> dotUpdater = new List<Tuple<int, double,string>>();
+            List<Tuple<int, double, string>> dotUpdater = new List<Tuple<int, double, string>>();
             Monster.update(dotUpdater);
             double dmg;
             double time;
             string dotName;
-            
+
             foreach (var x in dotUpdater)
             {
                 dmg = x.Item1;
                 time = x.Item2;
                 double dmgPerMs = dmg / 1000;
-               
+
                 dotName = x.Item3;
                 if (dotName == "Poison")
                 {
@@ -405,35 +408,35 @@ namespace BasicsOfGame
                     }
                 }
                 else if (dotName == "Stun")
-                { 
-                        if (!stunned)
+                {
+                    if (!stunned)
+                    {
+                        DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(0, 0, 0, time, dotName));
+                        Canvas.SetZIndex(buffsContainer[2], 1000);
+                        stunned = true;
+                        if (rightD)
                         {
-                            DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(0, 0, 0, time, dotName));
-                            Canvas.SetZIndex(buffsContainer[2], 1000);
-                            stunned = true;
-                             if (rightD)
-                            {
-                            currentMovementAnimation=0;
-                            
-                            playerSprite.ImageSource = rightRun[currentMovementAnimation];
-                            }
-                            else
-                            {
                             currentMovementAnimation = 0;
-                            
+
+                            playerSprite.ImageSource = rightRun[currentMovementAnimation];
+                        }
+                        else
+                        {
+                            currentMovementAnimation = 0;
+
                             playerSprite.ImageSource = leftRun[currentMovementAnimation];
 
-                            }
+                        }
                     }
 
                 }
                 else { DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName)); }
             }
-            
+
             if (DamagePerMilliseconds.Count > 0)
             {
-                
-                List<Tuple<double, double, double, double,string>> toRemove = new List<Tuple<double, double, double, double,string>>();
+
+                List<Tuple<double, double, double, double, string>> toRemove = new List<Tuple<double, double, double, double, string>>();
                 for (int i = 0; i < DamagePerMilliseconds.Count; i++)
                 {
 
@@ -451,13 +454,13 @@ namespace BasicsOfGame
                     double timeElapsed = DamagePerMilliseconds[i].Item3 + deltaTime * 1000;
                     double maxTime = DamagePerMilliseconds[i].Item4;
                     string nameOfDot = DamagePerMilliseconds[i].Item5;
-                    DamagePerMilliseconds[i] = new Tuple<double, double, double, double,string>(dmgPerMs, currentDmg, timeElapsed, maxTime,nameOfDot);
+                    DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(dmgPerMs, currentDmg, timeElapsed, maxTime, nameOfDot);
                     if (maxTime <= timeElapsed) toRemove.Add(DamagePerMilliseconds[i]);
                 }
 
                 foreach (var x in toRemove)
                 {
-                    
+
                     if (x.Item5 == "Poison")
                     {
                         poisonStacks--;
@@ -476,23 +479,23 @@ namespace BasicsOfGame
                     DamagePerMilliseconds.Remove(x);
 
                 }
-               
+
 
 
 
             }
-           
+
 
         }
         public void startPosition(ref Grid map)
         {
             map.goTo(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
         }
-        private void checkCollision(bool UpKey,bool DownKey, bool RightKey,bool LeftKey)
+        private void checkCollision(bool UpKey, bool DownKey, bool RightKey, bool LeftKey)
         {
             if (Speed == 0) return;
 
-            if (UpKey&&!stunned)
+            if (UpKey && !stunned)
             {
                 if (((Canvas.GetLeft(player) > 960) && (Canvas.GetTop(player) < 170)) && (Canvas.GetLeft(player) - Canvas.GetTop(player) > 1000))
                 {
@@ -567,7 +570,7 @@ namespace BasicsOfGame
 
 
         }
-        public void generateTB(string tag,ref List<TextBox> boxes) // Text Boxes
+        public void generateTB(string tag, ref List<TextBox> boxes) // Text Boxes
         {
             List<TextBox> removeTB = new List<TextBox>();
             int howMany = 0;
@@ -614,20 +617,20 @@ namespace BasicsOfGame
 
 
         }
-        public void gameTick(ScrollViewer Camera,bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map,double deltaTime,double Friction, ref List<TextBox> boxes)
+        public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes)
         {
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed / 2 * deltaTime;
 
             if (blockAttack)
             {
-                
+
                 unlockAttack += Convert.ToDouble(1000 * deltaTime);
 
                 if (unlockAttack / (intervalForAttackAnimations * (6 - ticksRemaining)) >= 1 && ticksRemaining > 0)
                 {
 
-                    attackOmni(deltaTime,ref map,ref boxes);
+                    attackOmni(deltaTime, ref map, ref boxes);
                 }
                 if (unlockAttack > 400) { blockAttack = false; unlockAttack = 0; ticksRemaining = 0; }
 
@@ -649,8 +652,8 @@ namespace BasicsOfGame
 
             Camera.ScrollToHorizontalOffset(horizontalOffset);
             Camera.ScrollToVerticalOffset(verticalOffset);
-            checkCollision(UpKey,DownKey,RightKey,LeftKey);
-            if ((UpKey || DownKey || RightKey || LeftKey)&&!stunned)
+            checkCollision(UpKey, DownKey, RightKey, LeftKey);
+            if ((UpKey || DownKey || RightKey || LeftKey) && !stunned)
             {
                 if (ticksDone >= 10 / Speed)
                 {
@@ -685,7 +688,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(player) < -20)
                 {
                     map.goTo(-1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
-                    generateTB("enemy",ref boxes);
+                    generateTB("enemy", ref boxes);
                 }
             }
             else if (Canvas.GetTop(player) < 10)
@@ -698,7 +701,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(player) > 518)
                 {
                     map.goTo(1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
-                    generateTB("enemy",ref boxes);
+                    generateTB("enemy", ref boxes);
                 }
             }
             else if (Canvas.GetTop(player) > 488)
@@ -711,7 +714,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(player) < -41)
                 {
                     map.goTo(0, -1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
-                    generateTB("enemy",ref boxes);
+                    generateTB("enemy", ref boxes);
                 }
             }
             else if (Canvas.GetLeft(player) < -11)
@@ -725,7 +728,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(player) > 1130)
                 {
                     map.goTo(0, 1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
-                    generateTB("enemy",ref boxes);
+                    generateTB("enemy", ref boxes);
                 }
             }
             else if (Canvas.GetLeft(player) > 1100)
@@ -763,17 +766,41 @@ namespace BasicsOfGame
 
             SpeedX = SpeedX * Friction;
             SpeedY = SpeedY * Friction;
-            if (Speed != 0&&!stunned) Canvas.SetLeft(player, Canvas.GetLeft(player) + SpeedX);
-            if (Speed != 0&&!stunned) Canvas.SetTop(player, Canvas.GetTop(player) + SpeedY);
+            if (Speed != 0 && !stunned) Canvas.SetLeft(player, Canvas.GetLeft(player) + SpeedX);
+            if (Speed != 0 && !stunned) Canvas.SetTop(player, Canvas.GetTop(player) + SpeedY);
 
             dotUpdate(deltaTime);
             foreach (Monster monster in map.rMon())
-                monster.moveToTarget(player, deltaTime, Friction, playerDmg, hpBar, ref healthPoints, ref maxHealthPoints, hpVisualization);
+                monster.moveToTarget(player, deltaTime, Friction, dealDmgToPlayer);
         }
-        public int getHp(){ return healthPoints; }
-        public bool getBlock(){return blockAttack; }
-        public void setBlock(bool block) {  blockAttack = block; }
+        public int getHp() { return healthPoints; }
+        public bool getBlock() { return blockAttack; }
+        public void setBlock(bool block) { blockAttack = block; }
         public double getSpeed() { return Speed; }
+        public void  dealDmgToPlayer(int dealtDamage,string monsterName)
+        {
+            int obecnyDmg = Convert.ToInt32(playerDmg.Text);
+            obecnyDmg += dealtDamage;
+            playerDmg.Text = obecnyDmg.ToString();
+            playerDmg.Width = Convert.ToInt16(playerDmg.Text.Length) * 20;
+            playerDmg.Opacity = 1;
+            Canvas.SetLeft(playerDmg, Canvas.GetLeft(player) + (player.ActualWidth / 2) - (playerDmg.Width / 2));
+            Canvas.SetTop(playerDmg, (Canvas.GetTop(player) - (player.Height - player.ActualHeight)) - playerDmg.Height);
+            healthPoints -= dealtDamage;
+            if (healthPoints <= 0)
+            {
+                isDead = true;
+                killedBy = monsterName;
+                lastDamage = dealtDamage;
+            }
+            hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
+            double w = Convert.ToDouble(healthPoints) / Convert.ToDouble(maxHealthPoints) * 200;
+            if (w < 0) w = 0;
+            hpBar.Width = Convert.ToInt32(w);
+
+
+
+        }
         private bool determinateCollision(Rect player, Rect obj)
         {
             if (obj.X < (player.X + player.Width) && (obj.X + obj.Width) > player.X)

@@ -213,11 +213,11 @@ namespace BasicsOfGame
             checkOpacity("enemy");
             mainCharacter.checkOpacity();
           
-            if (Monster.isDead||mainCharacter.getHp()<=0)
+            if (Player.isDead||mainCharacter.getHp()<=0)
             {
                 isGameRunning = false;
-                Monster.isDead = false;
-                gameMenu.deathScreen(Monster.killedBy,Monster.lastDamage);
+                Player.isDead = false;
+                gameMenu.deathScreen(Player.killedBy, Player.lastDamage);
             }
 
         }
