@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 using System.Numerics;
+using System.Windows.Shapes;
 
 namespace BasicsOfGame
 {
@@ -22,6 +23,7 @@ namespace BasicsOfGame
         Canvas BelongTo;
         Point[,] objectGrid;
         bool[,] availableOnGrid;
+        bool visited;
 
         public Pokoj(Canvas canv,int t)
         {
@@ -29,6 +31,7 @@ namespace BasicsOfGame
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
             enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
             BelongTo = canv;
+            visited = false;
 
             //below we setup a grid for spawning objects
             int gridX = 7, gridY = 3, gridBlockSizeX=162, gridBlockSizeY=166;
@@ -350,6 +353,16 @@ namespace BasicsOfGame
 
             
         }
+
+        public void setVisited(bool newValue)
+        {
+            visited = newValue;
+        }
+
+        public bool getVisited()
+        {
+            return visited;
+        }
     }
 
     internal class Grid
@@ -362,7 +375,9 @@ namespace BasicsOfGame
         Random rnd = new Random();
         int direction;
         int firstDoor = -1, lastDoor;
-        
+        List<System.Windows.Shapes.Rectangle> miniMapRectangles = new List<System.Windows.Shapes.Rectangle>();
+        Canvas canvas;
+
         public Grid(Canvas canv)
         {
             grid = new Pokoj[gridSize, gridSize]; //if 0 then no room and 1,2,3,etc. mean different types of rooms
@@ -374,6 +389,7 @@ namespace BasicsOfGame
                     
                 }
             }
+            canvas = canv;
             grid[gridMid, gridMid].setType(1);
             roomCount--;
             currX = gridMid;
@@ -401,7 +417,7 @@ namespace BasicsOfGame
                     case 1:
                         if (currY > 0)
                         {
-                            if (!CheckRoom(currX, currY - 1))//check) to up
+                            if (!CheckRoom(currX, currY - 1))//check to up
                             {
                                 grid[currX, currY - 1].setType(type);
                                 roomCount--;
@@ -442,17 +458,66 @@ namespace BasicsOfGame
             }
             generateDoors();
         }
-        public void ShowMap(TextBox c)
+        public void ShowMap(GroupBox c)  //minimapa
         {
+            miniMapRectangles = new List<Rectangle>();
             for (int i = 0; i < gridSize; i++)
             {
                 for(int j = 0; j < gridSize; j++)
                 {
-                    c.Text += grid[i, j].getType().ToString();
+                    if (grid[i, j].getVisited())
+                    {
+                        Rectangle square = new Rectangle();
+                        
+                        square.Width = c.Width / gridSize;
+                        square.Height = c.Height / gridSize;
+                        square.Fill = Brushes.White;
+                        square.Opacity = 1;
+                        Canvas.SetZIndex(square, 1000);
+                        //Canvas.SetZIndex(cStackPanel, 1000);
+                        
+                        
+                        Canvas.SetLeft(square, Canvas.GetLeft(c) + (j * ((c.Width) / gridSize)));
+                        Canvas.SetTop(square, Canvas.GetTop(c) + (i * ((c.Height) / gridSize)));
+
+                        miniMapRectangles.Add(square);
+                        //rysujemy kwadracik
+
+                        if (i - 1 >= 0 && !grid[i - 1, j].getVisited())
+                        {
+                            //rysujemy znak zapytania
+                        }
+                        if (j - 1 >= 0 && !grid[i , j - 1].getVisited())
+                        {
+                            //rysujemy znak zapytania
+                        }
+                        if (i + 1 < gridSize && !grid[i + 1, j].getVisited())
+                        {
+                            //rysujemy znak zapytania
+                        }
+                        if (j + 1 < gridSize && !grid[i, j + 1].getVisited())
+                        {
+                            //rysujemy znak zapytania
+                        }
+                    }
+                    //c.Text += grid[i, j].getType().ToString();
                 }
-                c.Text += "\n";
+                //c.Text += "\n";
             }
-            
+            //c.Content = cStackPanel;
+            foreach(Rectangle rectangle in miniMapRectangles)
+            {
+                canvas.Children.Add(rectangle);
+            }
+
+
+        }
+        public void miniMapClear()
+        {
+            for(int i=0; i<miniMapRectangles.Count; i++)
+            {
+                canvas.Children.Remove(miniMapRectangles[i]);
+            }
         }
         public int getX()
         {
@@ -466,7 +531,11 @@ namespace BasicsOfGame
         {
             currX = firstDoor / 10;
             currY = firstDoor % 10;
+            //if (!grid[currX, currY].getVisited())
+            //{
+            //}
             
+            grid[currX, currY].setVisited(true);
             grid[currX,currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist,ref upDoorExist, ref downDoorExist, doorDirection);
         }
         public List<Monster> rMon()
@@ -475,12 +544,16 @@ namespace BasicsOfGame
         }
         public void goTo(int xAxis,int yAxis, Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
+            //if (!grid[currX, currY].getVisited())
+            //{
+            //}
             foreach (Monster x in grid[currX, currY].monArr())
             {
                 x.remove();
             }
             if (xAxis==1 || xAxis == -1) { currX += xAxis; }
             else if(yAxis==1 || yAxis == -1) { currY += yAxis; }
+            grid[currX, currY].setVisited(true);
             grid[currX, currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, doorDirection);
         }
         private void generateDoors()
@@ -497,6 +570,7 @@ namespace BasicsOfGame
                         unlock = true;
                         firstDoor = i * 10 + j;
                         grid[i, j].setType(2);
+                        grid[i, j].setVisited(true);
 
                     }
                     if (grid[i, j].getType() != 0)

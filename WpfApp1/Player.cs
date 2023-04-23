@@ -16,7 +16,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BasicsOfGame
 {
@@ -83,8 +82,8 @@ namespace BasicsOfGame
             attackRange = 100;
             intervalForAttackAnimations = 30;
             exp = 0;
-            minDmg = 10;
-            maxDmg = 15;
+            minDmg = 1000;
+            maxDmg = 1500;
             Speed = 100;
             baseSpeed = 100;
             player.Name = "Player";
@@ -617,7 +616,7 @@ namespace BasicsOfGame
 
 
         }
-        public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes)
+        public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes, Action write)
         {
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed / 2 * deltaTime;
@@ -688,6 +687,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(player) < -20)
                 {
                     map.goTo(-1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
+                    write();
                     generateTB("enemy", ref boxes);
                 }
             }
@@ -701,6 +701,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(player) > 518)
                 {
                     map.goTo(1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
+                    write();
                     generateTB("enemy", ref boxes);
                 }
             }
@@ -714,6 +715,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(player) < -41)
                 {
                     map.goTo(0, -1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
+                    write();
                     generateTB("enemy", ref boxes);
                 }
             }
@@ -728,6 +730,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(player) > 1130)
                 {
                     map.goTo(0, 1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
+                    write();
                     generateTB("enemy", ref boxes);
                 }
             }

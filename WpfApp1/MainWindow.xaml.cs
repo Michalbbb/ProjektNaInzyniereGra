@@ -46,9 +46,9 @@ namespace BasicsOfGame
 
         Menu gameMenu;
         Grid map;
-        TextBox helper; // Current minimap
+        //TextBox helper; // Current minimap
+        GroupBox helper;  // new minimap
         Player mainCharacter;
-
 
         private void KeyboardDown(object sender, KeyEventArgs e)
         {
@@ -73,7 +73,8 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Tab)
             {
-                helper.Opacity = 1;
+                map.ShowMap(helper);
+                helper.Opacity = 0.5;
                 
             }
             if (e.Key == Key.Escape)
@@ -87,11 +88,15 @@ namespace BasicsOfGame
         }
         private void write()
         {
-            map.ShowMap(helper);
-            helper.Width = 200;
-            helper.Height = 200;
+            helper.Width = 400;
+            helper.Height = 400;
+            Canvas.SetLeft(helper, 575-(helper.Width)/2); //575 is the X value of the center of the screen
+            Canvas.SetTop(helper, 297-(helper.Height)/2); //297 is the Y value of the center of the screen
             helper.Background = Brushes.Black;
             helper.Foreground = Brushes.White;
+            Canvas.SetZIndex(helper, 998);
+            map.ShowMap(helper);
+            map.miniMapClear();
         }
         
         
@@ -116,6 +121,7 @@ namespace BasicsOfGame
             if (e.Key == Key.Tab)
             {
                 helper.Opacity = 0;
+                map.miniMapClear();
             }
             
         }
@@ -164,7 +170,7 @@ namespace BasicsOfGame
             }
             mainCharacter = new Player(GameScreen);
             map = new Grid(GameScreen);
-            helper = new TextBox();
+            helper = new GroupBox();
             helper.Opacity = 0;
             GameScreen.Children.Add(helper);
             helper.IsEnabled = false;
@@ -223,7 +229,7 @@ namespace BasicsOfGame
         }
         private void gameTick(object sender, EventArgs e)
         {
-            mainCharacter.gameTick(cam,UpKey,DownKey,RightKey,LeftKey,ref map,deltaTime,Friction,ref boxes);
+            mainCharacter.gameTick(cam,UpKey,DownKey,RightKey,LeftKey,ref map,deltaTime,Friction,ref boxes, write);
         }
         private void checkOpacity(string tag)
         {
