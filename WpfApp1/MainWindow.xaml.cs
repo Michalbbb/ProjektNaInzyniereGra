@@ -180,7 +180,7 @@ namespace BasicsOfGame
             
             GameScreen.Focus();
             mainCharacter.startPosition(ref map);
-            map.updateMiniMap(miniMapHolder);
+            updateMiniMap();
             mainCharacter.generateTB("enemy", ref boxes);
 
 

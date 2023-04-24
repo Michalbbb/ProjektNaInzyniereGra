@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.Numerics;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
 
 namespace BasicsOfGame
 {
@@ -376,7 +377,16 @@ namespace BasicsOfGame
         int direction;
         int firstDoor = -1, lastDoor;
         List<System.Windows.Shapes.Rectangle> miniMapRectangles = new List<System.Windows.Shapes.Rectangle>();
-        private bool[,] alreadyInMinimap = new bool[gridSize, gridSize];
+        List<System.Windows.Shapes.Rectangle> miniMapQuestionMarks = new List<System.Windows.Shapes.Rectangle>();
+
+        private int[,] isAssignedAs = new int[gridSize, gridSize];
+        private const int NOTHING = 0;
+        private const int BASIC_ROOM = 1;
+        private const int QUESTION_MARK_ROOM = 2;
+        private const int BOSS_ROOM = 3;
+        private const int TREASURE_ROOM = 4;
+
+
         Canvas canvas;
         private bool isMiniMapBeingUsed=false;
 
@@ -387,7 +397,7 @@ namespace BasicsOfGame
             {
                  for(int j=0;j<gridSize; j++)
                 {
-                    alreadyInMinimap[i, j] = false;
+                    isAssignedAs[i, j] = NOTHING;
                 }
             }
             for (int i = 0; i < gridSize; i++)
@@ -469,48 +479,58 @@ namespace BasicsOfGame
         }
         public void updateMiniMap(GroupBox c)  //minimapa
         {
-            for (int i = 0; i < gridSize; i++)
+            
+            if (grid[currX, currY].getVisited() && isAssignedAs[currX,currY]!= BASIC_ROOM)
             {
-                for(int j = 0; j < gridSize; j++)
+                if (isAssignedAs[currX, currY] == QUESTION_MARK_ROOM)
                 {
-                    if (grid[i, j].getVisited() && !alreadyInMinimap[i,j])
+                    for(int i = miniMapQuestionMarks.Count - 1; i >= 0; i++)
                     {
-                        alreadyInMinimap[i, j] = true;
-                        Rectangle square = new Rectangle();
-                        
-                        square.Width = c.Width / gridSize;
-                        square.Height = c.Height / gridSize;
-                        square.Fill = Brushes.White;
-                        square.Opacity = 0.55;
-                        Canvas.SetZIndex(square, 1000);
-                      
-                        
-                        
-                        Canvas.SetLeft(square, Canvas.GetLeft(c) + (j * ((c.Width) / gridSize)));
-                        Canvas.SetTop(square, Canvas.GetTop(c) + (i * ((c.Height) / gridSize)));
-
-                        miniMapRectangles.Add(square);
-                        //rysujemy kwadracik
-
-                        if (i - 1 >= 0 && !grid[i - 1, j].getVisited())
+                        // Question mark room becoming basic room ( delete question mark remains from list of question mark rectangles)
+                        if (Canvas.GetLeft(miniMapQuestionMarks[i]) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(miniMapQuestionMarks[i]) ==(Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))) )
                         {
-                            //rysujemy znak zapytania
-                        }
-                        if (j - 1 >= 0 && !grid[i , j - 1].getVisited())
-                        {
-                            //rysujemy znak zapytania
-                        }
-                        if (i + 1 < gridSize && !grid[i + 1, j].getVisited())
-                        {
-                            //rysujemy znak zapytania
-                        }
-                        if (j + 1 < gridSize && !grid[i, j + 1].getVisited())
-                        {
-                            //rysujemy znak zapytania
+                            miniMapQuestionMarks.Remove(miniMapQuestionMarks[i]);
                         }
                     }
-                    //c.Text += grid[i, j].getType().ToString();
                 }
+                isAssignedAs[currX, currY] = BASIC_ROOM;
+                        
+                Rectangle square = new Rectangle();
+                square.Width = c.Width / gridSize;
+                square.Height = c.Height / gridSize;
+                square.Fill = Brushes.White;
+                square.Opacity = 0.55;
+                Canvas.SetZIndex(square, 1000);
+                Canvas.SetLeft(square, Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize)));
+                Canvas.SetTop(square, Canvas.GetTop(c) + (currX * ((c.Height) / gridSize)));
+
+                miniMapRectangles.Add(square);
+                        //rysujemy kwadracik
+
+                        if (currX - 1 >= 0 && !grid[currX - 1, currY].getVisited() && grid[currX-1,currY].getType()!=0)
+                        {
+
+                            
+
+                            //grid[currX-1,currY].getType()==0 oznacza, ze pokoj jest nie uzywany, więc !=0 oznacza, że jest używany.
+                            //rysujemy znak zapytania
+
+                        }
+                        if (currY - 1 >= 0 && !grid[currX, currY - 1].getVisited() && grid[currX, currY - 1].getType() != 0)
+                        {
+                            //rysujemy znak zapytania
+                        }
+                        if (currX + 1 < gridSize && !grid[currX + 1, currY].getVisited() && grid[currX + 1, currY].getType()!=0)
+                        {
+                            //rysujemy znak zapytania
+                        }
+                        if (currY + 1 < gridSize && !grid[currX, currY + 1].getVisited() && grid[currX, currY+1].getType() != 0)
+                        {
+                            //rysujemy znak zapytania
+                        }
+                    
+                    //c.Text += grid[i, j].getType().ToString();
+                
                 //c.Text += "\n";
             }
 
