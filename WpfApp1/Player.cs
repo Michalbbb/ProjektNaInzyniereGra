@@ -68,11 +68,14 @@ namespace BasicsOfGame
         List<Tuple<double, double, double, double, string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
         // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list 5.Name 
         Canvas GameScreen;
-        public static string killedBy = "Damage over time";
-        public static bool isDead = false;
-        public static int lastDamage = 1;
+        public static string killedBy;
+        public static bool isDead;
+        public static int lastDamage;
         public Player(Canvas GS)
         {
+            killedBy = "Damage over time";
+            isDead = false;
+            lastDamage = 1;
             level = 1;
             stunned = false;
             poisonStacks = 0;
