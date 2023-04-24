@@ -21,6 +21,7 @@ namespace BasicsOfGame
 {
     internal class Player
     {
+        bool godmode = false;
         int level;
         bool ignited;
         bool stunned;
@@ -35,6 +36,7 @@ namespace BasicsOfGame
         private double SpeedX, SpeedY, Speed, baseSpeed;
         private int minDmg;
         private int maxDmg;
+        private int passiveSkillsToUse = 0;
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
         private const int animations = 6;
@@ -65,6 +67,8 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
+        
+        SkillTree playerPassives;
         List<Tuple<double, double, double, double, string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
         // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list 5.Name 
         Canvas GameScreen;
@@ -73,7 +77,9 @@ namespace BasicsOfGame
         public static int lastDamage;
         public Player(Canvas GS)
         {
+            
             killedBy = "Damage over time";
+            playerPassives = new SkillTree(GS);
             isDead = false;
             lastDamage = 1;
             level = 1;
@@ -85,8 +91,9 @@ namespace BasicsOfGame
             attackRange = 100;
             intervalForAttackAnimations = 30;
             exp = 0;
-            minDmg = 1000;
-            maxDmg = 1500;
+            minDmg = 10;
+            maxDmg = 15;
+            if (godmode) { minDmg = 1000;maxDmg = 1500;healthPoints = 20000;maxHealthPoints = 20000; }
             Speed = 100;
             baseSpeed = 100;
             player.Name = "Player";
@@ -434,7 +441,7 @@ namespace BasicsOfGame
                 }
                 else { DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName)); }
             }
-
+            
             if (DamagePerMilliseconds.Count > 0)
             {
 
@@ -867,6 +874,15 @@ namespace BasicsOfGame
                 }
             }
         }
+        public void hideSkillTree()
+        {
+            playerPassives.hideSkillTree();
+        }
+        public void showSkillTree()
+        {
+            playerPassives.showSkillTree();
+        }
+        public int remainingSkillsPoints() { return passiveSkillsToUse; }
         private void updateExp()
         {
             if (exp > 1000)
@@ -879,6 +895,10 @@ namespace BasicsOfGame
                 double w = Convert.ToDouble(healthPoints) / Convert.ToDouble(maxHealthPoints) * 200;
                 if (w < 0) w = 0;
                 hpBar.Width = Convert.ToInt32(w);
+
+                passiveSkillsToUse++;
+                
+                
             }
             
             expVisualization.Text = "lvl. "+level.ToString();

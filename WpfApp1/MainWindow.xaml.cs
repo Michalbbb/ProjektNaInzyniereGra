@@ -37,11 +37,11 @@ namespace BasicsOfGame
     {
         private bool UpKey, DownKey, LeftKey, RightKey;
         private List<TextBox> boxes;
-        
+        Button LevelUp;
         System.Windows.Shapes.Rectangle BlackScreenOverlay = new System.Windows.Shapes.Rectangle();
         private const float Friction = 0.65f;
-        
-        
+        bool tryingAssign = false;
+
         public static bool isGameRunning = false;
 
         Menu gameMenu;
@@ -79,7 +79,9 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Escape)
             {
-                StopGame();
+                SwitchState();
+                mainCharacter.hideSkillTree();
+                tryingAssign = false;
             }
             
             
@@ -128,15 +130,16 @@ namespace BasicsOfGame
             {
                 miniMapHolder.Opacity = 0;
                 map.miniMapClear();
+               
             }
             
         }
         
-        private void StopGame()
+        private void SwitchState()
         {
             if (isGameRunning)
             {
-
+                
                 isGameRunning = false;
                 GameScreen.Children.Remove(BlackScreenOverlay);
                 GameScreen.Children.Add(BlackScreenOverlay);
@@ -148,7 +151,6 @@ namespace BasicsOfGame
                 Canvas.SetTop(BlackScreenOverlay, 0);
                 Canvas.SetZIndex(BlackScreenOverlay, 50);
                 BlackScreenOverlay.Visibility = Visibility.Visible;
-               
                 gameMenu.pauseGameMenu();
                 
 
@@ -186,11 +188,28 @@ namespace BasicsOfGame
             mainCharacter.startPosition(ref map);
             updateMiniMap();
             mainCharacter.generateTB("enemy", ref boxes);
-
+            LevelUp = new Button();
+            LevelUp.Width = 50;
+            LevelUp.Height = 50;
+            LevelUp.Content = "+";
+            Canvas.SetLeft(LevelUp, 1150);
+            Canvas.SetTop(LevelUp, 550);
+            LevelUp.IsEnabled = false;
+            LevelUp.Visibility = Visibility.Hidden;
+            GameScreen.Children.Add(LevelUp);
+            LevelUp.Click += assignSkillPoints;
 
 
             isGameRunning = true;
+            
         }
+        
+        private void assignSkillPoints(object sender, RoutedEventArgs e)
+        {
+            if (tryingAssign) { mainCharacter.hideSkillTree(); tryingAssign = false; }
+            else { mainCharacter.showSkillTree(); tryingAssign = true; }
+        }
+
         public MainWindow()
         {     
             InitializeComponent();
@@ -216,8 +235,12 @@ namespace BasicsOfGame
             DateTime now = DateTime.Now;
             deltaTime = (now - _lastRenderTime).TotalSeconds;
             _lastRenderTime = now;
-            if (!isGameRunning)  return;
-            
+            if (!isGameRunning)
+            {
+
+                return;
+            }
+
             else GameScreen.Children.Remove(BlackScreenOverlay);
 
             
@@ -225,7 +248,16 @@ namespace BasicsOfGame
             gameTick(sender, e);
             checkOpacity("enemy");
             mainCharacter.checkOpacity();
-          
+            if (mainCharacter.remainingSkillsPoints() > 0)
+            {
+                LevelUp.Visibility= Visibility.Visible;
+                LevelUp.IsEnabled= true;
+            }
+            else
+            {
+                LevelUp.Visibility = Visibility.Hidden;
+                LevelUp.IsEnabled = false;
+            }
             if (Player.isDead||mainCharacter.getHp()<=0)
             {
                 isGameRunning = false;

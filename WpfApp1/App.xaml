@@ -3,7 +3,5 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BasicsOfGame"
              StartupUri="MainWindow.xaml">
-    <Application.Resources>
-        <SolidColorBrush x:Key="backgroundC">#DF1F1F</SolidColorBrush>
-    </Application.Resources>
+    
 </Application>

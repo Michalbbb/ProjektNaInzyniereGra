@@ -109,6 +109,7 @@
     <None Remove="images\MonsterSprites\impAttack.png" />
     <None Remove="images\MonsterSprites\impMovement.png" />
     <None Remove="images\MonsterSprites\spiderFullAnimation.png" />
+    <None Remove="images\passives\passive56.png" />
     
     <None Remove="images\playerAssets\hpBar.png" />
    
@@ -151,6 +152,7 @@
   <ItemGroup>
     <Resource Include="images\Buffs_Debuffs\buff1.png" />
     <Resource Include="images\Buffs_Debuffs\buff3.png" />
+    <Resource Include="images\passives\passive56.png" />
     <Resource Include="images\UI\Credits.png" />
     <Resource Include="images\UI\Death.png" />
     <Resource Include="images\UI\guideBG.png" />
