@@ -616,7 +616,7 @@ namespace BasicsOfGame
 
 
         }
-        public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes, Action write)
+        public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes, Action updateMiniMap)
         {
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed / 2 * deltaTime;
@@ -687,7 +687,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(player) < -20)
                 {
                     map.goTo(-1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, UPDOOR);
-                    write();
+                    updateMiniMap();
                     generateTB("enemy", ref boxes);
                 }
             }
@@ -701,7 +701,7 @@ namespace BasicsOfGame
                 if (Canvas.GetTop(player) > 518)
                 {
                     map.goTo(1, 0, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, DOWNDOOR);
-                    write();
+                    updateMiniMap();
                     generateTB("enemy", ref boxes);
                 }
             }
@@ -715,7 +715,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(player) < -41)
                 {
                     map.goTo(0, -1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, LEFTDOOR);
-                    write();
+                    updateMiniMap();
                     generateTB("enemy", ref boxes);
                 }
             }
@@ -730,7 +730,7 @@ namespace BasicsOfGame
                 if (Canvas.GetLeft(player) > 1130)
                 {
                     map.goTo(0, 1, GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, RIGHTDOOR);
-                    write();
+                    updateMiniMap();
                     generateTB("enemy", ref boxes);
                 }
             }

@@ -47,7 +47,7 @@ namespace BasicsOfGame
         Menu gameMenu;
         Grid map;
         //TextBox helper; // Current minimap
-        GroupBox helper;  // new minimap
+        GroupBox miniMapHolder;  // new minimap
         Player mainCharacter;
 
         private void KeyboardDown(object sender, KeyEventArgs e)
@@ -73,8 +73,8 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Tab)
             {
-                map.ShowMap(helper);
-                helper.Opacity = 0.5;
+                map.showMiniMap();
+                miniMapHolder.Opacity = 0.3;
                 
             }
             if (e.Key == Key.Escape)
@@ -86,19 +86,21 @@ namespace BasicsOfGame
 
 
         }
-        private void write()
+        private void updateMiniMap()
         {
-            helper.Width = 400;
-            helper.Height = 400;
-            Canvas.SetLeft(helper, 575-(helper.Width)/2); //575 is the X value of the center of the screen
-            Canvas.SetTop(helper, 297-(helper.Height)/2); //297 is the Y value of the center of the screen
-            helper.Background = Brushes.Black;
-            helper.Foreground = Brushes.White;
-            Canvas.SetZIndex(helper, 998);
-            map.ShowMap(helper);
-            map.miniMapClear();
+           
+            map.updateMiniMap(miniMapHolder);
         }
-        
+        private void setMiniMapPosition()
+        {
+            miniMapHolder.Width = 400;
+            miniMapHolder.Height = 400;
+            Canvas.SetLeft(miniMapHolder, 575 - (miniMapHolder.Width) / 2); //575 is the X value of the center of the screen
+            Canvas.SetTop(miniMapHolder, 297 - (miniMapHolder.Height) / 2); //297 is the Y value of the center of the screen
+            miniMapHolder.Background = Brushes.Black;
+            miniMapHolder.Foreground = Brushes.White;
+            Canvas.SetZIndex(miniMapHolder, 998);
+        }
         
         private void KeyboardUp(object sender, KeyEventArgs e)
         {
@@ -120,7 +122,7 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Tab)
             {
-                helper.Opacity = 0;
+                miniMapHolder.Opacity = 0;
                 map.miniMapClear();
             }
             
@@ -170,14 +172,15 @@ namespace BasicsOfGame
             }
             mainCharacter = new Player(GameScreen);
             map = new Grid(GameScreen);
-            helper = new GroupBox();
-            helper.Opacity = 0;
-            GameScreen.Children.Add(helper);
-            helper.IsEnabled = false;
-            write();
+            miniMapHolder = new GroupBox();
+            miniMapHolder.Opacity = 0;
+            GameScreen.Children.Add(miniMapHolder);
+            miniMapHolder.IsEnabled = false;
+            setMiniMapPosition();
             
             GameScreen.Focus();
             mainCharacter.startPosition(ref map);
+            map.updateMiniMap(miniMapHolder);
             mainCharacter.generateTB("enemy", ref boxes);
 
 
@@ -229,7 +232,7 @@ namespace BasicsOfGame
         }
         private void gameTick(object sender, EventArgs e)
         {
-            mainCharacter.gameTick(cam,UpKey,DownKey,RightKey,LeftKey,ref map,deltaTime,Friction,ref boxes, write);
+            mainCharacter.gameTick(cam,UpKey,DownKey,RightKey,LeftKey,ref map,deltaTime,Friction,ref boxes, updateMiniMap);
         }
         private void checkOpacity(string tag)
         {

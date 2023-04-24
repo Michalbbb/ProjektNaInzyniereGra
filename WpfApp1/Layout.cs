@@ -376,11 +376,20 @@ namespace BasicsOfGame
         int direction;
         int firstDoor = -1, lastDoor;
         List<System.Windows.Shapes.Rectangle> miniMapRectangles = new List<System.Windows.Shapes.Rectangle>();
+        private bool[,] alreadyInMinimap = new bool[gridSize, gridSize];
         Canvas canvas;
+        private bool isMiniMapBeingUsed=false;
 
         public Grid(Canvas canv)
         {
             grid = new Pokoj[gridSize, gridSize]; //if 0 then no room and 1,2,3,etc. mean different types of rooms
+            for(int i=0;i<gridSize; i++)
+            {
+                 for(int j=0;j<gridSize; j++)
+                {
+                    alreadyInMinimap[i, j] = false;
+                }
+            }
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
@@ -458,23 +467,23 @@ namespace BasicsOfGame
             }
             generateDoors();
         }
-        public void ShowMap(GroupBox c)  //minimapa
+        public void updateMiniMap(GroupBox c)  //minimapa
         {
-            miniMapRectangles = new List<Rectangle>();
             for (int i = 0; i < gridSize; i++)
             {
                 for(int j = 0; j < gridSize; j++)
                 {
-                    if (grid[i, j].getVisited())
+                    if (grid[i, j].getVisited() && !alreadyInMinimap[i,j])
                     {
+                        alreadyInMinimap[i, j] = true;
                         Rectangle square = new Rectangle();
                         
                         square.Width = c.Width / gridSize;
                         square.Height = c.Height / gridSize;
                         square.Fill = Brushes.White;
-                        square.Opacity = 1;
+                        square.Opacity = 0.55;
                         Canvas.SetZIndex(square, 1000);
-                        //Canvas.SetZIndex(cStackPanel, 1000);
+                      
                         
                         
                         Canvas.SetLeft(square, Canvas.GetLeft(c) + (j * ((c.Width) / gridSize)));
@@ -504,13 +513,22 @@ namespace BasicsOfGame
                 }
                 //c.Text += "\n";
             }
-            //c.Content = cStackPanel;
-            foreach(Rectangle rectangle in miniMapRectangles)
+
+            if (isMiniMapBeingUsed)
+            {
+                foreach (Rectangle rectangle in miniMapRectangles) canvas.Children.Remove(rectangle);
+                foreach (Rectangle rectangle in miniMapRectangles) canvas.Children.Add(rectangle);
+            }
+
+        }
+        public void showMiniMap()
+        {
+            if (isMiniMapBeingUsed) return;
+            isMiniMapBeingUsed = true;
+            foreach (Rectangle rectangle in miniMapRectangles)
             {
                 canvas.Children.Add(rectangle);
             }
-
-
         }
         public void miniMapClear()
         {
@@ -518,6 +536,7 @@ namespace BasicsOfGame
             {
                 canvas.Children.Remove(miniMapRectangles[i]);
             }
+            isMiniMapBeingUsed = false;
         }
         public int getX()
         {
