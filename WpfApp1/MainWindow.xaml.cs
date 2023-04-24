@@ -73,7 +73,7 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Tab)
             {
-                map.showMiniMap();
+                map.showMiniMap(miniMapHolder);
                 miniMapHolder.Opacity = 0.3;
                 
             }
@@ -93,6 +93,10 @@ namespace BasicsOfGame
         }
         private void setMiniMapPosition()
         {
+            //miniMapHolder.Header = "Minimap";
+            miniMapHolder.FontSize = 15;
+            miniMapHolder.FontFamily = new FontFamily("Algerian");
+            miniMapHolder.BorderThickness = new Thickness(0);
             miniMapHolder.Width = 400;
             miniMapHolder.Height = 400;
             Canvas.SetLeft(miniMapHolder, 575 - (miniMapHolder.Width) / 2); //575 is the X value of the center of the screen

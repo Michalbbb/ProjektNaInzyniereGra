@@ -377,7 +377,7 @@ namespace BasicsOfGame
         int direction;
         int firstDoor = -1, lastDoor;
         List<System.Windows.Shapes.Rectangle> miniMapRectangles = new List<System.Windows.Shapes.Rectangle>();
-        List<System.Windows.Shapes.Rectangle> miniMapQuestionMarks = new List<System.Windows.Shapes.Rectangle>();
+        List<Label> miniMapQuestionMarks = new List<Label>();
 
         private int[,] isAssignedAs = new int[gridSize, gridSize];
         private const int NOTHING = 0;
@@ -479,12 +479,17 @@ namespace BasicsOfGame
         }
         public void updateMiniMap(GroupBox c)  //minimapa
         {
+            if (isMiniMapBeingUsed)
+            {
+                foreach (Rectangle rectangle in miniMapRectangles) canvas.Children.Remove(rectangle);
+                foreach (Label questionMark in miniMapQuestionMarks) canvas.Children.Remove(questionMark);
+            }
             
             if (grid[currX, currY].getVisited() && isAssignedAs[currX,currY]!= BASIC_ROOM)
             {
                 if (isAssignedAs[currX, currY] == QUESTION_MARK_ROOM)
                 {
-                    for(int i = miniMapQuestionMarks.Count - 1; i >= 0; i++)
+                    for(int i = miniMapQuestionMarks.Count - 1; i >= 0; i--)
                     {
                         // Question mark room becoming basic room ( delete question mark remains from list of question mark rectangles)
                         if (Canvas.GetLeft(miniMapQuestionMarks[i]) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(miniMapQuestionMarks[i]) ==(Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))) )
@@ -496,8 +501,8 @@ namespace BasicsOfGame
                 isAssignedAs[currX, currY] = BASIC_ROOM;
                         
                 Rectangle square = new Rectangle();
-                square.Width = c.Width / gridSize;
-                square.Height = c.Height / gridSize;
+                square.Width = (c.Width / gridSize);
+                square.Height = (c.Height / gridSize);
                 square.Fill = Brushes.White;
                 square.Opacity = 0.55;
                 Canvas.SetZIndex(square, 1000);
@@ -506,28 +511,81 @@ namespace BasicsOfGame
 
                 miniMapRectangles.Add(square);
                         //rysujemy kwadracik
+        
+                if (currX - 1 >= 0 && !grid[currX - 1, currY].getVisited()&& grid[currX-1,currY].getType()!=0 && isAssignedAs[currX - 1, currY] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX-1, currY] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX - 1) * ((c.Height) / gridSize)));
 
-                        if (currX - 1 >= 0 && !grid[currX - 1, currY].getVisited() && grid[currX-1,currY].getType()!=0)
-                        {
+                    miniMapQuestionMarks.Add(question);
+                    //grid[currX-1,currY].getType()==0 oznacza, ze pokoj jest nie uzywany, więc !=0 oznacza, że jest używany.
+                    //rysujemy znak zapytania
 
-                            
+                }
+                if (currY - 1 >= 0 && !grid[currX, currY - 1].getVisited() && grid[currX, currY - 1].getType() != 0 && isAssignedAs[currX, currY - 1] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX, currY - 1] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + ((currY - 1) * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX) * ((c.Height) / gridSize)));
 
-                            //grid[currX-1,currY].getType()==0 oznacza, ze pokoj jest nie uzywany, więc !=0 oznacza, że jest używany.
-                            //rysujemy znak zapytania
+                    miniMapQuestionMarks.Add(question);
+                    //rysujemy znak zapytania
+                }
+                if (currX + 1 < gridSize && !grid[currX + 1, currY].getVisited() && grid[currX + 1, currY].getType()!=0 && isAssignedAs[currX + 1, currY] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX + 1, currY] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX + 1) * ((c.Height) / gridSize)));
 
-                        }
-                        if (currY - 1 >= 0 && !grid[currX, currY - 1].getVisited() && grid[currX, currY - 1].getType() != 0)
-                        {
-                            //rysujemy znak zapytania
-                        }
-                        if (currX + 1 < gridSize && !grid[currX + 1, currY].getVisited() && grid[currX + 1, currY].getType()!=0)
-                        {
-                            //rysujemy znak zapytania
-                        }
-                        if (currY + 1 < gridSize && !grid[currX, currY + 1].getVisited() && grid[currX, currY+1].getType() != 0)
-                        {
-                            //rysujemy znak zapytania
-                        }
+                    miniMapQuestionMarks.Add(question);
+                    //rysujemy znak zapytania
+                }
+                if (currY + 1 < gridSize && !grid[currX, currY + 1].getVisited() && grid[currX, currY+1].getType() != 0 && isAssignedAs[currX, currY + 1] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX, currY + 1] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + ((currY + 1) * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX) * ((c.Height) / gridSize)));
+
+                    miniMapQuestionMarks.Add(question);
+                    //rysujemy znak zapytania
+                }
                     
                     //c.Text += grid[i, j].getType().ToString();
                 
@@ -536,25 +594,49 @@ namespace BasicsOfGame
 
             if (isMiniMapBeingUsed)
             {
-                foreach (Rectangle rectangle in miniMapRectangles) canvas.Children.Remove(rectangle);
-                foreach (Rectangle rectangle in miniMapRectangles) canvas.Children.Add(rectangle);
+                foreach (Rectangle rectangle in miniMapRectangles)
+                {
+                    if (Canvas.GetLeft(rectangle) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(rectangle) == (Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))))
+                    {
+                        rectangle.Opacity = 0.8;
+                    }
+                    else
+                    {
+                        rectangle.Opacity = 0.55;// w przyszłości może będzie tu zmienna żeby 2 razy nie pisać 0.55 bo się zepsuje
+                    }
+                    canvas.Children.Add(rectangle);
+                }
+                foreach (Label questionMark in miniMapQuestionMarks) canvas.Children.Add(questionMark);
             }
 
         }
-        public void showMiniMap()
+        public void showMiniMap(GroupBox c)
         {
             if (isMiniMapBeingUsed) return;
             isMiniMapBeingUsed = true;
             foreach (Rectangle rectangle in miniMapRectangles)
             {
+                if (Canvas.GetLeft(rectangle) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(rectangle) == (Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))))
+                {
+                    rectangle.Opacity = 0.8;
+                }
+                else
+                {
+                    rectangle.Opacity = 0.55;// w przyszłości może będzie tu zmienna żeby 2 razy nie pisać 0.55 bo się zepsuje
+                }
                 canvas.Children.Add(rectangle);
             }
+            foreach (Label questionMark in miniMapQuestionMarks) canvas.Children.Add(questionMark);
         }
         public void miniMapClear()
         {
             for(int i=0; i<miniMapRectangles.Count; i++)
             {
                 canvas.Children.Remove(miniMapRectangles[i]);
+            }
+            for (int i = 0; i < miniMapQuestionMarks.Count; i++)
+            {
+                canvas.Children.Remove(miniMapQuestionMarks[i]);
             }
             isMiniMapBeingUsed = false;
         }
