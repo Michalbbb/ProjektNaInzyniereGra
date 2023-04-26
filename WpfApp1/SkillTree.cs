@@ -18,17 +18,21 @@ namespace BasicsOfGame
         List<Tuple<string, string, double>> propertiesOfNode = new List<Tuple<string, string, double>>();
         string name="";
         string description="";
+        int stages=0;
+        int currentStage = 0;
         TextBlock toolTip;
         Button visualPassive;
         Canvas currentCanvas;
         bool isBeingShown = false;
         bool isAddedToTree = false;
-        public Passive(string data,Canvas canvas)
+        Action up;
+        public Passive(string data,Canvas canvas,Action update)
         {
+            up = update;
             currentCanvas = canvas;
             const int NAME = 0;
             const int DESCRIPTION = 1;
-            const int NAME_OF_PASSIVE = 2;
+            const int NAME_OF_PASSIVE_IMAGE = 2;
             const int TAG = 3;
             const int TYPE = 4;
             const int VALUE = 5;
@@ -39,11 +43,11 @@ namespace BasicsOfGame
             string nameOfPassive = "";
             bool sequenceEnded = false;
             for(int i=0; i<data.Length; i++)
-            {
+            {                                                                               
                 if (data[i] == ';') { segment++; continue; }
                 if (segment == NAME) name += data[i];
                 else if (segment == DESCRIPTION) description += data[i];
-                else if (segment == NAME_OF_PASSIVE) nameOfPassive += data[i];
+                else if (segment == NAME_OF_PASSIVE_IMAGE) nameOfPassive += data[i];
                 else if (segment > 2)
                         {
                             if ((segment % 3) + 3 == TAG)
@@ -51,6 +55,7 @@ namespace BasicsOfGame
                                 if (sequenceEnded)
                                 {
                                     sequenceEnded = false;
+                                    stages++;
                                     propertiesOfNode.Add(new Tuple<string, string, double>(tag, type, Convert.ToDouble(valueToConvert)));
                                     tag = "";
                                     type = "";
@@ -71,42 +76,57 @@ namespace BasicsOfGame
                         }
                 
             }
+            stages++;
             propertiesOfNode.Add(new Tuple<string, string, double>(tag, type, Convert.ToDouble(valueToConvert)));
 
             toolTip = new TextBlock();
-            toolTip.Text = name+"\n"+description;
+            
             toolTip.IsEnabled = false;
             toolTip.FontSize = 10.0;
-            int start = toolTip.Text.IndexOf(name);
-            int length = name.Length + 1;
-            TextPointer startPtr = toolTip.ContentStart.GetPositionAtOffset(start);
-            TextPointer endPtr = startPtr.GetPositionAtOffset(length);
-            TextRange boldRange = new TextRange(startPtr, endPtr);
-            boldRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
-            boldRange.ApplyPropertyValue(TextElement.FontSizeProperty, 15.0);
             toolTip.Background = Brushes.OrangeRed;
             toolTip.Foreground = Brushes.AliceBlue;
             toolTip.Padding = new Thickness(10);
             visualPassive = new Button();
             visualPassive.Opacity = 0.5;
             visualPassive.Style = (Style)Application.Current.MainWindow.FindResource("InformButton");
-            //visualPassive.Style = (Style)FindResource("InformButton");
+           
             ImageBrush sprite = new ImageBrush();
             sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/{nameOfPassive}.png", UriKind.Absolute));
             visualPassive.Background = sprite;
             visualPassive.Foreground = Brushes.Black;
 
 
-            Canvas.SetLeft(visualPassive, 580);
-            Canvas.SetTop(visualPassive, 280);
+            Canvas.SetLeft(visualPassive, 120);
+            Canvas.SetTop(visualPassive, 120);
             Canvas.SetZIndex(visualPassive, 1501);
             Canvas.SetZIndex(toolTip, 1502);
-            visualPassive.Width = 40;
-            visualPassive.Height = 40;
+            visualPassive.Width = 60;
+            visualPassive.Height = 60;
             visualPassive.MouseMove += showToolTip;
             visualPassive.MouseLeave += hideToolTip;
 
             visualPassive.Click += tryAllocating;
+           
+
+        }
+
+       
+
+        private void tryAllocating(object sender, RoutedEventArgs e)
+        {
+            
+            
+            if (Player.unassignedSkillPoints < 1) return;
+            else { Player.unassignedSkillPoints--; Player.assignedSkillPoints++; SkillTree.updateAssignedSkillPoints(); up(); }
+            if (currentStage < stages) { currentStage++; updateToolTip(); }
+            visualPassive.Opacity = 1;
+           
+        }
+
+        public void setPos(int x, int y)
+        {
+            Canvas.SetLeft(visualPassive, x);
+            Canvas.SetTop(visualPassive, y);
 
         }
         public void showPassiveInTree()
@@ -129,38 +149,107 @@ namespace BasicsOfGame
             isBeingShown = false;
             currentCanvas.Children.Remove(toolTip);
         }
+        private void updateToolTip()
+        {
+            toolTip.Text = name;
+           
+            toolTip.Text += "\nCurrent effect: ";
+            if (currentStage == 0) { toolTip.Text += "none"; }
+            else
+            {
+                toolTip.Text += description + " " + propertiesOfNode[currentStage - 1].Item3.ToString();
+                if (propertiesOfNode[currentStage - 1].Item2 == "percent") toolTip.Text += "%";
 
+
+            }
+
+            if (currentStage < stages)
+            {
+                toolTip.Text += "\n";
+                toolTip.Text += "Next level: ";
+                toolTip.Text += description + " " + propertiesOfNode[currentStage].Item3.ToString();
+                if (propertiesOfNode[currentStage].Item2 == "percent") toolTip.Text += "%";
+            }
+            int start = toolTip.Text.IndexOf(name);
+            int length = name.Length + 1;
+
+            TextPointer startPtr = toolTip.ContentStart.GetPositionAtOffset(start);
+            TextPointer endPtr = startPtr.GetPositionAtOffset(length);
+            TextRange boldRange = new TextRange(startPtr, endPtr);
+            boldRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+            boldRange.ApplyPropertyValue(TextElement.FontSizeProperty, 15.0);
+        }
         private void showToolTip(object sender, MouseEventArgs e)
         {
-            Point p = Mouse.GetPosition(currentCanvas);
-            Canvas.SetLeft(toolTip, p.X + 15);
-            Canvas.SetTop(toolTip, p.Y + 15);
+            
+            toolTip.Text = name;
+            
+            toolTip.Text += "\nCurrent effect: ";
+            if(currentStage==0) { toolTip.Text += "none"; }
+            else
+            {
+                toolTip.Text += description+" "+propertiesOfNode[currentStage-1].Item3.ToString();
+                if (propertiesOfNode[currentStage-1].Item2 == "percent") toolTip.Text += "%";
 
+
+            }
+            
+            if (currentStage < stages)
+            {
+                toolTip.Text += "\n";
+                toolTip.Text += "Next level: ";
+                toolTip.Text += description + " " + propertiesOfNode[currentStage].Item3.ToString();
+                if (propertiesOfNode[currentStage].Item2 == "percent") toolTip.Text += "%";
+            }
+            int start = toolTip.Text.IndexOf(name);
+            int length = name.Length + 1;
+            TextPointer startPtr = toolTip.ContentStart.GetPositionAtOffset(start);
+            TextPointer endPtr = startPtr.GetPositionAtOffset(length);
+            TextRange boldRange = new TextRange(startPtr, endPtr);
+            boldRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+            boldRange.ApplyPropertyValue(TextElement.FontSizeProperty, 15.0);
+            Point p = Mouse.GetPosition(currentCanvas);
+            if (p.X>1000)
+            Canvas.SetLeft(toolTip, p.X - toolTip.ActualWidth);
+            else Canvas.SetLeft(toolTip, p.X + 15);
+            if(p.Y>520) Canvas.SetTop(toolTip, p.Y + 15 - toolTip.ActualHeight);
+            else Canvas.SetTop(toolTip, p.Y + 15);
             if (!isBeingShown) currentCanvas.Children.Add(toolTip);
             isBeingShown = true;
         }
 
-        private void tryAllocating(object sender, RoutedEventArgs e)
-        {
-            if (visualPassive.Opacity == 1) visualPassive.Opacity = 0.5;
-            else visualPassive.Opacity = 1;
-
-        }
+       
     }
     internal class SkillTree
     {
         Canvas currentCanvas;
-        Passive demo;
+        private Passive[] skills=new Passive[25];
         GroupBox tree;
         Button closeTree;
         Button acceptChanges;
         bool isBeingShown;
-        TextBox assignedCurrently;
+        static TextBox assignedCurrently;
+        private int skillPointsAtTimeOfClick;
         public SkillTree(Canvas canvas)
         {
             currentCanvas = canvas;
-            string data= "Might of the bear;+10 to maximum health\n+1 to minimum damage;passive56;maximumHealth;flat;10;minimumDamage;flat;1"; 
-            demo = new Passive(data, currentCanvas);
+            string data= "Heavy hand;Increases your damage by;passive56;damage;percent;10;damage;percent;25;damage;percent;50;"; 
+            for(int i = 0; i < 25; i++)
+            {
+                skills[i] = new Passive(data, currentCanvas,updateAcceptChanges);
+            }
+            int x; 
+            int y = 120;
+            for(int i = 0; i < 5; i++)
+            {
+                x = 300;
+                for(int j = 0; j < 5; j++)
+                {
+                    skills[j+i*5].setPos(x, y);
+                    x += 200;
+                }
+                y += 100;
+            }
             tree = new GroupBox();
             tree.Width = 1200;
             tree.Height = 601;
@@ -210,6 +299,27 @@ namespace BasicsOfGame
             Canvas.SetZIndex(assignedCurrently, 1501);
             tree.BorderThickness = new Thickness(0);
         }
+        public static void updateAssignedSkillPoints()
+        {
+            assignedCurrently.Text = "Remaining skill points: " + Player.unassignedSkillPoints + "\nAssigned skill points: " + Player.assignedSkillPoints;
+            
+        }
+        private void updateAcceptChanges()
+        {
+            if(Player.unassignedSkillPoints<skillPointsAtTimeOfClick)
+            {
+                acceptChanges.Opacity = 1;
+                acceptChanges.IsEnabled = true;
+                acceptChanges.MouseEnter += changeColorAC;
+                acceptChanges.MouseLeave += changeColorAC;
+            }
+        }
+
+        private void changeColorAC(object sender, MouseEventArgs e)
+        {
+            if (acceptChanges.Foreground == Brushes.Black) acceptChanges.Foreground = Brushes.LightGreen;
+            else if (acceptChanges.Foreground == Brushes.LightGreen) acceptChanges.Foreground = Brushes.Black;
+        }
 
         private void changeColor(object sender, MouseEventArgs e)
         {
@@ -233,13 +343,15 @@ namespace BasicsOfGame
             if (isBeingShown) return;
             else
             {
+               
+                skillPointsAtTimeOfClick = Player.unassignedSkillPoints;
                 isBeingShown = true;
                 assignedCurrently.Text = "Remaining skill points: "+Player.unassignedSkillPoints+"\nAssigned skill points: "+Player.assignedSkillPoints;
                 currentCanvas.Children.Add(tree);
                 currentCanvas.Children.Add(closeTree);
                 currentCanvas.Children.Add(assignedCurrently);
                 currentCanvas.Children.Add(acceptChanges);
-                demo.showPassiveInTree();
+                foreach (Passive pas in skills) pas.showPassiveInTree();
             }
         }
         public void hideSkillTree()
@@ -252,7 +364,7 @@ namespace BasicsOfGame
                 currentCanvas.Children.Remove(closeTree);
                 currentCanvas.Children.Remove(assignedCurrently);
                 currentCanvas.Children.Remove(acceptChanges);
-                demo.removeFromTree();
+                foreach (Passive pas in skills) pas.removeFromTree();
                 currentCanvas.Focus();
             }
         }
