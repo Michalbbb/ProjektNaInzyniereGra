@@ -21,7 +21,7 @@ namespace BasicsOfGame
 {
     internal class Player
     {
-        bool godmode = false;
+        bool godmode = true;
         int level;
         bool ignited;
         bool stunned;
@@ -36,7 +36,9 @@ namespace BasicsOfGame
         private double SpeedX, SpeedY, Speed, baseSpeed;
         private int minDmg;
         private int maxDmg;
-        private int passiveSkillsToUse = 0;
+        public static int unassignedSkillPoints ;
+        public static int assignedSkillPoints ;
+
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
         private const int animations = 6;
@@ -77,7 +79,9 @@ namespace BasicsOfGame
         public static int lastDamage;
         public Player(Canvas GS)
         {
-            
+
+            unassignedSkillPoints = 0;
+            assignedSkillPoints = 0;
             killedBy = "Damage over time";
             playerPassives = new SkillTree(GS);
             isDead = false;
@@ -882,7 +886,7 @@ namespace BasicsOfGame
         {
             playerPassives.showSkillTree();
         }
-        public int remainingSkillsPoints() { return passiveSkillsToUse; }
+        
         private void updateExp()
         {
             if (exp > 1000)
@@ -896,7 +900,7 @@ namespace BasicsOfGame
                 if (w < 0) w = 0;
                 hpBar.Width = Convert.ToInt32(w);
 
-                passiveSkillsToUse++;
+                unassignedSkillPoints++;
                 
                 
             }

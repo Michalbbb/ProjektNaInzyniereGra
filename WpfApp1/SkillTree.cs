@@ -152,46 +152,93 @@ namespace BasicsOfGame
         Canvas currentCanvas;
         Passive demo;
         GroupBox tree;
-        TextBox description;
+        Button closeTree;
+        Button acceptChanges;
         bool isBeingShown;
+        TextBox assignedCurrently;
         public SkillTree(Canvas canvas)
         {
             currentCanvas = canvas;
             string data= "Might of the bear;+10 to maximum health\n+1 to minimum damage;passive56;maximumHealth;flat;10;minimumDamage;flat;1"; 
             demo = new Passive(data, currentCanvas);
             tree = new GroupBox();
-            tree.Width = 720;
-            tree.Height = 480;
-            description= new TextBox();
-            description.Text = " SKILL TREE ";
-            description.FontFamily = new FontFamily("Algerian");
-            description.FontSize = 50;
-            Canvas.SetLeft(tree, (currentCanvas.Width / 2) - (tree.Width / 2));
-            Canvas.SetTop(tree, (currentCanvas.Height / 2) - (tree.Height / 2));
-            Canvas.SetZIndex(tree, 1500);
-            description.Width = 300;
-            description.Height = 60;
-            description.Opacity = 1;
-            description.Background = Brushes.Black;
-            description.Foreground = Brushes.White;
+            tree.Width = 1200;
+            tree.Height = 601;
+            ImageBrush bgForST = new ImageBrush();
+            bgForST.ImageSource= new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/skillTreeBackground.png", UriKind.Absolute));
+            tree.Background =bgForST;
             
-
-            Canvas.SetLeft(description, (currentCanvas.Width / 2) - (description.Width/2));
-            Canvas.SetTop(description,0);
-            Canvas.SetZIndex(description, 1500);
-            description.IsEnabled = false;
-            tree.Background = Brushes.Black;
+            Canvas.SetLeft(tree, 0);
+            Canvas.SetTop(tree, -1);
+            Canvas.SetZIndex(tree, 1500);
+            closeTree = new Button();
+            closeTree.Style= (Style)Application.Current.MainWindow.FindResource("InformButton");
+            closeTree.Content = "X";
+            closeTree.Click += hideST;
+            closeTree.MouseEnter += changeColor;
+            closeTree.MouseLeave += changeColor;
+            Canvas.SetLeft(closeTree, 1110);
+            Canvas.SetTop(closeTree, 10);
+            Canvas.SetZIndex(closeTree, 1501);
+            closeTree.Background = Brushes.White;
+            closeTree.Foreground = Brushes.Black;
+            closeTree.Width = 50;
+            closeTree.Height = 50;
+            acceptChanges = new Button();
+            acceptChanges.Style = (Style)Application.Current.MainWindow.FindResource("InformButton");
+            acceptChanges.Content = "✓";
+            acceptChanges.Click += updateTree;
+            acceptChanges.IsEnabled = false;
+            acceptChanges.Opacity = 0.7;
+            Canvas.SetLeft(acceptChanges, 1050);
+            Canvas.SetTop(acceptChanges, 10);
+            Canvas.SetZIndex(acceptChanges, 1501);
+            acceptChanges.Background = Brushes.White;
+            acceptChanges.Foreground = Brushes.Black;
+            acceptChanges.Width = 50;
+            acceptChanges.Height = 50;
+            
+            assignedCurrently = new TextBox();
+            assignedCurrently.FontFamily = new FontFamily("Algerian");
+            assignedCurrently.Background = Brushes.Transparent;
+            assignedCurrently.BorderBrush = Brushes.Transparent;
+            assignedCurrently.Foreground = Brushes.White;
+            assignedCurrently.IsEnabled= false;
+            assignedCurrently.FontSize = 23;
+            Canvas.SetLeft(assignedCurrently, 10);
+            Canvas.SetTop(assignedCurrently, 10);
+            Canvas.SetZIndex(assignedCurrently, 1501);
             tree.BorderThickness = new Thickness(0);
+        }
+
+        private void changeColor(object sender, MouseEventArgs e)
+        {
+           if(closeTree.Foreground == Brushes.Black)closeTree.Foreground= Brushes.Red;
+           else if(closeTree.Foreground == Brushes.Red)closeTree.Foreground= Brushes.Black;
 
         }
+
+        private void updateTree(object sender, RoutedEventArgs e)
+        {
+            return;
+        }
+
+        private void hideST(object sender, RoutedEventArgs e)
+        {
+            hideSkillTree();
+        }
+
         public void showSkillTree()
         {
             if (isBeingShown) return;
             else
             {
                 isBeingShown = true;
+                assignedCurrently.Text = "Remaining skill points: "+Player.unassignedSkillPoints+"\nAssigned skill points: "+Player.assignedSkillPoints;
                 currentCanvas.Children.Add(tree);
-                currentCanvas.Children.Add(description);
+                currentCanvas.Children.Add(closeTree);
+                currentCanvas.Children.Add(assignedCurrently);
+                currentCanvas.Children.Add(acceptChanges);
                 demo.showPassiveInTree();
             }
         }
@@ -202,8 +249,11 @@ namespace BasicsOfGame
             {
                 isBeingShown = false;
                 currentCanvas.Children.Remove(tree);
-                currentCanvas.Children.Remove(description);
+                currentCanvas.Children.Remove(closeTree);
+                currentCanvas.Children.Remove(assignedCurrently);
+                currentCanvas.Children.Remove(acceptChanges);
                 demo.removeFromTree();
+                currentCanvas.Focus();
             }
         }
         

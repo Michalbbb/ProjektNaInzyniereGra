@@ -248,7 +248,7 @@ namespace BasicsOfGame
             gameTick(sender, e);
             checkOpacity("enemy");
             mainCharacter.checkOpacity();
-            if (mainCharacter.remainingSkillsPoints() > 0)
+            if (Player.unassignedSkillPoints > 0)
             {
                 LevelUp.Visibility= Visibility.Visible;
                 LevelUp.IsEnabled= true;
