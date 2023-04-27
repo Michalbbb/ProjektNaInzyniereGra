@@ -304,6 +304,7 @@ namespace BasicsOfGame
 
         private void RightClick(object sender, MouseButtonEventArgs e) // CHWILOWE PRZYPISANE DO OBYDWU KLIKNIEC ( PRAWO, LEWO )
         {
+           
             if (!isGameRunning)
             {
                 e.Handled = true;

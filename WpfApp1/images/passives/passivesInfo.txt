@@ -1,0 +1,5 @@
+Heavier swings;Increases your damage by;passive1;damage;percent;10;damage;percent;25;damage;percent;50;
+Sharper edge;Increases your critical hit damage by;passive2;criticalDamage;percent;20;criticalDamage;percent;50;criticalDamage;percent;100;
+Precison;Increases your critical hit chance by +;passive3;absoluteCriticalHitChance;percent;5;absoluteCriticalHitChance;percent;15;absoluteCriticalHitChance;percent;30;
+Fast hand;Increases your attack speed by;passive4;attackSpeed;percent;3;attackSpeed;percent;7;attackSpeed;percent;15;
+Open wounds;Chance to inflict bleeding +;passive5;bleedingChance;percent;4;bleedingChance;percent;10;bleedingChance;percent;20;

@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
+using System.IO;
 
 namespace BasicsOfGame
 {
@@ -87,7 +88,7 @@ namespace BasicsOfGame
             toolTip.Foreground = Brushes.AliceBlue;
             toolTip.Padding = new Thickness(10);
             visualPassive = new Button();
-            visualPassive.Opacity = 0.5;
+            visualPassive.Opacity = 0.75;
             visualPassive.Style = (Style)Application.Current.MainWindow.FindResource("InformButton");
            
             ImageBrush sprite = new ImageBrush();
@@ -106,20 +107,32 @@ namespace BasicsOfGame
             visualPassive.MouseLeave += hideToolTip;
 
             visualPassive.Click += tryAllocating;
-           
+            visualPassive.MouseRightButtonDown += cancelOneStageOfAllocating;
 
         }
 
-       
+        private void cancelOneStageOfAllocating(object sender, MouseButtonEventArgs e)
+        {
+            if (currentStage < 1) return;
+            currentStage--; updateToolTip();
+            Player.unassignedSkillPoints++; Player.assignedSkillPoints--; SkillTree.updateAssignedSkillPoints(); up();
+            if(currentStage==0) visualPassive.Opacity = 0.75;
+        }
 
         private void tryAllocating(object sender, RoutedEventArgs e)
         {
-            
-            
+
+
             if (Player.unassignedSkillPoints < 1) return;
-            else { Player.unassignedSkillPoints--; Player.assignedSkillPoints++; SkillTree.updateAssignedSkillPoints(); up(); }
-            if (currentStage < stages) { currentStage++; updateToolTip(); }
-            visualPassive.Opacity = 1;
+            else
+            {
+                if (currentStage < stages)
+                {
+                    Player.unassignedSkillPoints--; Player.assignedSkillPoints++; SkillTree.updateAssignedSkillPoints(); up();
+                currentStage++; updateToolTip(); 
+                visualPassive.Opacity = 1;
+                }
+            }
            
         }
 
@@ -223,7 +236,7 @@ namespace BasicsOfGame
     internal class SkillTree
     {
         Canvas currentCanvas;
-        private Passive[] skills=new Passive[25];
+        private Passive[] skills=new Passive[5];
         GroupBox tree;
         Button closeTree;
         Button acceptChanges;
@@ -233,23 +246,27 @@ namespace BasicsOfGame
         public SkillTree(Canvas canvas)
         {
             currentCanvas = canvas;
-            string data= "Heavy hand;Increases your damage by;passive56;damage;percent;10;damage;percent;25;damage;percent;50;"; 
-            for(int i = 0; i < 25; i++)
+            string solutionDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..","..","..", "images");
+            string filePath = Path.Combine(solutionDir, "passives", "passivesInfo.txt");
+            StreamReader passives = new StreamReader(filePath);
+            string data;
+            for(int i = 0; i < 5; i++)
             {
+                data=passives.ReadLine();
                 skills[i] = new Passive(data, currentCanvas,updateAcceptChanges);
             }
             int x; 
             int y = 120;
-            for(int i = 0; i < 5; i++)
-            {
+            //for(int i = 0; i < 5; i++)
+            //{
                 x = 300;
                 for(int j = 0; j < 5; j++)
                 {
-                    skills[j+i*5].setPos(x, y);
+                    skills[j].setPos(x, y); //i*5
                     x += 200;
                 }
                 y += 100;
-            }
+            //}
             tree = new GroupBox();
             tree.Width = 1200;
             tree.Height = 601;
