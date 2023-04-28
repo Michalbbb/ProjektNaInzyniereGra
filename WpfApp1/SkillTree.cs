@@ -22,6 +22,7 @@ namespace BasicsOfGame
         int stages=0;
         int currentStage = 0;
         TextBlock toolTip;
+        TextBlock stageVisual;
         Button visualPassive;
         Canvas currentCanvas;
         bool isBeingShown = false;
@@ -92,15 +93,22 @@ namespace BasicsOfGame
             visualPassive.Style = (Style)Application.Current.MainWindow.FindResource("InformButton");
            
             ImageBrush sprite = new ImageBrush();
-            sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/{nameOfPassive}.png", UriKind.Absolute));
+            sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/{nameOfPassive}.png", UriKind.Absolute)); //
             visualPassive.Background = sprite;
             visualPassive.Foreground = Brushes.Black;
-
-
+            stageVisual = new TextBlock();
+            stageVisual.Background = Brushes.Transparent;
+            stageVisual.Foreground = Brushes.Black;
+            stageVisual.FontSize = 20;
+            stageVisual.FontFamily = new FontFamily("Algerian");
+            stageVisual.Text = "";
+            stageVisual.IsEnabled = false;
+            
             Canvas.SetLeft(visualPassive, 120);
             Canvas.SetTop(visualPassive, 120);
             Canvas.SetZIndex(visualPassive, 1501);
-            Canvas.SetZIndex(toolTip, 1502);
+            Canvas.SetZIndex(stageVisual, 1502);
+            Canvas.SetZIndex(toolTip, 1503);
             visualPassive.Width = 60;
             visualPassive.Height = 60;
             visualPassive.MouseMove += showToolTip;
@@ -117,6 +125,9 @@ namespace BasicsOfGame
             currentStage--; updateToolTip();
             Player.unassignedSkillPoints++; Player.assignedSkillPoints--; SkillTree.updateAssignedSkillPoints(); up();
             if(currentStage==0) visualPassive.Opacity = 0.75;
+            if (currentStage > 0) stageVisual.Text = currentStage.ToString();
+            else stageVisual.Text = "";
+            stageVisual.Foreground = Brushes.Black;
         }
 
         private void tryAllocating(object sender, RoutedEventArgs e)
@@ -129,8 +140,11 @@ namespace BasicsOfGame
                 if (currentStage < stages)
                 {
                     Player.unassignedSkillPoints--; Player.assignedSkillPoints++; SkillTree.updateAssignedSkillPoints(); up();
-                currentStage++; updateToolTip(); 
-                visualPassive.Opacity = 1;
+                currentStage++; updateToolTip();
+                    stageVisual.Text=currentStage.ToString();
+                    if (currentStage == stages) stageVisual.Foreground = Brushes.Red;
+                    else stageVisual.Foreground = Brushes.Black;
+                    visualPassive.Opacity = 1;
                 }
             }
            
@@ -140,11 +154,17 @@ namespace BasicsOfGame
         {
             Canvas.SetLeft(visualPassive, x);
             Canvas.SetTop(visualPassive, y);
+            Canvas.SetTop(stageVisual,y-20);
+            Canvas.SetLeft(stageVisual, x+25 );
 
         }
         public void showPassiveInTree()
         {
-            if(!isAddedToTree)currentCanvas.Children.Add(visualPassive);
+            if (!isAddedToTree)
+            {
+                currentCanvas.Children.Add(visualPassive);
+                currentCanvas.Children.Add(stageVisual);
+            }
             isAddedToTree=true;
         }
         public void removeFromTree()
@@ -154,6 +174,7 @@ namespace BasicsOfGame
             {
                 isAddedToTree= false;
                 currentCanvas.Children.Remove(visualPassive);
+                currentCanvas.Children.Remove(stageVisual);
             }
         }
 
@@ -222,10 +243,10 @@ namespace BasicsOfGame
             boldRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
             boldRange.ApplyPropertyValue(TextElement.FontSizeProperty, 15.0);
             Point p = Mouse.GetPosition(currentCanvas);
-            if (p.X>1000)
-            Canvas.SetLeft(toolTip, p.X - toolTip.ActualWidth);
+            if (p.X>710)
+            Canvas.SetLeft(toolTip, p.X - toolTip.ActualWidth - 5);
             else Canvas.SetLeft(toolTip, p.X + 15);
-            if(p.Y>520) Canvas.SetTop(toolTip, p.Y + 15 - toolTip.ActualHeight);
+            if(p.Y>500) Canvas.SetTop(toolTip, p.Y + 15 - toolTip.ActualHeight);
             else Canvas.SetTop(toolTip, p.Y + 15);
             if (!isBeingShown) currentCanvas.Children.Add(toolTip);
             isBeingShown = true;
@@ -236,7 +257,8 @@ namespace BasicsOfGame
     internal class SkillTree
     {
         Canvas currentCanvas;
-        private Passive[] skills=new Passive[5];
+        const int passivesInTree = 25;
+        private Passive[] skills=new Passive[passivesInTree];
         GroupBox tree;
         Button closeTree;
         Button acceptChanges;
@@ -250,23 +272,23 @@ namespace BasicsOfGame
             string filePath = Path.Combine(solutionDir, "passives", "passivesInfo.txt");
             StreamReader passives = new StreamReader(filePath);
             string data;
-            for(int i = 0; i < 5; i++)
+            for(int i = 0; i < passivesInTree; i++)
             {
                 data=passives.ReadLine();
                 skills[i] = new Passive(data, currentCanvas,updateAcceptChanges);
             }
             int x; 
             int y = 120;
-            //for(int i = 0; i < 5; i++)
-            //{
+            for(int i = 0; i < 5; i++)
+            {
                 x = 300;
                 for(int j = 0; j < 5; j++)
                 {
-                    skills[j].setPos(x, y); //i*5
+                    skills[j+i*5].setPos(x, y); 
                     x += 200;
                 }
                 y += 100;
-            //}
+            }
             tree = new GroupBox();
             tree.Width = 1200;
             tree.Height = 601;

@@ -97,7 +97,7 @@ namespace BasicsOfGame
             exp = 0;
             minDmg = 10;
             maxDmg = 15;
-            if (godmode) { minDmg = 1000;maxDmg = 1500;healthPoints = 20000;maxHealthPoints = 20000; }
+            if (godmode) { minDmg = 1000;maxDmg = 1500;healthPoints = 20000;maxHealthPoints = 20000;unassignedSkillPoints = 10;level = 10; }
             Speed = 100;
             baseSpeed = 100;
             player.Name = "Player";
