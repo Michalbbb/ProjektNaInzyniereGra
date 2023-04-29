@@ -36,8 +36,8 @@ namespace BasicsOfGame
         private double SpeedX, SpeedY, Speed, baseSpeed;
         private int minDmg;
         private int maxDmg;
-        public static int unassignedSkillPoints ;
-        public static int assignedSkillPoints ;
+        public static int unassignedSkillPoints;
+        public static int assignedSkillPoints;
 
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
@@ -54,6 +54,7 @@ namespace BasicsOfGame
         private int currentMovementAnimation = 0;
         private int attackRange, attackDirection;
         private double unlockAttack = 0;
+        private double attackCooldown = 400;
         System.Windows.Shapes.Rectangle hpBar;
         System.Windows.Shapes.Rectangle hpBarWindow;
         System.Windows.Shapes.Rectangle expBar;
@@ -69,7 +70,31 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
-        
+        int equippedPieces;
+        int itemQuantity;
+        int itemQuality;
+        int lifeGainPerHit;
+        double healthRecoryRate;
+        int criticalHitChance;
+        double criticalHitDamage;
+
+        int chanceToBleed;
+        double increasedDamage;
+        double increasedFireDamage;
+        double increasedIceDamage;
+        double increasedLightningDamage;
+        double increasedNonElementalDotDamage;
+        double damageTakenReduction;
+        int armour;
+        double cooldownReduction;
+        bool isShieldActive;
+        bool isImmunityActive;
+        double shieldCooldown;
+        double immunityCooldown;
+        double igniteResistance;
+        double shockResistance;
+        double stunResistance;
+        double nonElementalDotResistance;
         SkillTree playerPassives;
         List<Tuple<double, double, double, double, string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
         // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list 5.Name 
@@ -77,13 +102,96 @@ namespace BasicsOfGame
         public static string killedBy;
         public static bool isDead;
         public static int lastDamage;
+        // Following tuples have up to 5 arguments : BASE VALUE(Always),FLAT VALUE(optionally),PERCENT VALUE(optionally)
+        private Tuple<int, double, double> healthPointsCalucalations;
+        private Tuple<double, double, double> healthRecoveryRateCalucalations;
+        private Tuple<int, int, double, double> damageCalculations;
+        private Tuple<double, double> iceDamageCalculations;
+        private Tuple<double, double> fireDamageCalculations;
+        private Tuple<double, double> lightningDamageCalculations;
+        private Tuple<double, double, double> criticalDamageCaluclations;
+        private Tuple<int, double, double> crticialHitChanceCaluclations;
+        private Tuple<double, double> attackSpeedCalculations;
+        private Tuple<double, double> attackCooldownCalculations;
+        private Tuple<int, double> chanceToBleedCalculations;
+        private Tuple<double, double> increasedNonElementalDotDamageCalculations;
+        private Tuple<int, double, double> armourCalculations;
+        private Tuple<double,double,double> decreasedDamageTakenCalculations;
+        private Tuple<bool, double> shield;
+        private Tuple<bool, double> immunity;
+        private Tuple<double, double> cooldownTimeForActiveSkillsCalculations;
+        private Tuple<int, double> movementSpeedCalculations;
+        private Tuple<int, double> itemQuantityCalculations;
+        private Tuple<int, double> itemQualityCalculations;
+        private Tuple<int, double, double> lifeGainOnHitCalculations;
+        private Tuple<double, double> igniteResistanceCalculations;
+        private Tuple<double, double> shockResistanceCalculations;
+        private Tuple<double, double> nonElementalDotResistanceCalculations;
+        private Tuple<double, double> stunResitanceCalculations;
+
+
+
+
+
+
         public Player(Canvas GS)
         {
+            chanceToBleed=0;
+            increasedDamage=0;
+            increasedFireDamage=0;
+            increasedIceDamage=0;
+            increasedLightningDamage=0;
+            increasedNonElementalDotDamage=0;
+            damageTakenReduction=0;
+            armour=0;
+            cooldownReduction=0;
+            isShieldActive=false;
+            isImmunityActive=false;
+            shieldCooldown = 30;
+            immunityCooldown = 18;
+            igniteResistance = 1;
+            shockResistance = 1;
+            stunResistance = 1;
+            nonElementalDotResistance = 1;
+            equippedPieces = 0;
+            itemQuantity = 0;
+            itemQuality = 0;
+            healthRecoryRate = 1.0;
+            criticalHitDamage = 2.0;
+            criticalHitChance = 0;
+            lifeGainPerHit = 0;
+
+            healthPointsCalucalations=new Tuple<int,double, double>(200,0,0);
+            healthRecoveryRateCalucalations=new Tuple<double, double, double>(1,0,0);
+            damageCalculations=new Tuple<int,int,double,double>(10, 15, 0, 0);
+            iceDamageCalculations=new Tuple<double, double>(0,0);
+            fireDamageCalculations = new Tuple<double, double>(0, 0);
+            lightningDamageCalculations = new Tuple<double, double>(0, 0);
+            criticalDamageCaluclations=new Tuple<double, double,double>(2,0,0);
+            crticialHitChanceCaluclations=new Tuple<int, double, double>(0,0,0);
+            attackSpeedCalculations = new Tuple<double, double>(30, 0);
+            attackCooldownCalculations = new Tuple<double, double>(400, 0);
+            chanceToBleedCalculations=new Tuple<int, double>(0,0);
+            increasedNonElementalDotDamageCalculations=new Tuple<double, double>(0,0);
+            armourCalculations=new Tuple<int, double, double>(0,0,0);
+            decreasedDamageTakenCalculations=new Tuple<double, double, double>(0,0,0);
+            shield=new Tuple<bool, double>(false,30);
+            immunity=new Tuple<bool, double>(false,18);
+            cooldownTimeForActiveSkillsCalculations=new Tuple<double, double>(0,0);
+            movementSpeedCalculations=new Tuple<int, double>(100,0);
+            itemQuantityCalculations=new Tuple<int, double>(0,0);
+            itemQualityCalculations = new Tuple<int, double>(0, 0);
+            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0);
+            igniteResistanceCalculations = new Tuple<double, double>(1, 0);
+            shockResistanceCalculations = new Tuple<double, double>(1, 0);
+            nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
+            stunResitanceCalculations = new Tuple<double, double>(1, 0);
 
             unassignedSkillPoints = 0;
             assignedSkillPoints = 0;
             killedBy = "Damage over time";
             playerPassives = new SkillTree(GS);
+            playerPassives.updateStats += updateStats;
             isDead = false;
             lastDamage = 1;
             level = 1;
@@ -97,7 +205,7 @@ namespace BasicsOfGame
             exp = 0;
             minDmg = 10;
             maxDmg = 15;
-            if (godmode) { minDmg = 1000;maxDmg = 1500;healthPoints = 20000;maxHealthPoints = 20000;unassignedSkillPoints = 10;level = 10; }
+            if (godmode) { minDmg = 1000; maxDmg = 1500; healthPoints = 20000; maxHealthPoints = 20000; unassignedSkillPoints = 10; level = 10; }
             Speed = 100;
             baseSpeed = 100;
             player.Name = "Player";
@@ -137,6 +245,69 @@ namespace BasicsOfGame
             createDotBar();
             activeBuffs();
 
+        }
+        private void recalculateStats(List<Tuple<string, string, double>> listOfSkills)
+        {
+            healthPointsCalucalations = new Tuple<int, double, double>(200, 0, 0);
+            healthRecoveryRateCalucalations = new Tuple<double, double, double>(1, 0, 0);
+            damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0);
+            iceDamageCalculations = new Tuple<double, double>(0, 0);
+            fireDamageCalculations = new Tuple<double, double>(0, 0);
+            lightningDamageCalculations = new Tuple<double, double>(0, 0);
+            criticalDamageCaluclations = new Tuple<double, double, double>(2, 0, 0);
+            crticialHitChanceCaluclations = new Tuple<int, double, double>(0, 0, 0);
+            attackSpeedCalculations = new Tuple<double, double>(30, 0);
+            attackCooldownCalculations = new Tuple<double, double>(400, 0);
+            chanceToBleedCalculations = new Tuple<int, double>(0, 0);
+            increasedNonElementalDotDamageCalculations = new Tuple<double, double>(0, 0);
+            armourCalculations = new Tuple<int, double, double>(0, 0, 0);
+            decreasedDamageTakenCalculations = new Tuple<double, double, double>(0, 0, 0);
+            shield = new Tuple<bool, double>(false, 30);
+            immunity = new Tuple<bool, double>(false, 18);
+            cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(0, 0);
+            movementSpeedCalculations = new Tuple<int, double>(100, 0);
+            itemQuantityCalculations = new Tuple<int, double>(0, 0);
+            itemQualityCalculations = new Tuple<int, double>(0, 0);
+            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0);
+            igniteResistanceCalculations = new Tuple<double, double>(1, 0);
+            shockResistanceCalculations = new Tuple<double, double>(1, 0);
+            nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
+            stunResitanceCalculations = new Tuple<double, double>(1, 0);
+
+            foreach(var skills in listOfSkills)
+            {
+                if(skills.Item1 == "absoluteCriticalHitChance"){ crticialHitChanceCaluclations= new Tuple<int, double, double>(crticialHitChanceCaluclations.Item1, crticialHitChanceCaluclations.Item2+skills.Item3, crticialHitChanceCaluclations.Item3);}
+                if(skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2+equippedPieces*skills.Item3, armourCalculations.Item3); }
+                if(skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2+skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "criticalDamage") { criticalDamageCaluclations = new Tuple<double, double, double>(2, 0, 0); }
+                if(skills.Item1 == "damage") { damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0); }
+                if(skills.Item1 == "damagePerDebuff") {} // NOT IMPLEMENTED YET
+                if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(0, 0, 0); }
+                if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(0, 0); }
+                if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalucalations = new Tuple<double, double, double>(1, 0, 0); }
+                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(0, 0); }
+                if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(false, 18); }
+                if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<int, double>(0, 0); }
+                if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<int, double>(0, 0); }
+                if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0); }
+                if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(0, 0); }
+                if(skills.Item1 == "maximumHealth") { healthPointsCalucalations = new Tuple<int, double, double>(200, 0, 0); }
+                if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<int, double>(100, 0); }
+                if(skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(0, 0); }
+                if(skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(1, 0); }
+                if(skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0); }
+                if(skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(1, 0); }
+                if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(1, 0); }
+                if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(false, 30); }
+                
+
+            }
+        }
+        private void updateStats(List<Tuple<string,string,double>> listOfSkills)
+        {
+            recalculateStats(listOfSkills);
         }
         private void initializeAnimationsForAttack()
         {
@@ -645,7 +816,7 @@ namespace BasicsOfGame
 
                     attackOmni(deltaTime, ref map, ref boxes);
                 }
-                if (unlockAttack > 400) { blockAttack = false; unlockAttack = 0; ticksRemaining = 0; }
+                if (unlockAttack > attackCooldown) { blockAttack = false; unlockAttack = 0; ticksRemaining = 0; }
 
             }
 

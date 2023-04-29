@@ -3,10 +3,10 @@ Sharper edge;Increases your critical hit damage by;passive2;criticalDamage;perce
 Precison;Increases your critical hit chance by +;passive3;absoluteCriticalHitChance;percent;5;absoluteCriticalHitChance;percent;15;absoluteCriticalHitChance;percent;30;
 Fast hand;Increases your attack speed by;passive4;attackSpeed;percent;3;attackSpeed;percent;7;attackSpeed;percent;15;
 Open wounds;Chance to inflict bleeding +;passive5;bleedingChance;percent;4;bleedingChance;percent;10;bleedingChance;percent;20;
-Unity with Equipment;Per every piece of worn equipment gain additional armour equal to;passive6;armour;flat;2;armour;flat;5;armour;flat;10;
+Unity with equipment;Per every piece of worn equipment gain additional armour equal to;passive6;armour;flat;2;armour;flat;5;armour;flat;10;
 Undying;Increase your max hp by;passive7;maximumHealth;flat;20;maximumHealth;flat;50;maximumHealth;flat;100;
 Iron skin;Decrease damage taken from hits by;passive8;decreaseDamageTaken;percent;3;decreaseDamageTaken;percent;7;decreaseDamageTaken;percent;15;
-Shielded by mind;Gain Barrier that's block 1 enemy hit. Barrier renew every (seconds):;passive9;shieldStack;flat;18;shieldStack;flat;11;shieldStack;flat;5;
+Shielded by mind;Gain Barrier that's block 1 enemy hit. Barrier renew every (seconds):;passive9;shieldStack;flat;30;shieldStack;flat;23;shieldStack;flat;15;
 Supreme vitality;Increases your health recovery by;passive10;healthRecoveryRate;percent;15;healthRecoveryRate;percent;40;healthRecoveryRate;percent;80;
 Playing with fire;Increase your fire damage by;passive11;fireDamage;percent;20;fireDamage;percent;50;fireDamage;percent;100;
 Bringer of storm;Increase your lightning damage by;passive12;lightningDamage;percent;20;lightningDamage;percent;50;lightningDamage;percent;100;
@@ -16,7 +16,7 @@ Illusion of time;Decreases your active skills cooldown time by;passive15;cooldow
 Swift moves;Increases your movement speed by;passive16;movementSpeed;percent;5;movementSpeed;percent;10;movementSpeed;percent;20;
 Scavenger;Increases your chance to obtain items from enemies by;passive17;itemQuantity;percent;10;itemQuantity;percent;25;itemQuantity;percent;50;
 Treasure among trash;Your chance to obtain items of better quality is increased by;passive18;itemQuality;percent;10;itemQuality;percent;25;itemQuality;percent;50;
-Purity of soul;Removes 1 debuff. Cooldown (seconds):;passive19;immunityStack;flat;19;immunityStack;flat;11;immunityStack;flat;5;
+Purity of soul;Removes 1 debuff. Cooldown (seconds):;passive19;immunityStack;flat;18;immunityStack;flat;12;immunityStack;flat;6;
 Bloodthirst;Every time you hit enemy, recover life (flat amount) by;passive20;lifeGainOnHit;flat;1;lifeGainOnHit;flat;2;lifeGainOnHit;flat;3;
 Ignite tolerance;Reduces effect of ignite inflicted on you by;passive21;selfIgniteEffect;percent;50;selfIgniteEffect;percent;100;
 Shock tolerance;Reduces effect of shock inflicted on you by;passive22;selfShockEffect;percent;50;selfShockEffect;percent;100;

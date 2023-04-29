@@ -21,6 +21,7 @@ namespace BasicsOfGame
         string description="";
         int stages=0;
         int currentStage = 0;
+        int stageToBe=0;
         TextBlock toolTip;
         TextBlock stageVisual;
         Button visualPassive;
@@ -118,14 +119,27 @@ namespace BasicsOfGame
             visualPassive.MouseRightButtonDown += cancelOneStageOfAllocating;
 
         }
-
+        public void saveChanges()
+        {
+            currentStage = stageToBe;
+        }
+        public void discardChanges()
+        {
+            stageToBe = currentStage;
+            if (stageToBe > 0) stageVisual.Text = currentStage.ToString();
+            else
+            {
+                stageVisual.Text = "";
+                visualPassive.Opacity = 0.75;
+            }
+        }
         private void cancelOneStageOfAllocating(object sender, MouseButtonEventArgs e)
         {
-            if (currentStage < 1) return;
-            currentStage--; updateToolTip();
+            if (stageToBe <= currentStage ) return;
+            stageToBe--; updateToolTip();
             Player.unassignedSkillPoints++; Player.assignedSkillPoints--; SkillTree.updateAssignedSkillPoints(); up();
-            if(currentStage==0) visualPassive.Opacity = 0.75;
-            if (currentStage > 0) stageVisual.Text = currentStage.ToString();
+            if(stageToBe == 0) visualPassive.Opacity = 0.75;
+            if (stageToBe > 0) stageVisual.Text = stageToBe.ToString();
             else stageVisual.Text = "";
             stageVisual.Foreground = Brushes.Black;
         }
@@ -137,12 +151,12 @@ namespace BasicsOfGame
             if (Player.unassignedSkillPoints < 1) return;
             else
             {
-                if (currentStage < stages)
+                if (stageToBe < stages)
                 {
                     Player.unassignedSkillPoints--; Player.assignedSkillPoints++; SkillTree.updateAssignedSkillPoints(); up();
-                currentStage++; updateToolTip();
-                    stageVisual.Text=currentStage.ToString();
-                    if (currentStage == stages) stageVisual.Foreground = Brushes.Red;
+                    stageToBe++; updateToolTip();
+                    stageVisual.Text= stageToBe.ToString();
+                    if (stageToBe == stages) stageVisual.Foreground = Brushes.DarkGray;
                     else stageVisual.Foreground = Brushes.Black;
                     visualPassive.Opacity = 1;
                 }
@@ -188,21 +202,21 @@ namespace BasicsOfGame
             toolTip.Text = name;
            
             toolTip.Text += "\nCurrent effect: ";
-            if (currentStage == 0) { toolTip.Text += "none"; }
+            if (stageToBe == 0) { toolTip.Text += "none"; }
             else
             {
-                toolTip.Text += description + " " + propertiesOfNode[currentStage - 1].Item3.ToString();
-                if (propertiesOfNode[currentStage - 1].Item2 == "percent") toolTip.Text += "%";
+                toolTip.Text += description + " " + propertiesOfNode[stageToBe - 1].Item3.ToString();
+                if (propertiesOfNode[stageToBe - 1].Item2 == "percent") toolTip.Text += "%";
 
 
             }
 
-            if (currentStage < stages)
+            if (stageToBe < stages)
             {
                 toolTip.Text += "\n";
                 toolTip.Text += "Next level: ";
-                toolTip.Text += description + " " + propertiesOfNode[currentStage].Item3.ToString();
-                if (propertiesOfNode[currentStage].Item2 == "percent") toolTip.Text += "%";
+                toolTip.Text += description + " " + propertiesOfNode[stageToBe].Item3.ToString();
+                if (propertiesOfNode[stageToBe].Item2 == "percent") toolTip.Text += "%";
             }
             int start = toolTip.Text.IndexOf(name);
             int length = name.Length + 1;
@@ -213,27 +227,37 @@ namespace BasicsOfGame
             boldRange.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
             boldRange.ApplyPropertyValue(TextElement.FontSizeProperty, 15.0);
         }
+        public bool isAnyStageAllocated()
+        {
+            if (currentStage == 0 ) return false;
+            else return true;
+        }
+        public Tuple<string,string,double> getPropertiesOfPassive()
+        {
+            if (currentStage == 0) return new Tuple<string, string, double>("none", "none", 0);// In case something goes wrong ( or someone will try use function without isAnyStageAllocated )
+            else return propertiesOfNode[currentStage-1];
+        }
         private void showToolTip(object sender, MouseEventArgs e)
         {
             
             toolTip.Text = name;
             
             toolTip.Text += "\nCurrent effect: ";
-            if(currentStage==0) { toolTip.Text += "none"; }
+            if(stageToBe==0) { toolTip.Text += "none"; }
             else
             {
-                toolTip.Text += description+" "+propertiesOfNode[currentStage-1].Item3.ToString();
-                if (propertiesOfNode[currentStage-1].Item2 == "percent") toolTip.Text += "%";
+                toolTip.Text += description+" "+propertiesOfNode[stageToBe - 1].Item3.ToString();
+                if (propertiesOfNode[stageToBe - 1].Item2 == "percent") toolTip.Text += "%";
 
 
             }
             
-            if (currentStage < stages)
+            if (stageToBe < stages)
             {
                 toolTip.Text += "\n";
                 toolTip.Text += "Next level: ";
-                toolTip.Text += description + " " + propertiesOfNode[currentStage].Item3.ToString();
-                if (propertiesOfNode[currentStage].Item2 == "percent") toolTip.Text += "%";
+                toolTip.Text += description + " " + propertiesOfNode[stageToBe].Item3.ToString();
+                if (propertiesOfNode[stageToBe].Item2 == "percent") toolTip.Text += "%";
             }
             int start = toolTip.Text.IndexOf(name);
             int length = name.Length + 1;
@@ -265,6 +289,8 @@ namespace BasicsOfGame
         bool isBeingShown;
         static TextBox assignedCurrently;
         private int skillPointsAtTimeOfClick;
+        private int assignedSkillPointsAtTimeOfClick;
+        public event Action<List<Tuple<string,string,double>>> updateStats; 
         public SkillTree(Canvas canvas)
         {
             currentCanvas = canvas;
@@ -352,6 +378,11 @@ namespace BasicsOfGame
                 acceptChanges.MouseEnter += changeColorAC;
                 acceptChanges.MouseLeave += changeColorAC;
             }
+            else
+            {
+                acceptChanges.IsEnabled = false;
+                acceptChanges.Opacity = 0.7;
+            }
         }
 
         private void changeColorAC(object sender, MouseEventArgs e)
@@ -369,11 +400,26 @@ namespace BasicsOfGame
 
         private void updateTree(object sender, RoutedEventArgs e)
         {
-            return;
+            acceptChanges.IsEnabled = false;
+            acceptChanges.Opacity = 0.7;
+            List<Tuple<string, string, double>> listOfSkills=new List<Tuple<string, string, double>>();
+            foreach (Passive pas in skills)
+            {
+                pas.saveChanges();
+                if(pas.isAnyStageAllocated())listOfSkills.Add(pas.getPropertiesOfPassive());
+                
+            }
+           
+            updateStats.Invoke(listOfSkills);
+            hideSkillTree();
+           
         }
 
         private void hideST(object sender, RoutedEventArgs e)
         {
+            foreach (Passive pas in skills) pas.discardChanges();
+            Player.assignedSkillPoints = assignedSkillPointsAtTimeOfClick;
+            Player.unassignedSkillPoints = skillPointsAtTimeOfClick;
             hideSkillTree();
         }
 
@@ -384,6 +430,7 @@ namespace BasicsOfGame
             {
                
                 skillPointsAtTimeOfClick = Player.unassignedSkillPoints;
+                assignedSkillPointsAtTimeOfClick = Player.assignedSkillPoints;
                 isBeingShown = true;
                 assignedCurrently.Text = "Remaining skill points: "+Player.unassignedSkillPoints+"\nAssigned skill points: "+Player.assignedSkillPoints;
                 currentCanvas.Children.Add(tree);
