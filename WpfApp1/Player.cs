@@ -185,7 +185,7 @@ namespace BasicsOfGame
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
-            stunResitanceCalculations = new Tuple<double, double>(1, 0);
+            stunResitanceCalculations = new Tuple<double, double>(1, 1);
 
             unassignedSkillPoints = 0;
             assignedSkillPoints = 0;
@@ -272,7 +272,7 @@ namespace BasicsOfGame
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
-            stunResitanceCalculations = new Tuple<double, double>(1, 0);
+            stunResitanceCalculations = new Tuple<double, double>(1, 1);
 
             foreach(var skills in listOfSkills)
             {
@@ -281,26 +281,26 @@ namespace BasicsOfGame
                 if(skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2+skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "criticalDamage") { criticalDamageCaluclations = new Tuple<double, double, double>(2, 0, 0); }
-                if(skills.Item1 == "damage") { damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0); }
+                if(skills.Item1 == "criticalDamage") { criticalDamageCaluclations = new Tuple<double, double, double>(criticalDamageCaluclations.Item1, criticalDamageCaluclations.Item2, criticalDamageCaluclations.Item3+skills.Item3); }
+                if(skills.Item1 == "damage") { damageCalculations = new Tuple<int, int, double, double>(damageCalculations.Item1, damageCalculations.Item2, damageCalculations.Item3, damageCalculations.Item4+skills.Item3); }
                 if(skills.Item1 == "damagePerDebuff") {} // NOT IMPLEMENTED YET
-                if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(0, 0, 0); }
-                if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(0, 0); }
-                if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalucalations = new Tuple<double, double, double>(1, 0, 0); }
-                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(0, 0); }
-                if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(false, 18); }
-                if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<int, double>(0, 0); }
-                if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<int, double>(0, 0); }
-                if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0); }
-                if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(0, 0); }
-                if(skills.Item1 == "maximumHealth") { healthPointsCalucalations = new Tuple<int, double, double>(200, 0, 0); }
-                if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<int, double>(100, 0); }
-                if(skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(0, 0); }
-                if(skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(1, 0); }
-                if(skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0); }
-                if(skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(1, 0); }
-                if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(1, 0); }
-                if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(false, 30); }
+                if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(decreasedDamageTakenCalculations.Item1, decreasedDamageTakenCalculations.Item2, decreasedDamageTakenCalculations.Item3+skills.Item3); }
+                if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(fireDamageCalculations.Item1,fireDamageCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalucalations = new Tuple<double, double, double>(healthRecoveryRateCalucalations.Item1,healthRecoveryRateCalucalations.Item2,healthRecoveryRateCalucalations.Item3+skills.Item3); }
+                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(IceDamageCalculations.Item1,IceDamageCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(true, skills.Item3*1000); } // ms
+                if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<int, double>(itemQualityCalculations.Item1,itemQuality.Item2+skills.Item3); }
+                if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<int, double>(itemQuantityCalculations.Item1,itemQuantity.Item2+skills.Item3); }
+                if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<int, double, double>(lifeGainOnHitCalculations.Item1,lifeGainOnHitCalculations.Item2+skills.Item3,lifeGainOnHitCalculations.Item3); }
+                if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1,lightningDamageCalculations.Item1+skills.Item3); }
+                if(skills.Item1 == "maximumHealth") { healthPointsCalucalations = new Tuple<int, double, double>(healthPointsCalucalations.Item1,healthPointsCalucalations.Item2+skills.Item3,healthPointsCalucalations.Item3); }
+                if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<int, double>(movementSpeedCalculations.Item1,movementSpeedCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(increasedNonElementalDotDamageCalculations.Item1,increasedNonElementalDotDamageCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(igniteResistanceCalculations.Item1,igniteResistanceCalculations.Item2+(skills.Item3/100)); }
+                if(skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(nonElementalDotResistanceCalculations.Item1,nonElementalDotResistanceCalculations.Item2+(skills.Item3/100)); }
+                if(skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(shockResistanceCalculations.Item1,shockResistanceCalculations.Item2+(skills.Item3/100)); }
+                if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(stunResitanceCalculations.Item1,stunResitanceCalculations.Item2*(skills.Item3/100)); }
+                if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(true, skills.Item3); }
                 
 
             }
