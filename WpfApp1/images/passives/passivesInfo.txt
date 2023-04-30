@@ -21,7 +21,7 @@ Bloodthirst;Every time you hit enemy, recover life (flat amount) by;passive20;li
 Ignite tolerance;Reduces effect of ignite inflicted on you by;passive21;selfIgniteEffect;percent;50;selfIgniteEffect;percent;100;
 Shock tolerance;Reduces effect of shock inflicted on you by;passive22;selfShockEffect;percent;50;selfShockEffect;percent;100;
 Rot tolerance;Reduces damage dealt by bleed and poison inflicted on you by;passive23;selfNonElementalDotDamageEffect;percent;50;selfNonElementalDotDamageEffect;percent;100;
-Stun tolerance;Duration of stun inflicted on you is equal to portion of base duration.Portion:;passive24;selfStunEffect;percent;50;selfStunEffect;percent;0;
+Stun tolerance;Stun duration inflicted on you is decreased by;passive24;selfStunEffect;percent;50;selfStunEffect;percent;100;
 Immunological response;For every debuff on you, increase your dmg by;passive25;damage;percent;10;damage;percent;20;damage;percent;40;
 
 

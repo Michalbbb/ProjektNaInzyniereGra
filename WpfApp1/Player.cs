@@ -71,10 +71,11 @@ namespace BasicsOfGame
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
         int equippedPieces;
-        int itemQuantity;
-        int itemQuality;
+        
+        double itemQuantity;
+        double itemQuality;
         int lifeGainPerHit;
-        double healthRecoryRate;
+        double healthRecoveryRate;
         int criticalHitChance;
         double criticalHitDamage;
 
@@ -97,12 +98,13 @@ namespace BasicsOfGame
         double nonElementalDotResistance;
         SkillTree playerPassives;
         List<Tuple<double, double, double, double, string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
-        // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list 5.Name 
+        // 1. dmg per millisecond 2. accumulated dmg (change everytime dealing dmg from pool ) 3. Time elapsed 4.When remove from list 5.Name
         Canvas GameScreen;
         public static string killedBy;
         public static bool isDead;
         public static int lastDamage;
         // Following tuples have up to 5 arguments : BASE VALUE(Always),FLAT VALUE(optionally),PERCENT VALUE(optionally)
+        private Tuple<int,int> healthPointsToDistribute;
         private Tuple<int, double, double> healthPointsCalucalations;
         private Tuple<double, double, double> healthRecoveryRateCalucalations;
         private Tuple<int, int, double, double> damageCalculations;
@@ -121,8 +123,8 @@ namespace BasicsOfGame
         private Tuple<bool, double> immunity;
         private Tuple<double, double> cooldownTimeForActiveSkillsCalculations;
         private Tuple<int, double> movementSpeedCalculations;
-        private Tuple<int, double> itemQuantityCalculations;
-        private Tuple<int, double> itemQualityCalculations;
+        private Tuple<double, double> itemQuantityCalculations;
+        private Tuple<double, double> itemQualityCalculations;
         private Tuple<int, double, double> lifeGainOnHitCalculations;
         private Tuple<double, double> igniteResistanceCalculations;
         private Tuple<double, double> shockResistanceCalculations;
@@ -137,6 +139,7 @@ namespace BasicsOfGame
         public Player(Canvas GS)
         {
             chanceToBleed=0;
+            healthPointsToDistribute=new Tuple<int, int>(0,0);
             increasedDamage=0;
             increasedFireDamage=0;
             increasedIceDamage=0;
@@ -154,9 +157,9 @@ namespace BasicsOfGame
             stunResistance = 1;
             nonElementalDotResistance = 1;
             equippedPieces = 0;
-            itemQuantity = 0;
-            itemQuality = 0;
-            healthRecoryRate = 1.0;
+            itemQuantity = 1;
+            itemQuality = 1;
+            healthRecoveryRate = 1.0;
             criticalHitDamage = 2.0;
             criticalHitChance = 0;
             lifeGainPerHit = 0;
@@ -179,13 +182,13 @@ namespace BasicsOfGame
             immunity=new Tuple<bool, double>(false,18);
             cooldownTimeForActiveSkillsCalculations=new Tuple<double, double>(0,0);
             movementSpeedCalculations=new Tuple<int, double>(100,0);
-            itemQuantityCalculations=new Tuple<int, double>(0,0);
-            itemQualityCalculations = new Tuple<int, double>(0, 0);
+            itemQuantityCalculations=new Tuple<double, double>(1,0);
+            itemQualityCalculations = new Tuple<double, double>(1, 0);
             lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
-            stunResitanceCalculations = new Tuple<double, double>(1, 1);
+            stunResitanceCalculations = new Tuple<double, double>(1, 0);
 
             unassignedSkillPoints = 0;
             assignedSkillPoints = 0;
@@ -266,13 +269,13 @@ namespace BasicsOfGame
             immunity = new Tuple<bool, double>(false, 18);
             cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(0, 0);
             movementSpeedCalculations = new Tuple<int, double>(100, 0);
-            itemQuantityCalculations = new Tuple<int, double>(0, 0);
-            itemQualityCalculations = new Tuple<int, double>(0, 0);
+            itemQuantityCalculations = new Tuple<double, double>(1, 0);
+            itemQualityCalculations = new Tuple<double, double>(1, 0);
             lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
-            stunResitanceCalculations = new Tuple<double, double>(1, 1);
+            stunResitanceCalculations = new Tuple<double, double>(1, 0);
 
             foreach(var skills in listOfSkills)
             {
@@ -287,10 +290,10 @@ namespace BasicsOfGame
                 if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(decreasedDamageTakenCalculations.Item1, decreasedDamageTakenCalculations.Item2, decreasedDamageTakenCalculations.Item3+skills.Item3); }
                 if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(fireDamageCalculations.Item1,fireDamageCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalucalations = new Tuple<double, double, double>(healthRecoveryRateCalucalations.Item1,healthRecoveryRateCalucalations.Item2,healthRecoveryRateCalucalations.Item3+skills.Item3); }
-                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(IceDamageCalculations.Item1,IceDamageCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(iceDamageCalculations.Item1,iceDamageCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(true, skills.Item3*1000); } // ms
-                if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<int, double>(itemQualityCalculations.Item1,itemQuality.Item2+skills.Item3); }
-                if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<int, double>(itemQuantityCalculations.Item1,itemQuantity.Item2+skills.Item3); }
+                if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<double, double>(itemQualityCalculations.Item1,itemQualityCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<double, double>(itemQuantityCalculations.Item1,itemQuantityCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<int, double, double>(lifeGainOnHitCalculations.Item1,lifeGainOnHitCalculations.Item2+skills.Item3,lifeGainOnHitCalculations.Item3); }
                 if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1,lightningDamageCalculations.Item1+skills.Item3); }
                 if(skills.Item1 == "maximumHealth") { healthPointsCalucalations = new Tuple<int, double, double>(healthPointsCalucalations.Item1,healthPointsCalucalations.Item2+skills.Item3,healthPointsCalucalations.Item3); }
@@ -299,11 +302,43 @@ namespace BasicsOfGame
                 if(skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(igniteResistanceCalculations.Item1,igniteResistanceCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(nonElementalDotResistanceCalculations.Item1,nonElementalDotResistanceCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(shockResistanceCalculations.Item1,shockResistanceCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(stunResitanceCalculations.Item1,stunResitanceCalculations.Item2*(skills.Item3/100)); }
+                if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(stunResitanceCalculations.Item1,stunResitanceCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(true, skills.Item3); }
                 
 
             }
+            healthPointsToDistribute=new Tuple<int, int>(Convert.ToInt32(healthPointsCalucalations.Item2*(1+healthPointsCalucalations.Item3/100)),healthPointsToDistribute.Item2);
+            maxHealthPoints=Convert.ToInt32(Convert.ToDouble(healthPointsCalucalations.Item1+healthPointsCalucalations.Item2)*(1+healthPointsCalucalations.Item3/100));
+            int healthBoost=healthPointsToDistribute.Item1-healthPointsToDistribute.Item2;
+            if(healthBoost<0)healthBoost=0;
+            else healthPointsToDistribute=new Tuple<int, int>(healthPointsToDistribute.Item1,healthPointsToDistribute.Item2+healthBoost);
+            healthPoints+=healthBoost;
+            updateHpBar();
+            itemQuality=itemQualityCalculations.Item1+itemQualityCalculations.Item1*(itemQualityCalculations.Item2/100);
+            itemQuantity=itemQuantityCalculations.Item1+itemQuantityCalculations.Item1*(itemQuantityCalculations.Item2/100);
+            
+            minDmg=Convert.ToInt32(Convert.ToInt32(damageCalculations.Item1+damageCalculations.Item3)*Convert.ToDouble(1+damageCalculations.Item4/100));
+            maxDmg=Convert.ToInt32(Convert.ToInt32(damageCalculations.Item2+damageCalculations.Item3)*Convert.ToDouble(1+damageCalculations.Item4/100));
+
+            healthRecoveryRate=(healthRecoveryRateCalucalations.Item1+healthRecoveryRateCalucalations.Item2)*(1+healthRecoveryRateCalucalations.Item3/100);
+            shockResistance=shockResistanceCalculations.Item1-shockResistanceCalculations.Item2;
+            nonElementalDotResistance=nonElementalDotResistanceCalculations.Item1-nonElementalDotResistanceCalculations.Item2;
+            igniteResistance=igniteResistanceCalculations.Item1-igniteResistanceCalculations.Item2;
+            stunResistance=stunResitanceCalculations.Item1-stunResitanceCalculations.Item2;
+            if(shockResistance<0)shockResistance=0;
+            if(nonElementalDotResistance<0)nonElementalDotResistance=0;
+            if(igniteResistance<0)igniteResistance=0;
+            if(shockResistance<0)shockResistance=0;
+            if(stunResistance<0)stunResistance=0;
+            
+        }
+        
+        private void updateHpBar(){
+            if(healthPoints>maxHealthPoints)healthPoints=maxHealthPoints;
+            hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
+            double w = Convert.ToDouble(healthPoints) / Convert.ToDouble(maxHealthPoints) * 200;
+            if (w < 0) w = 0;
+            hpBar.Width = Convert.ToInt32(w);
         }
         private void updateStats(List<Tuple<string,string,double>> listOfSkills)
         {
@@ -559,11 +594,13 @@ namespace BasicsOfGame
                 dotName = x.Item3;
                 if (dotName == "Poison")
                 {
+                    dmgPerMs=dmgPerMs*nonElementalDotResistance;
                     DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName));
                     poisonStacks++;
                 }
                 else if (dotName == "Ignite")
                 {
+                    dmgPerMs=dmgPerMs*igniteResistance;
                     double currentDmg;
                     double elapsedTime;
                     bool foundIgnite = false;
@@ -595,6 +632,8 @@ namespace BasicsOfGame
                 {
                     if (!stunned)
                     {
+                        time=time*stunResistance;
+                        if(time==0)continue;
                         DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(0, 0, 0, time, dotName));
                         Canvas.SetZIndex(buffsContainer[2], 1000);
                         stunned = true;
@@ -1008,8 +1047,9 @@ namespace BasicsOfGame
             int maxDmgAfterCalc=maxDmg;
             if (ignited)
             {
-                minDmgAfterCalc = Convert.ToInt32(minDmg * 0.8);
-                maxDmgAfterCalc = Convert.ToInt32(maxDmg * 0.8);
+                double igniteEffect=1-(0.2*igniteResistance);
+                minDmgAfterCalc = Convert.ToInt32(minDmg * igniteEffect);
+                maxDmgAfterCalc = Convert.ToInt32(maxDmg * igniteEffect);
             }
             List<Monster> updateState = map.rMon();
             foreach (Monster x in updateState)
@@ -1057,20 +1097,19 @@ namespace BasicsOfGame
         {
             playerPassives.showSkillTree();
         }
-        
+        private void healPlayerBy(double healAmount){
+            healthPoints += Convert.ToInt32((healAmount)*(healthRecoveryRate));
+                if (healthPoints > maxHealthPoints) healthPoints = maxHealthPoints;
+                updateHpBar();
+        }
         private void updateExp()
         {
             if (exp > 1000)
             {
                 exp -= 1000;
                 level++;
-                healthPoints += Convert.ToInt32(maxHealthPoints * 0.1);
-                if (healthPoints > maxHealthPoints) healthPoints = maxHealthPoints;
-                hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
-                double w = Convert.ToDouble(healthPoints) / Convert.ToDouble(maxHealthPoints) * 200;
-                if (w < 0) w = 0;
-                hpBar.Width = Convert.ToInt32(w);
-
+                double lifeRestoredDueToLevelUp=maxHealthPoints*0.1;
+                healPlayerBy(lifeRestoredDueToLevelUp);
                 unassignedSkillPoints++;
                 
                 
