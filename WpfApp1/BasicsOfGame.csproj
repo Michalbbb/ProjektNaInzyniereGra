@@ -168,12 +168,13 @@
     <None Remove="images\UI\Paint Layer 1.PNG" />
    
     <None Remove="images\UI\Start.PNG" />
-   
+    <None Remove="images\UI\levelUpSprite.png" />
     <None Remove="images\UI\StartH.PNG" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="images\Buffs_Debuffs\buff2.png" />
+    <Resource Include="images\UI\levelUpSprite.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -41,7 +41,7 @@ namespace BasicsOfGame
         System.Windows.Shapes.Rectangle BlackScreenOverlay = new System.Windows.Shapes.Rectangle();
         private const float Friction = 0.65f;
         bool tryingAssign = false;
-
+        bool getReadyToDeleteDeadToDot=false;
         public static bool isGameRunning = false;
 
         Menu gameMenu;
@@ -189,21 +189,27 @@ namespace BasicsOfGame
             updateMiniMap();
             mainCharacter.generateTB("enemy", ref boxes);
             LevelUp = new Button();
+            ImageBrush sprite = new ImageBrush();
+            sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/levelUpSprite.png", UriKind.Absolute));
             LevelUp.Width = 50;
             LevelUp.Height = 50;
-            LevelUp.Content = "+";
-            Canvas.SetLeft(LevelUp, 1150);
-            Canvas.SetTop(LevelUp, 550);
+            LevelUp.Style = (Style)FindResource("InformButton");
+            LevelUp.Background=sprite;
+            Canvas.SetLeft(LevelUp, 0);
+            Canvas.SetTop(LevelUp, 50);
+            Canvas.SetZIndex(LevelUp, 50);
             LevelUp.IsEnabled = false;
             LevelUp.Visibility = Visibility.Hidden;
             GameScreen.Children.Add(LevelUp);
             LevelUp.Click += assignSkillPoints;
 
-
+            Monster.deadToDot+=removeDeadToDot;
             isGameRunning = true;
             
         }
-        
+        private void removeDeadToDot(){
+            getReadyToDeleteDeadToDot=true;
+        }
         private void assignSkillPoints(object sender, RoutedEventArgs e)
         {
             if (tryingAssign) { mainCharacter.hideSkillTree(); tryingAssign = false; }
@@ -217,7 +223,7 @@ namespace BasicsOfGame
             WindowState = WindowState.Maximized;
             gameMenu = new Menu(GameScreen,startGame);
             
-            
+            this.PreviewKeyDown += MainWindowPreviewKeyDown;
             
             gameMenu.ShowMenu();
             
@@ -226,6 +232,15 @@ namespace BasicsOfGame
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
             
+        }
+          void MainWindowPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Tab)
+            {
+               map.showMiniMap(miniMapHolder);
+                miniMapHolder.Opacity = 0.3;
+                e.Handled=true;
+            }
         }
         private DateTime _lastRenderTime = DateTime.MinValue;
         double deltaTime;
@@ -250,6 +265,11 @@ namespace BasicsOfGame
             mainCharacter.checkOpacity();
             if (Player.unassignedSkillPoints > 0)
             {
+                LevelUp.Content=Player.unassignedSkillPoints.ToString();
+                LevelUp.FontSize=30;
+                LevelUp.FontFamily=new FontFamily("Algerian");
+                LevelUp.Foreground=Brushes.Black;
+                LevelUp.BorderBrush=Brushes.Transparent;
                 LevelUp.Visibility= Visibility.Visible;
                 LevelUp.IsEnabled= true;
             }
@@ -269,6 +289,13 @@ namespace BasicsOfGame
         private void gameTick(object sender, EventArgs e)
         {
             mainCharacter.gameTick(cam,UpKey,DownKey,RightKey,LeftKey,ref map,deltaTime,Friction,ref boxes, updateMiniMap);
+            if(getReadyToDeleteDeadToDot){
+                mainCharacter.deleteDeadToDot(ref map,ref boxes);
+                getReadyToDeleteDeadToDot=false;
+            }
+            System.Windows.Point playerCoordinates=mainCharacter.playerCoordinates();
+            if(playerCoordinates.X<55&&playerCoordinates.Y<110)LevelUp.Opacity=0.5;
+            else LevelUp.Opacity=1;
         }
         private void checkOpacity(string tag)
         {
@@ -282,7 +309,7 @@ namespace BasicsOfGame
                         else boxes[i].Text = "0"; 
                         
                         Canvas.SetLeft(boxes[i], Canvas.GetLeft(x) + (x.ActualWidth / 2) - (boxes[i].Width / 2));
-                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x) - (x.Height - x.ActualHeight)) - boxes[i].Height);
+                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x) - (x.Height - x.ActualHeight)) - boxes[i].Height - 15);
                         i++;
 
 

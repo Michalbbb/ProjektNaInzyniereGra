@@ -126,7 +126,19 @@ namespace BasicsOfGame
         public void discardChanges()
         {
             stageToBe = currentStage;
-            if (stageToBe > 0) stageVisual.Text = currentStage.ToString();
+            if (stageToBe > 0){
+                if (stageToBe == stages)
+                    {
+                        stageVisual.Text="MAX";
+                        Canvas.SetLeft(stageVisual,Canvas.GetLeft(visualPassive)+12); 
+                    }
+                    else
+                    {
+                         stageVisual.Text= stageToBe.ToString();
+                         Canvas.SetLeft(stageVisual,Canvas.GetLeft(visualPassive)+25);   
+                    } 
+
+            }
             else
             {
                 stageVisual.Text = "";
@@ -136,6 +148,7 @@ namespace BasicsOfGame
         private void cancelOneStageOfAllocating(object sender, MouseButtonEventArgs e)
         {
             if (stageToBe <= currentStage ) return;
+            Canvas.SetLeft(stageVisual,Canvas.GetLeft(visualPassive)+25);   
             stageToBe--; updateToolTip();
             Player.unassignedSkillPoints++; Player.assignedSkillPoints--; SkillTree.updateAssignedSkillPoints(); up();
             if(stageToBe == 0) visualPassive.Opacity = 0.75;
@@ -155,9 +168,17 @@ namespace BasicsOfGame
                 {
                     Player.unassignedSkillPoints--; Player.assignedSkillPoints++; SkillTree.updateAssignedSkillPoints(); up();
                     stageToBe++; updateToolTip();
-                    stageVisual.Text= stageToBe.ToString();
-                    if (stageToBe == stages) stageVisual.Foreground = Brushes.DarkGray;
-                    else stageVisual.Foreground = Brushes.Black;
+                    
+                    if (stageToBe == stages)
+                    {
+                        stageVisual.Text="MAX";
+                        Canvas.SetLeft(stageVisual,Canvas.GetLeft(visualPassive)+12); 
+                    }
+                    else
+                    {
+                         stageVisual.Text= stageToBe.ToString();
+                         Canvas.SetLeft(stageVisual,Canvas.GetLeft(visualPassive)+25);   
+                    } 
                     visualPassive.Opacity = 1;
                 }
             }
@@ -168,8 +189,8 @@ namespace BasicsOfGame
         {
             Canvas.SetLeft(visualPassive, x);
             Canvas.SetTop(visualPassive, y);
-            Canvas.SetTop(stageVisual,y-20);
-            Canvas.SetLeft(stageVisual, x+25 );
+            Canvas.SetTop(stageVisual,y -20);
+            Canvas.SetLeft(stageVisual, x +25 );
 
         }
         public void showPassiveInTree()

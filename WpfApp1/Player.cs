@@ -21,7 +21,14 @@ namespace BasicsOfGame
 {
     internal class Player
     {
-        bool godmode = true;
+        bool allocateMode = true;
+        TextBox visualForShieldCooldown;
+        TextBox visualForImmunityCooldown;
+        System.Windows.Shapes.Rectangle immunityPassiveVisual;
+        System.Windows.Shapes.Rectangle shieldPassiveVisual;
+        bool isShieldAdded;
+        bool isImmunityAdded;
+        int addedSpecialBuffs;
         int level;
         bool ignited;
         bool stunned;
@@ -49,18 +56,19 @@ namespace BasicsOfGame
         BitmapImage[] attackAnimationsL = new BitmapImage[4];
         BitmapImage[] attackAnimationsR = new BitmapImage[4];
         int exp;
-        private int intervalForAttackAnimations;
+        private double intervalForAttackAnimations;
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
         private int attackRange, attackDirection;
-        private double unlockAttack = 0;
-        private double attackCooldown = 400;
+        private double unlockAttack ;
+        private double attackCooldown;
         System.Windows.Shapes.Rectangle hpBar;
         System.Windows.Shapes.Rectangle hpBarWindow;
         System.Windows.Shapes.Rectangle expBar;
         System.Windows.Shapes.Rectangle expBarWindow;
         System.Windows.Shapes.Rectangle DotBar;
         System.Windows.Shapes.Rectangle[] buffsContainer = new System.Windows.Shapes.Rectangle[14];
+        int howManyBuffsAndDebuffsImplemented;
         TextBox expVisualization;
         int healthPoints;
         int maxHealthPoints;
@@ -71,27 +79,32 @@ namespace BasicsOfGame
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
         int equippedPieces;
-        
+        double damageIncreasedPerDebuff;
         double itemQuantity;
         double itemQuality;
-        int lifeGainPerHit;
+        int lifeGainOnHit;
+        double overflowingHealing;
         double healthRecoveryRate;
         int criticalHitChance;
         double criticalHitDamage;
 
-        int chanceToBleed;
+        int chanceToInflictBleed;
         double increasedDamage;
+        double increasedDamageDueToDebuffs;
         double increasedFireDamage;
         double increasedIceDamage;
         double increasedLightningDamage;
         double increasedNonElementalDotDamage;
         double damageTakenReduction;
         int armour;
-        double cooldownReduction;
+        // cooldown base time is result of equation { 100/(100+(cooldown reduction in percent) , 1 by default and never <= 0 }
+        double cooldownBaseTime;
         bool isShieldActive;
         bool isImmunityActive;
         double shieldCooldown;
         double immunityCooldown;
+        double timeUntilShieldAvailable;
+        double timeUntilImmunityAvailable;
         double igniteResistance;
         double shockResistance;
         double stunResistance;
@@ -105,14 +118,14 @@ namespace BasicsOfGame
         public static int lastDamage;
         // Following tuples have up to 5 arguments : BASE VALUE(Always),FLAT VALUE(optionally),PERCENT VALUE(optionally)
         private Tuple<int,int> healthPointsToDistribute;
-        private Tuple<int, double, double> healthPointsCalucalations;
-        private Tuple<double, double, double> healthRecoveryRateCalucalations;
+        private Tuple<int, double, double> healthPointsCalculations;
+        private Tuple<double, double, double> healthRecoveryRateCalculations;
         private Tuple<int, int, double, double> damageCalculations;
         private Tuple<double, double> iceDamageCalculations;
         private Tuple<double, double> fireDamageCalculations;
         private Tuple<double, double> lightningDamageCalculations;
-        private Tuple<double, double, double> criticalDamageCaluclations;
-        private Tuple<int, double, double> crticialHitChanceCaluclations;
+        private Tuple<double, double, double> criticalDamageCalculations;
+        private Tuple<int, double, double> criticalHitChanceCalculations;
         private Tuple<double, double> attackSpeedCalculations;
         private Tuple<double, double> attackCooldownCalculations;
         private Tuple<int, double> chanceToBleedCalculations;
@@ -122,7 +135,7 @@ namespace BasicsOfGame
         private Tuple<bool, double> shield;
         private Tuple<bool, double> immunity;
         private Tuple<double, double> cooldownTimeForActiveSkillsCalculations;
-        private Tuple<int, double> movementSpeedCalculations;
+        private Tuple<double, double> movementSpeedCalculations;
         private Tuple<double, double> itemQuantityCalculations;
         private Tuple<double, double> itemQualityCalculations;
         private Tuple<int, double, double> lifeGainOnHitCalculations;
@@ -130,7 +143,7 @@ namespace BasicsOfGame
         private Tuple<double, double> shockResistanceCalculations;
         private Tuple<double, double> nonElementalDotResistanceCalculations;
         private Tuple<double, double> stunResitanceCalculations;
-
+        private Tuple<double,double>damageIncreasedPerDebuffCalculations;
 
 
 
@@ -138,16 +151,32 @@ namespace BasicsOfGame
 
         public Player(Canvas GS)
         {
-            chanceToBleed=0;
-            healthPointsToDistribute=new Tuple<int, int>(0,0);
-            increasedDamage=0;
-            increasedFireDamage=0;
-            increasedIceDamage=0;
-            increasedLightningDamage=0;
-            increasedNonElementalDotDamage=0;
+            shieldPassiveVisual=new System.Windows.Shapes.Rectangle();
+            immunityPassiveVisual=new System.Windows.Shapes.Rectangle();
+            ImageBrush shieldSprite = new ImageBrush();
+            shieldSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive9.png", UriKind.Absolute));
+            shieldPassiveVisual.Fill=shieldSprite;
+            ImageBrush immunitySprite = new ImageBrush();
+            immunitySprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive19.png", UriKind.Absolute));
+            immunityPassiveVisual.Fill=immunitySprite;
+            visualForShieldCooldown=new TextBox();
+            visualForImmunityCooldown=new TextBox();
+            isImmunityAdded=false;
+            isShieldAdded=false;
+            addedSpecialBuffs=0;
+            attackCooldown = 400;
+            unlockAttack=0;
+            chanceToInflictBleed=0;
+            increasedDamage=1.0;
+            increasedFireDamage=0.0;
+            increasedIceDamage=0.0;
+            increasedLightningDamage=0.0;
+            increasedNonElementalDotDamage=0.0;
             damageTakenReduction=0;
             armour=0;
-            cooldownReduction=0;
+            timeUntilShieldAvailable=0;
+            timeUntilImmunityAvailable=0;
+            cooldownBaseTime=1.0;
             isShieldActive=false;
             isImmunityActive=false;
             shieldCooldown = 30;
@@ -162,16 +191,18 @@ namespace BasicsOfGame
             healthRecoveryRate = 1.0;
             criticalHitDamage = 2.0;
             criticalHitChance = 0;
-            lifeGainPerHit = 0;
-
-            healthPointsCalucalations=new Tuple<int,double, double>(200,0,0);
-            healthRecoveryRateCalucalations=new Tuple<double, double, double>(1,0,0);
+            lifeGainOnHit = 0;
+            increasedDamageDueToDebuffs=0;
+            
+            healthPointsCalculations=new Tuple<int,double, double>(200,0,0);
+            healthPointsToDistribute=new Tuple<int, int>(0,0);
+            healthRecoveryRateCalculations=new Tuple<double, double, double>(1,0,0);
             damageCalculations=new Tuple<int,int,double,double>(10, 15, 0, 0);
             iceDamageCalculations=new Tuple<double, double>(0,0);
             fireDamageCalculations = new Tuple<double, double>(0, 0);
             lightningDamageCalculations = new Tuple<double, double>(0, 0);
-            criticalDamageCaluclations=new Tuple<double, double,double>(2,0,0);
-            crticialHitChanceCaluclations=new Tuple<int, double, double>(0,0,0);
+            criticalDamageCalculations=new Tuple<double, double,double>(2,0,1);
+            criticalHitChanceCalculations=new Tuple<int, double, double>(0,0,1);
             attackSpeedCalculations = new Tuple<double, double>(30, 0);
             attackCooldownCalculations = new Tuple<double, double>(400, 0);
             chanceToBleedCalculations=new Tuple<int, double>(0,0);
@@ -180,16 +211,16 @@ namespace BasicsOfGame
             decreasedDamageTakenCalculations=new Tuple<double, double, double>(0,0,0);
             shield=new Tuple<bool, double>(false,30);
             immunity=new Tuple<bool, double>(false,18);
-            cooldownTimeForActiveSkillsCalculations=new Tuple<double, double>(0,0);
-            movementSpeedCalculations=new Tuple<int, double>(100,0);
+            cooldownTimeForActiveSkillsCalculations=new Tuple<double, double>(1,0);
+            movementSpeedCalculations=new Tuple<double, double>(100,0);
             itemQuantityCalculations=new Tuple<double, double>(1,0);
             itemQualityCalculations = new Tuple<double, double>(1, 0);
-            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0);
+            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 1);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
             stunResitanceCalculations = new Tuple<double, double>(1, 0);
-
+            damageIncreasedPerDebuffCalculations=new Tuple<double, double>(0,0);
             unassignedSkillPoints = 0;
             assignedSkillPoints = 0;
             killedBy = "Damage over time";
@@ -208,7 +239,7 @@ namespace BasicsOfGame
             exp = 0;
             minDmg = 10;
             maxDmg = 15;
-            if (godmode) { minDmg = 1000; maxDmg = 1500; healthPoints = 20000; maxHealthPoints = 20000; unassignedSkillPoints = 10; level = 10; }
+            if (allocateMode) { unassignedSkillPoints = 25; level = 25; }
             Speed = 100;
             baseSpeed = 100;
             player.Name = "Player";
@@ -251,14 +282,15 @@ namespace BasicsOfGame
         }
         private void recalculateStats(List<Tuple<string, string, double>> listOfSkills)
         {
-            healthPointsCalucalations = new Tuple<int, double, double>(200, 0, 0);
-            healthRecoveryRateCalucalations = new Tuple<double, double, double>(1, 0, 0);
+            
+            healthPointsCalculations = new Tuple<int, double, double>(200, 0, 0);
+            healthRecoveryRateCalculations = new Tuple<double, double, double>(1, 0, 0);
             damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0);
             iceDamageCalculations = new Tuple<double, double>(0, 0);
             fireDamageCalculations = new Tuple<double, double>(0, 0);
             lightningDamageCalculations = new Tuple<double, double>(0, 0);
-            criticalDamageCaluclations = new Tuple<double, double, double>(2, 0, 0);
-            crticialHitChanceCaluclations = new Tuple<int, double, double>(0, 0, 0);
+            criticalDamageCalculations = new Tuple<double, double, double>(2, 0, 1);
+            criticalHitChanceCalculations = new Tuple<int, double, double>(0, 0, 1);
             attackSpeedCalculations = new Tuple<double, double>(30, 0);
             attackCooldownCalculations = new Tuple<double, double>(400, 0);
             chanceToBleedCalculations = new Tuple<int, double>(0, 0);
@@ -267,60 +299,62 @@ namespace BasicsOfGame
             decreasedDamageTakenCalculations = new Tuple<double, double, double>(0, 0, 0);
             shield = new Tuple<bool, double>(false, 30);
             immunity = new Tuple<bool, double>(false, 18);
-            cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(0, 0);
-            movementSpeedCalculations = new Tuple<int, double>(100, 0);
+            cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(1, 0);
+            movementSpeedCalculations = new Tuple<double, double>(100, 0);
             itemQuantityCalculations = new Tuple<double, double>(1, 0);
             itemQualityCalculations = new Tuple<double, double>(1, 0);
-            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 0);
+            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 1);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
             stunResitanceCalculations = new Tuple<double, double>(1, 0);
-
+            damageIncreasedPerDebuffCalculations=new Tuple<double, double>(0,0);
             foreach(var skills in listOfSkills)
             {
-                if(skills.Item1 == "absoluteCriticalHitChance"){ crticialHitChanceCaluclations= new Tuple<int, double, double>(crticialHitChanceCaluclations.Item1, crticialHitChanceCaluclations.Item2+skills.Item3, crticialHitChanceCaluclations.Item3);}
+                if(skills.Item1 == "absoluteCriticalHitChance"){ criticalHitChanceCalculations= new Tuple<int, double, double>(criticalHitChanceCalculations.Item1, criticalHitChanceCalculations.Item2+skills.Item3, criticalHitChanceCalculations.Item3);}
                 if(skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2+equippedPieces*skills.Item3, armourCalculations.Item3); }
                 if(skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2+skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "criticalDamage") { criticalDamageCaluclations = new Tuple<double, double, double>(criticalDamageCaluclations.Item1, criticalDamageCaluclations.Item2, criticalDamageCaluclations.Item3+skills.Item3); }
+                if(skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2+(skills.Item3/100)); }
+                if(skills.Item1 == "criticalDamage") { criticalDamageCalculations = new Tuple<double, double, double>(criticalDamageCalculations.Item1, criticalDamageCalculations.Item2+skills.Item3, criticalDamageCalculations.Item3); }
                 if(skills.Item1 == "damage") { damageCalculations = new Tuple<int, int, double, double>(damageCalculations.Item1, damageCalculations.Item2, damageCalculations.Item3, damageCalculations.Item4+skills.Item3); }
-                if(skills.Item1 == "damagePerDebuff") {} // NOT IMPLEMENTED YET
-                if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(decreasedDamageTakenCalculations.Item1, decreasedDamageTakenCalculations.Item2, decreasedDamageTakenCalculations.Item3+skills.Item3); }
-                if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(fireDamageCalculations.Item1,fireDamageCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalucalations = new Tuple<double, double, double>(healthRecoveryRateCalucalations.Item1,healthRecoveryRateCalucalations.Item2,healthRecoveryRateCalucalations.Item3+skills.Item3); }
-                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(iceDamageCalculations.Item1,iceDamageCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "damagePerDebuff") {damageIncreasedPerDebuffCalculations= new Tuple<double, double>(damageIncreasedPerDebuffCalculations.Item1,damageIncreasedPerDebuffCalculations.Item2+skills.Item3/100);}
+                if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(decreasedDamageTakenCalculations.Item1, decreasedDamageTakenCalculations.Item2+skills.Item3/100, decreasedDamageTakenCalculations.Item3); }
+                if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(fireDamageCalculations.Item1,fireDamageCalculations.Item2+skills.Item3/100); }
+                if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalculations = new Tuple<double, double, double>(healthRecoveryRateCalculations.Item1,healthRecoveryRateCalculations.Item2,healthRecoveryRateCalculations.Item3+skills.Item3); }
+                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(iceDamageCalculations.Item1,iceDamageCalculations.Item2+skills.Item3/100); }
                 if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(true, skills.Item3*1000); } // ms
                 if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<double, double>(itemQualityCalculations.Item1,itemQualityCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<double, double>(itemQuantityCalculations.Item1,itemQuantityCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<int, double, double>(lifeGainOnHitCalculations.Item1,lifeGainOnHitCalculations.Item2+skills.Item3,lifeGainOnHitCalculations.Item3); }
-                if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1,lightningDamageCalculations.Item1+skills.Item3); }
-                if(skills.Item1 == "maximumHealth") { healthPointsCalucalations = new Tuple<int, double, double>(healthPointsCalucalations.Item1,healthPointsCalucalations.Item2+skills.Item3,healthPointsCalucalations.Item3); }
-                if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<int, double>(movementSpeedCalculations.Item1,movementSpeedCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(increasedNonElementalDotDamageCalculations.Item1,increasedNonElementalDotDamageCalculations.Item2+skills.Item3); }
+                if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1,lightningDamageCalculations.Item2+skills.Item3/100); }
+                if(skills.Item1 == "maximumHealth") { healthPointsCalculations = new Tuple<int, double, double>(healthPointsCalculations.Item1,healthPointsCalculations.Item2+skills.Item3,healthPointsCalculations.Item3); }
+                if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<double, double>(movementSpeedCalculations.Item1,movementSpeedCalculations.Item2+skills.Item3/100); }
+                if(skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(increasedNonElementalDotDamageCalculations.Item1,increasedNonElementalDotDamageCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(igniteResistanceCalculations.Item1,igniteResistanceCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(nonElementalDotResistanceCalculations.Item1,nonElementalDotResistanceCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(shockResistanceCalculations.Item1,shockResistanceCalculations.Item2+(skills.Item3/100)); }
                 if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(stunResitanceCalculations.Item1,stunResitanceCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(true, skills.Item3); }
+                if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(true, skills.Item3*1000); } //ms
                 
 
             }
-            healthPointsToDistribute=new Tuple<int, int>(Convert.ToInt32(healthPointsCalucalations.Item2*(1+healthPointsCalucalations.Item3/100)),healthPointsToDistribute.Item2);
-            maxHealthPoints=Convert.ToInt32(Convert.ToDouble(healthPointsCalucalations.Item1+healthPointsCalucalations.Item2)*(1+healthPointsCalucalations.Item3/100));
+            healthPointsToDistribute=new Tuple<int, int>(Convert.ToInt16(healthPointsCalculations.Item2*(1+healthPointsCalculations.Item3/100)),Convert.ToInt16(healthPointsToDistribute.Item2));
+            maxHealthPoints=Convert.ToInt16(Convert.ToDouble(healthPointsCalculations.Item1+healthPointsCalculations.Item2)*Convert.ToDouble(1+healthPointsCalculations.Item3/100));
+            
             int healthBoost=healthPointsToDistribute.Item1-healthPointsToDistribute.Item2;
-            if(healthBoost<0)healthBoost=0;
+            if(healthBoost<=0)healthBoost=0;
             else healthPointsToDistribute=new Tuple<int, int>(healthPointsToDistribute.Item1,healthPointsToDistribute.Item2+healthBoost);
             healthPoints+=healthBoost;
             updateHpBar();
             itemQuality=itemQualityCalculations.Item1+itemQualityCalculations.Item1*(itemQualityCalculations.Item2/100);
             itemQuantity=itemQuantityCalculations.Item1+itemQuantityCalculations.Item1*(itemQuantityCalculations.Item2/100);
             
-            minDmg=Convert.ToInt32(Convert.ToInt32(damageCalculations.Item1+damageCalculations.Item3)*Convert.ToDouble(1+damageCalculations.Item4/100));
-            maxDmg=Convert.ToInt32(Convert.ToInt32(damageCalculations.Item2+damageCalculations.Item3)*Convert.ToDouble(1+damageCalculations.Item4/100));
+            minDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item1+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
+            maxDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item2+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
 
-            healthRecoveryRate=(healthRecoveryRateCalucalations.Item1+healthRecoveryRateCalucalations.Item2)*(1+healthRecoveryRateCalucalations.Item3/100);
+            increasedDamage=1+damageCalculations.Item4/100+increasedDamageDueToDebuffs;
+            healthRecoveryRate=(healthRecoveryRateCalculations.Item1+healthRecoveryRateCalculations.Item2)*(1+healthRecoveryRateCalculations.Item3/100);
             shockResistance=shockResistanceCalculations.Item1-shockResistanceCalculations.Item2;
             nonElementalDotResistance=nonElementalDotResistanceCalculations.Item1-nonElementalDotResistanceCalculations.Item2;
             igniteResistance=igniteResistanceCalculations.Item1-igniteResistanceCalculations.Item2;
@@ -330,9 +364,85 @@ namespace BasicsOfGame
             if(igniteResistance<0)igniteResistance=0;
             if(shockResistance<0)shockResistance=0;
             if(stunResistance<0)stunResistance=0;
+            cooldownBaseTime=cooldownTimeForActiveSkillsCalculations.Item1/(cooldownTimeForActiveSkillsCalculations.Item1+cooldownTimeForActiveSkillsCalculations.Item2);
+            increasedFireDamage=fireDamageCalculations.Item1+fireDamageCalculations.Item2;
+            increasedIceDamage=iceDamageCalculations.Item1+iceDamageCalculations.Item2;
+            increasedLightningDamage=lightningDamageCalculations.Item1+lightningDamageCalculations.Item2;
+            increasedNonElementalDotDamage=increasedNonElementalDotDamageCalculations.Item1+increasedNonElementalDotDamageCalculations.Item2;
+            criticalHitChance=Convert.ToInt16((criticalHitChanceCalculations.Item1+criticalHitChanceCalculations.Item2)*criticalHitChanceCalculations.Item3);
+            criticalHitDamage=Convert.ToInt16((criticalDamageCalculations.Item1+criticalDamageCalculations.Item2/100)*criticalDamageCalculations.Item3);
+            lifeGainOnHit=Convert.ToInt16((lifeGainOnHitCalculations.Item1+lifeGainOnHitCalculations.Item2)*lifeGainOnHitCalculations.Item3);
+            armour=Convert.ToInt16((armourCalculations.Item1+armourCalculations.Item2)*(1+armourCalculations.Item3/100));
+            baseSpeed=movementSpeedCalculations.Item1*(1+movementSpeedCalculations.Item2);
+            damageTakenReduction=(decreasedDamageTakenCalculations.Item1+decreasedDamageTakenCalculations.Item2)*(1+decreasedDamageTakenCalculations.Item3);
+            if(damageTakenReduction>1)damageTakenReduction=1;
+            isImmunityActive=immunity.Item1;
+            immunityCooldown=immunity.Item2;
+            isShieldActive=shield.Item1;
+            shieldCooldown=shield.Item2;
+            damageIncreasedPerDebuff=damageIncreasedPerDebuffCalculations.Item1+damageIncreasedPerDebuffCalculations.Item2;
+            intervalForAttackAnimations=attackSpeedCalculations.Item1*(attackSpeedCalculations.Item1/(attackSpeedCalculations.Item1+(attackSpeedCalculations.Item1*attackSpeedCalculations.Item2/100)));
+            attackCooldown=attackCooldownCalculations.Item1*(attackCooldownCalculations.Item1/(attackCooldownCalculations.Item1+(attackCooldownCalculations.Item1*attackCooldownCalculations.Item2/100)));;
+            chanceToInflictBleed=Convert.ToInt16(chanceToBleedCalculations.Item1+chanceToBleedCalculations.Item2);
+            
+            if(isShieldActive){
+                if(!isShieldAdded){
+                    isShieldAdded=true;
+                    
+                    shieldPassiveVisual.Width=40;
+                    shieldPassiveVisual.Height=40;
+               
+                    Canvas.SetTop(shieldPassiveVisual,0);
+                    Canvas.SetLeft(shieldPassiveVisual,1160-40*addedSpecialBuffs);
+                    visualForShieldCooldown.Text="0.0";
+                    visualForShieldCooldown.FontSize=10;
+                    visualForShieldCooldown.Height=15;
+                    visualForShieldCooldown.Width=30;
+                    visualForShieldCooldown.Foreground=Brushes.Black;
+                    visualForShieldCooldown.IsHitTestVisible=false;
+                    visualForShieldCooldown.Background=Brushes.White;
+                    visualForShieldCooldown.Opacity=1;
+                    visualForShieldCooldown.TextAlignment=TextAlignment.Center;
+                    Canvas.SetZIndex(shieldPassiveVisual,49);
+                    Canvas.SetZIndex(visualForShieldCooldown,50);
+                    Canvas.SetTop(visualForShieldCooldown,25);
+                    Canvas.SetLeft(visualForShieldCooldown,1165-40*addedSpecialBuffs);
+                    GameScreen.Children.Add(shieldPassiveVisual);
+                    GameScreen.Children.Add(visualForShieldCooldown);
+                     addedSpecialBuffs++;
+                }
+            }
+             if(isImmunityActive){
+                if(!isImmunityAdded){
+                    isImmunityAdded=true;
+                    
+                    immunityPassiveVisual.Width=40;
+                    immunityPassiveVisual.Height=40;
+                    
+                    Canvas.SetTop(immunityPassiveVisual,0);
+                    Canvas.SetLeft(immunityPassiveVisual,1160-40*addedSpecialBuffs);
+                    
+                    visualForImmunityCooldown.Text="0.0";
+                    visualForImmunityCooldown.TextAlignment=TextAlignment.Center;
+                    visualForImmunityCooldown.FontSize=10;
+                    visualForImmunityCooldown.Height=15;
+                    visualForImmunityCooldown.Width=30;
+                    visualForImmunityCooldown.Foreground=Brushes.Black;
+                    visualForImmunityCooldown.IsHitTestVisible=false;
+                    visualForImmunityCooldown.Background=Brushes.White;
+                    visualForImmunityCooldown.Opacity=1;
+                    Canvas.SetZIndex(immunityPassiveVisual,49);
+                    Canvas.SetZIndex(visualForImmunityCooldown,50);
+                    Canvas.SetTop(visualForImmunityCooldown,25);
+                    Canvas.SetLeft(visualForImmunityCooldown,1165-40*addedSpecialBuffs);
+                    GameScreen.Children.Add(immunityPassiveVisual);
+                    GameScreen.Children.Add(visualForImmunityCooldown);
+                    addedSpecialBuffs++;
+                }
+            }
             
         }
-        
+    
         private void updateHpBar(){
             if(healthPoints>maxHealthPoints)healthPoints=maxHealthPoints;
             hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
@@ -453,8 +563,8 @@ namespace BasicsOfGame
         private void activeBuffs()//poison
         {
 
-
-            for (int i = 0; i < 3; i++)
+            howManyBuffsAndDebuffsImplemented=3;
+            for (int i = 0; i < howManyBuffsAndDebuffsImplemented; i++)
             {
                 buffsContainer[i] = new System.Windows.Shapes.Rectangle();
                 buffsContainer[i].Width = 30;
@@ -660,6 +770,39 @@ namespace BasicsOfGame
             {
 
                 List<Tuple<double, double, double, double, string>> toRemove = new List<Tuple<double, double, double, double, string>>();
+                if(isImmunityActive&&timeUntilImmunityAvailable==0)
+                {
+                    Tuple<double,double,double,double,string> LongestDot;
+                    LongestDot=DamagePerMilliseconds[0];
+                    for (int i = 1; i < DamagePerMilliseconds.Count; i++){
+                            if((DamagePerMilliseconds[i].Item4-DamagePerMilliseconds[i].Item3)>(LongestDot.Item4-LongestDot.Item3))
+                            LongestDot=DamagePerMilliseconds[i];
+                    }
+                    toRemove.Add(LongestDot);
+                    timeUntilImmunityAvailable=immunityCooldown;
+
+                }
+                foreach (var x in toRemove)
+                {
+
+                    if (x.Item5 == "Poison")
+                    {
+                        poisonStacks--;
+                        if (poisonStacks == 0) Canvas.SetZIndex(buffsContainer[0], 800);
+                    }
+                    if (x.Item5 == "Ignite")
+                    {
+                        ignited = false;
+                        Canvas.SetZIndex(buffsContainer[1], 800);
+                    }
+                    if (x.Item5 == "Stun")
+                    {
+                        stunned = false;
+                        Canvas.SetZIndex(buffsContainer[2], 800);
+                    }
+                    DamagePerMilliseconds.Remove(x);
+
+                }
                 for (int i = 0; i < DamagePerMilliseconds.Count; i++)
                 {
 
@@ -679,6 +822,7 @@ namespace BasicsOfGame
                     string nameOfDot = DamagePerMilliseconds[i].Item5;
                     DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(dmgPerMs, currentDmg, timeElapsed, maxTime, nameOfDot);
                     if (maxTime <= timeElapsed) toRemove.Add(DamagePerMilliseconds[i]);
+                    
                 }
 
                 foreach (var x in toRemove)
@@ -702,7 +846,21 @@ namespace BasicsOfGame
                     DamagePerMilliseconds.Remove(x);
 
                 }
-
+                
+                int currentDebuffs=0;
+                for(int i=0;i<howManyBuffsAndDebuffsImplemented;i++) // 7 debuffs & 7 buffs
+                {
+                    if(Canvas.GetZIndex(buffsContainer[i])==1000){
+                        
+                        currentDebuffs++;
+                    }
+                }
+               
+                increasedDamageDueToDebuffs=currentDebuffs*damageIncreasedPerDebuff;
+                 minDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item1+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
+                maxDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item2+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
+                
+                increasedDamage=1+damageCalculations.Item4/100+increasedDamageDueToDebuffs;
 
 
 
@@ -845,6 +1003,28 @@ namespace BasicsOfGame
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed / 2 * deltaTime;
 
+            timeUntilImmunityAvailable-=Convert.ToDouble(1000 * deltaTime);
+            if(timeUntilImmunityAvailable<0)timeUntilImmunityAvailable=0;
+            timeUntilShieldAvailable-=Convert.ToDouble(1000 * deltaTime);
+            if(timeUntilShieldAvailable<0)timeUntilShieldAvailable=0;
+            if(isShieldAdded)
+            {
+                int cdOnShieldStackS=(int)Math.Floor(timeUntilShieldAvailable/1000);
+                int cdOnShieldStackMs=(int)Math.Floor(timeUntilShieldAvailable/100)-(cdOnShieldStackS*10);
+                
+                visualForShieldCooldown.Text=cdOnShieldStackS.ToString()+"."+cdOnShieldStackMs.ToString();
+            }
+             if(isImmunityAdded)
+             {
+                 int cdOnImmunityStackS=(int)Math.Floor(timeUntilImmunityAvailable/1000);
+                
+                int cdOnImmunityStackMs=(int)Math.Floor(timeUntilImmunityAvailable/100)-(cdOnImmunityStackS*10);
+                visualForImmunityCooldown.Text=cdOnImmunityStackS.ToString()+"."+cdOnImmunityStackMs.ToString();
+             }
+            if(timeUntilImmunityAvailable>0)immunityPassiveVisual.Opacity=0.5;
+            else immunityPassiveVisual.Opacity=1;
+            if(timeUntilShieldAvailable>0)shieldPassiveVisual.Opacity=0.5;
+            else shieldPassiveVisual.Opacity=1;
             if (blockAttack)
             {
 
@@ -995,17 +1175,50 @@ namespace BasicsOfGame
             SpeedY = SpeedY * Friction;
             if (Speed != 0 && !stunned) Canvas.SetLeft(player, Canvas.GetLeft(player) + SpeedX);
             if (Speed != 0 && !stunned) Canvas.SetTop(player, Canvas.GetTop(player) + SpeedY);
-
-            dotUpdate(deltaTime);
+            if(Canvas.GetLeft(player)<400&& Canvas.GetTop(player)<60)
+            {
+                hpBar.Opacity=0.5;
+                hpBarWindow.Opacity=0.5;
+                hpVisualization.Opacity=0.5;
+                expBar.Opacity=0.5;
+                expBarWindow.Opacity=0.5;
+                expVisualization.Opacity=0.5;
+                DotBar.Opacity=0.5;
+                for(int i=0;i<howManyBuffsAndDebuffsImplemented;i++)
+                {
+                    if(Canvas.GetZIndex(buffsContainer[i])<950)buffsContainer[i].Visibility=Visibility.Hidden;
+                }               
+            }
+            else
+            {
+                hpBar.Opacity=1;
+                hpBarWindow.Opacity=1;
+                hpVisualization.Opacity=1;
+                expBar.Opacity=1;
+                expBarWindow.Opacity=1;
+                expVisualization.Opacity=1;
+                DotBar.Opacity=1;
+                for(int i=0;i<howManyBuffsAndDebuffsImplemented;i++)
+                    buffsContainer[i].Visibility=Visibility.Visible;
+             
+            }
+            
             foreach (Monster monster in map.rMon())
                 monster.moveToTarget(player, deltaTime, Friction, dealDmgToPlayer);
+            dotUpdate(deltaTime);
         }
         public int getHp() { return healthPoints; }
         public bool getBlock() { return blockAttack; }
         public void setBlock(bool block) { blockAttack = block; }
         public double getSpeed() { return Speed; }
+        public System.Windows.Point playerCoordinates(){return new System.Windows.Point(Canvas.GetLeft(player),Canvas.GetTop(player));}
         public void  dealDmgToPlayer(int dealtDamage,string monsterName)
         {
+            if(isShieldActive&&timeUntilShieldAvailable<=0){
+                timeUntilShieldAvailable=shieldCooldown;
+                return;
+            }
+            dealtDamage=Convert.ToInt16(dealtDamage*(1-damageTakenReduction));
             int obecnyDmg = Convert.ToInt32(playerDmg.Text);
             obecnyDmg += dealtDamage;
             playerDmg.Text = obecnyDmg.ToString();
@@ -1039,9 +1252,23 @@ namespace BasicsOfGame
             else return false;
         }
 
+        public void deleteDeadToDot(ref Grid map,ref List<TextBox> boxes){
 
+            List<Monster> updateState = map.rMon();
+                for(int j=map.rMon().Count-1;j>=0;j--)
+                {
+                if (map.grid[map.getX(), map.getY()].checkIfDead(updateState[j], ref exp))
+                {
+
+                    GameScreen.Children.Remove(boxes[j]);
+                    boxes.RemoveAt(j);
+                    updateExp();
+                }
+                }
+        }
         private void checkAttackCollision(ref Grid map,ref List<TextBox> boxes)
         {
+            
             int i = 0;
             int minDmgAfterCalc=minDmg;
             int maxDmgAfterCalc=maxDmg;
@@ -1062,15 +1289,33 @@ namespace BasicsOfGame
                 if (determinateCollision(hitbox, collisionChecker))
                 {
                     int dealtDmg = getRand.Next(minDmgAfterCalc, maxDmgAfterCalc + 1);
-                    int obecnyDmg = Convert.ToInt32(boxes[i].Text);
-                    obecnyDmg += dealtDmg;
-                    x.damageTaken(dealtDmg);
-                    boxes[i].Text = obecnyDmg.ToString();
-                    boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 15;
-                    boxes[i].Opacity = 1;
-                    Canvas.SetLeft(boxes[i], Canvas.GetLeft(x.getBody()) + (x.getBody().ActualWidth / 2) - (boxes[i].Width / 2));
-                    Canvas.SetTop(boxes[i], (Canvas.GetTop(x.getBody()) - (x.getBody().Height - x.getBody().ActualHeight)) - boxes[i].Height);
+                    if(getRand.Next(1,101)<chanceToInflictBleed){
+                        double dmg=dealtDmg*1.2*(increasedDamage+increasedNonElementalDotDamage);
+                        x.addDot(dmg,4000,"Bleed");
+                        boxes[i].Foreground=Brushes.PaleVioletRed;
+                    }
+                    else{
+                        boxes[i].Foreground=Brushes.BlanchedAlmond;
+                    }
+                    if(getRand.Next(1,101)<criticalHitChance){ // 1 - 100
+                        dealtDmg=Convert.ToInt16(dealtDmg*criticalHitDamage);
+                        boxes[i].Text = dealtDmg.ToString()+"!";
+                    }
+                     else{
+                        boxes[i].Text = dealtDmg.ToString();
+                    }
+                    
+                   
+                        
+                        x.damageTaken(dealtDmg);
+                        
+                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 14;
+                        boxes[i].Opacity = 1;
+                        Canvas.SetLeft(boxes[i], Canvas.GetLeft(x.getBody()) + (x.getBody().ActualWidth / 2) - (boxes[i].Width / 2));
+                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x.getBody()) - (x.getBody().Height - x.getBody().ActualHeight)) - (boxes[i].Height) - 15 );
 
+                    
+                    healPlayerBy(lifeGainOnHit);
                 }
 
 
@@ -1098,13 +1343,21 @@ namespace BasicsOfGame
             playerPassives.showSkillTree();
         }
         private void healPlayerBy(double healAmount){
-            healthPoints += Convert.ToInt32((healAmount)*(healthRecoveryRate));
+            double expectedHealing=healAmount*healthRecoveryRate;
+            int healingGiven=Convert.ToInt16(healAmount*healthRecoveryRate);
+            overflowingHealing+=(expectedHealing-healingGiven);
+            if(overflowingHealing>1){
+                int additionalHealingDueToAccumulationOfOverlowingHealing=Convert.ToInt16(overflowingHealing);
+                healingGiven+=additionalHealingDueToAccumulationOfOverlowingHealing;
+                overflowingHealing-=additionalHealingDueToAccumulationOfOverlowingHealing;
+            }
+            healthPoints += healingGiven;
                 if (healthPoints > maxHealthPoints) healthPoints = maxHealthPoints;
                 updateHpBar();
         }
         private void updateExp()
         {
-            if (exp > 1000)
+            if (exp >= 1000)
             {
                 exp -= 1000;
                 level++;

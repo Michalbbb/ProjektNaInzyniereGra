@@ -1,9 +1,9 @@
 Heavier swings;Increases your damage by;passive1;damage;percent;10;damage;percent;25;damage;percent;50;
-Sharper edge;Increases your critical hit damage by;passive2;criticalDamage;percent;20;criticalDamage;percent;50;criticalDamage;percent;100;
+Sharper edge;Critical hit damage +;passive2;criticalDamage;percent;20;criticalDamage;percent;50;criticalDamage;percent;100;
 Precison;Increases your critical hit chance by +;passive3;absoluteCriticalHitChance;percent;5;absoluteCriticalHitChance;percent;15;absoluteCriticalHitChance;percent;30;
 Fast hand;Increases your attack speed by;passive4;attackSpeed;percent;3;attackSpeed;percent;7;attackSpeed;percent;15;
 Open wounds;Chance to inflict bleeding +;passive5;bleedingChance;percent;4;bleedingChance;percent;10;bleedingChance;percent;20;
-Unity with equipment;Per every piece of worn equipment gain additional armour equal to;passive6;armour;flat;2;armour;flat;5;armour;flat;10;
+Unity with equipment;Per every piece of worn equipment gain additional armour equal to;passive6;armourPerEq;flat;2;armourPerEq;flat;5;armourPerEq;flat;10;
 Undying;Increase your max hp by;passive7;maximumHealth;flat;20;maximumHealth;flat;50;maximumHealth;flat;100;
 Iron skin;Decrease damage taken from hits by;passive8;decreaseDamageTaken;percent;3;decreaseDamageTaken;percent;7;decreaseDamageTaken;percent;15;
 Shielded by mind;Gain Barrier that's block 1 enemy hit. Barrier renew every (seconds):;passive9;shieldStack;flat;30;shieldStack;flat;23;shieldStack;flat;15;
@@ -21,8 +21,5 @@ Bloodthirst;Every time you hit enemy, recover life (flat amount) by;passive20;li
 Ignite tolerance;Reduces effect of ignite inflicted on you by;passive21;selfIgniteEffect;percent;50;selfIgniteEffect;percent;100;
 Shock tolerance;Reduces effect of shock inflicted on you by;passive22;selfShockEffect;percent;50;selfShockEffect;percent;100;
 Rot tolerance;Reduces damage dealt by bleed and poison inflicted on you by;passive23;selfNonElementalDotDamageEffect;percent;50;selfNonElementalDotDamageEffect;percent;100;
-Stun tolerance;Stun duration inflicted on you is decreased by;passive24;selfStunEffect;percent;50;selfStunEffect;percent;100;
-Immunological response;For every debuff on you, increase your dmg by;passive25;damage;percent;10;damage;percent;20;damage;percent;40;
-
-
-
+Stun tolerance;Duration of stun inflicted on you is decreased by;passive24;selfStunEffect;percent;50;selfStunEffect;percent;100;
+Immunological response;For every type of debuff on you, increase your dmg by;passive25;damagePerDebuff;percent;10;damagePerDebuff;percent;20;damagePerDebuff;percent;40;
