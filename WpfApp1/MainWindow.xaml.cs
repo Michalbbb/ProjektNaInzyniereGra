@@ -79,9 +79,12 @@ namespace BasicsOfGame
             }
             if (e.Key == Key.Escape)
             {
-                SwitchState();
-                mainCharacter.hideSkillTree();
+                if(tryingAssign){
+                    mainCharacter.hideSkillTree();
                 tryingAssign = false;
+                }
+                else SwitchState();
+                
             }
             
             

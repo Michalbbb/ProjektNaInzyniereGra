@@ -1289,7 +1289,7 @@ namespace BasicsOfGame
                 if (determinateCollision(hitbox, collisionChecker))
                 {
                     int dealtDmg = getRand.Next(minDmgAfterCalc, maxDmgAfterCalc + 1);
-                    if(getRand.Next(1,101)<chanceToInflictBleed){
+                    if(getRand.Next(0,100)<chanceToInflictBleed){
                         double dmg=dealtDmg*1.2*(increasedDamage+increasedNonElementalDotDamage);
                         x.addDot(dmg,4000,"Bleed");
                         boxes[i].Foreground=Brushes.PaleVioletRed;
@@ -1297,7 +1297,7 @@ namespace BasicsOfGame
                     else{
                         boxes[i].Foreground=Brushes.BlanchedAlmond;
                     }
-                    if(getRand.Next(1,101)<criticalHitChance){ // 1 - 100
+                    if(getRand.Next(0,100)<criticalHitChance){ // 0 - 99 < 1 - 100
                         dealtDmg=Convert.ToInt16(dealtDmg*criticalHitDamage);
                         boxes[i].Text = dealtDmg.ToString()+"!";
                     }
