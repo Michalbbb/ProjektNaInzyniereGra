@@ -788,7 +788,11 @@ namespace BasicsOfGame
                     if (x.Item5 == "Poison")
                     {
                         poisonStacks--;
-                        if (poisonStacks == 0) Canvas.SetZIndex(buffsContainer[0], 800);
+                        if (poisonStacks <= 0)
+                        {
+                            Canvas.SetZIndex(buffsContainer[0], 800);
+                            poisonStacks=0;
+                        }
                     }
                     if (x.Item5 == "Ignite")
                     {
@@ -803,6 +807,7 @@ namespace BasicsOfGame
                     DamagePerMilliseconds.Remove(x);
 
                 }
+                toRemove.Clear();
                 for (int i = 0; i < DamagePerMilliseconds.Count; i++)
                 {
 
@@ -831,7 +836,11 @@ namespace BasicsOfGame
                     if (x.Item5 == "Poison")
                     {
                         poisonStacks--;
-                        if (poisonStacks == 0) Canvas.SetZIndex(buffsContainer[0], 800);
+                        if (poisonStacks <= 0)
+                        {
+                            Canvas.SetZIndex(buffsContainer[0], 800);
+                            poisonStacks=0;
+                        }
                     }
                     if (x.Item5 == "Ignite")
                     {
