@@ -18,6 +18,8 @@ namespace BasicsOfGame
         // Tag ( fe. elementalDamage,lightningAttack), Type ( flat or percent ), value ( double, because it'll be easier to convert it that way)
         List<Tuple<string, string, double>> propertiesOfNode = new List<Tuple<string, string, double>>();
         string name="";
+        bool extraInfoAtEnd=false;
+        string infoAtEnd="";
         string description="";
         int stages=0;
         int currentStage = 0;
@@ -44,12 +46,22 @@ namespace BasicsOfGame
             string type = "";
             string valueToConvert="";
             string nameOfPassive = "";
+            infoAtEnd="";
             bool sequenceEnded = false;
             for(int i=0; i<data.Length; i++)
             {                                                                               
                 if (data[i] == ';') { segment++; continue; }
                 if (segment == NAME) name += data[i];
-                else if (segment == DESCRIPTION) description += data[i];
+                else if (segment == DESCRIPTION)
+                {
+                    if(data[i]=='|')extraInfoAtEnd=true;
+                    if(extraInfoAtEnd)
+                    {
+                    if(data[i]=='|')infoAtEnd+="\n";
+                    else infoAtEnd+=data[i];
+                    }
+                    else description += data[i];
+                }
                 else if (segment == NAME_OF_PASSIVE_IMAGE) nameOfPassive += data[i];
                 else if (segment > 2)
                         {
@@ -239,6 +251,8 @@ namespace BasicsOfGame
                 toolTip.Text += description + " " + propertiesOfNode[stageToBe].Item3.ToString();
                 if (propertiesOfNode[stageToBe].Item2 == "percent") toolTip.Text += "%";
             }
+            toolTip.Text+=infoAtEnd;
+
             int start = toolTip.Text.IndexOf(name);
             int length = name.Length + 1;
 
@@ -280,6 +294,7 @@ namespace BasicsOfGame
                 toolTip.Text += description + " " + propertiesOfNode[stageToBe].Item3.ToString();
                 if (propertiesOfNode[stageToBe].Item2 == "percent") toolTip.Text += "%";
             }
+            toolTip.Text+=infoAtEnd;
             int start = toolTip.Text.IndexOf(name);
             int length = name.Length + 1;
             TextPointer startPtr = toolTip.ContentStart.GetPositionAtOffset(start);

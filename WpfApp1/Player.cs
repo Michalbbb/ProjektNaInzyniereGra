@@ -82,7 +82,7 @@ namespace BasicsOfGame
         double damageIncreasedPerDebuff;
         double itemQuantity;
         double itemQuality;
-        int lifeGainOnHit;
+        double lifeGainOnHit;
         double overflowingHealing;
         double healthRecoveryRate;
         int criticalHitChance;
@@ -138,7 +138,7 @@ namespace BasicsOfGame
         private Tuple<double, double> movementSpeedCalculations;
         private Tuple<double, double> itemQuantityCalculations;
         private Tuple<double, double> itemQualityCalculations;
-        private Tuple<int, double, double> lifeGainOnHitCalculations;
+        private Tuple<double, double, double> lifeGainOnHitCalculations;
         private Tuple<double, double> igniteResistanceCalculations;
         private Tuple<double, double> shockResistanceCalculations;
         private Tuple<double, double> nonElementalDotResistanceCalculations;
@@ -189,7 +189,7 @@ namespace BasicsOfGame
             itemQuantity = 1;
             itemQuality = 1;
             healthRecoveryRate = 1.0;
-            criticalHitDamage = 2.0;
+            criticalHitDamage = 1.5;
             criticalHitChance = 0;
             lifeGainOnHit = 0;
             increasedDamageDueToDebuffs=0;
@@ -201,7 +201,7 @@ namespace BasicsOfGame
             iceDamageCalculations=new Tuple<double, double>(0,0);
             fireDamageCalculations = new Tuple<double, double>(0, 0);
             lightningDamageCalculations = new Tuple<double, double>(0, 0);
-            criticalDamageCalculations=new Tuple<double, double,double>(2,0,1);
+            criticalDamageCalculations=new Tuple<double, double,double>(1.5,0,1);
             criticalHitChanceCalculations=new Tuple<int, double, double>(0,0,1);
             attackSpeedCalculations = new Tuple<double, double>(30, 0);
             attackCooldownCalculations = new Tuple<double, double>(400, 0);
@@ -215,7 +215,7 @@ namespace BasicsOfGame
             movementSpeedCalculations=new Tuple<double, double>(100,0);
             itemQuantityCalculations=new Tuple<double, double>(1,0);
             itemQualityCalculations = new Tuple<double, double>(1, 0);
-            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 1);
+            lifeGainOnHitCalculations = new Tuple<double, double, double>(0, 0, 1);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
@@ -289,7 +289,7 @@ namespace BasicsOfGame
             iceDamageCalculations = new Tuple<double, double>(0, 0);
             fireDamageCalculations = new Tuple<double, double>(0, 0);
             lightningDamageCalculations = new Tuple<double, double>(0, 0);
-            criticalDamageCalculations = new Tuple<double, double, double>(2, 0, 1);
+            criticalDamageCalculations = new Tuple<double, double, double>(1.5, 0, 1);
             criticalHitChanceCalculations = new Tuple<int, double, double>(0, 0, 1);
             attackSpeedCalculations = new Tuple<double, double>(30, 0);
             attackCooldownCalculations = new Tuple<double, double>(400, 0);
@@ -303,7 +303,7 @@ namespace BasicsOfGame
             movementSpeedCalculations = new Tuple<double, double>(100, 0);
             itemQuantityCalculations = new Tuple<double, double>(1, 0);
             itemQualityCalculations = new Tuple<double, double>(1, 0);
-            lifeGainOnHitCalculations = new Tuple<int, double, double>(0, 0, 1);
+            lifeGainOnHitCalculations = new Tuple<double, double, double>(0, 0, 1);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
@@ -326,7 +326,7 @@ namespace BasicsOfGame
                 if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(true, skills.Item3*1000); } // ms
                 if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<double, double>(itemQualityCalculations.Item1,itemQualityCalculations.Item2+skills.Item3); }
                 if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<double, double>(itemQuantityCalculations.Item1,itemQuantityCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<int, double, double>(lifeGainOnHitCalculations.Item1,lifeGainOnHitCalculations.Item2+skills.Item3,lifeGainOnHitCalculations.Item3); }
+                if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<double, double, double>(lifeGainOnHitCalculations.Item1,lifeGainOnHitCalculations.Item2+skills.Item3,lifeGainOnHitCalculations.Item3); }
                 if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1,lightningDamageCalculations.Item2+skills.Item3/100); }
                 if(skills.Item1 == "maximumHealth") { healthPointsCalculations = new Tuple<int, double, double>(healthPointsCalculations.Item1,healthPointsCalculations.Item2+skills.Item3,healthPointsCalculations.Item3); }
                 if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<double, double>(movementSpeedCalculations.Item1,movementSpeedCalculations.Item2+skills.Item3/100); }
@@ -370,8 +370,8 @@ namespace BasicsOfGame
             increasedLightningDamage=lightningDamageCalculations.Item1+lightningDamageCalculations.Item2;
             increasedNonElementalDotDamage=increasedNonElementalDotDamageCalculations.Item1+increasedNonElementalDotDamageCalculations.Item2;
             criticalHitChance=Convert.ToInt16((criticalHitChanceCalculations.Item1+criticalHitChanceCalculations.Item2)*criticalHitChanceCalculations.Item3);
-            criticalHitDamage=Convert.ToInt16((criticalDamageCalculations.Item1+criticalDamageCalculations.Item2/100)*criticalDamageCalculations.Item3);
-            lifeGainOnHit=Convert.ToInt16((lifeGainOnHitCalculations.Item1+lifeGainOnHitCalculations.Item2)*lifeGainOnHitCalculations.Item3);
+            criticalHitDamage=(criticalDamageCalculations.Item1+criticalDamageCalculations.Item2/100)*criticalDamageCalculations.Item3;
+            lifeGainOnHit=(lifeGainOnHitCalculations.Item1+lifeGainOnHitCalculations.Item2)*lifeGainOnHitCalculations.Item3;
             armour=Convert.ToInt16((armourCalculations.Item1+armourCalculations.Item2)*(1+armourCalculations.Item3/100));
             baseSpeed=movementSpeedCalculations.Item1*(1+movementSpeedCalculations.Item2);
             damageTakenReduction=(decreasedDamageTakenCalculations.Item1+decreasedDamageTakenCalculations.Item2)*(1+decreasedDamageTakenCalculations.Item3);
