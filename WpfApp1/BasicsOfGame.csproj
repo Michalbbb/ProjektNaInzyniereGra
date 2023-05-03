@@ -170,11 +170,16 @@
     <None Remove="images\UI\Start.PNG" />
     <None Remove="images\UI\levelUpSprite.png" />
     <None Remove="images\UI\StartH.PNG" />
+
+    <None Remove="images\UI\equipmentClosedSprite.png" />
+    <None Remove="images\UI\equipmentOpenSprite.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="images\Buffs_Debuffs\buff2.png" />
     <Resource Include="images\UI\levelUpSprite.png" />
+     <Resource Include="images\UI\equipmentClosedSprite.png" />
+    <Resource Include="images\UI\equipmentOpenSprite.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -21,6 +21,7 @@ namespace BasicsOfGame
 {
     internal class Player
     {
+        TextBox playerStatsHolder;
         bool allocateMode = true;
         TextBox visualForShieldCooldown;
         TextBox visualForImmunityCooldown;
@@ -146,11 +147,20 @@ namespace BasicsOfGame
         private Tuple<double,double>damageIncreasedPerDebuffCalculations;
 
 
-
+        bool showingStats=false;
 
 
         public Player(Canvas GS)
         {
+            playerStatsHolder=new TextBox();
+            Canvas.SetLeft(playerStatsHolder,300);
+            Canvas.SetTop(playerStatsHolder,100);
+            Canvas.SetZIndex(playerStatsHolder,400);
+            playerStatsHolder.Padding=new Thickness(20,20,20,20);
+             playerStatsHolder.IsEnabled=false;
+            playerStatsHolder.Background=Brushes.Black;
+            playerStatsHolder.Foreground=Brushes.White;
+            playerStatsHolder.BorderBrush=Brushes.White;
             shieldPassiveVisual=new System.Windows.Shapes.Rectangle();
             immunityPassiveVisual=new System.Windows.Shapes.Rectangle();
             ImageBrush shieldSprite = new ImageBrush();
@@ -280,6 +290,46 @@ namespace BasicsOfGame
             activeBuffs();
 
         }
+        public void showStats(){
+            playerStatsHolder.Text="";
+           
+            playerStatsHolder.Text+="Damage: "+minDmg.ToString()+"-"+maxDmg.ToString();
+            playerStatsHolder.Text+="\nIncreased damage: "+Math.Round((increasedDamage-1)*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nIncreased fire damage: "+Math.Round((increasedFireDamage)*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nIncreased lightning damage: "+Math.Round((increasedLightningDamage)*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nIncreased ice damage: "+Math.Round((increasedIceDamage)*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nIncreased bleeding and poison damage: "+Math.Round((increasedNonElementalDotDamage)*100).ToString()+"%";
+            playerStatsHolder.Text+="\nChance to inflict bleed on hit: "+(chanceToInflictBleed).ToString()+"%";
+            playerStatsHolder.Text+="\nAttack speed: "+(100+attackSpeedCalculations.Item2).ToString()+"% of base";
+            playerStatsHolder.Text+="\nCritical hit chance: "+criticalHitChance.ToString()+"%";
+            playerStatsHolder.Text+="\nCritical hit damage: "+(criticalHitDamage*100).ToString()+"% of non critical damage";
+            playerStatsHolder.Text+="\nArmour:"+armour.ToString();
+            playerStatsHolder.Text+="\nMax life: "+maxHealthPoints.ToString();
+            playerStatsHolder.Text+="\nDamage Reduction from hits: "+(damageTakenReduction*100).ToString()+"%";
+            playerStatsHolder.Text+="\nLife recovery rate: "+Math.Round(healthRecoveryRate*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nIgnite effect reduction: "+((1-igniteResistance)*100).ToString()+"%";
+            playerStatsHolder.Text+="\nShock effect reduction: "+((1-shockResistance)*100).ToString()+"%";
+            playerStatsHolder.Text+="\nStun duration reduction: "+((1-stunResistance)*100).ToString()+"%";
+            playerStatsHolder.Text+="\nBleed and poison effect reduction: "+((1-nonElementalDotResistance)*100).ToString()+"%";
+            playerStatsHolder.Text+="\nMovement speed: "+baseSpeed.ToString()+"%";
+            playerStatsHolder.Text+="\nCooldown Reduction: "+(cooldownTimeForActiveSkillsCalculations.Item2*100).ToString()+"%";
+            playerStatsHolder.Text+="\nIncrease of item quality dropped: "+Math.Round((itemQuality-1)*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nIncrease of amount of items dropped: "+Math.Round((itemQuantity-1)*100,0).ToString()+"%";
+            playerStatsHolder.Text+="\nLife gain per hit(including life recovery rate): "+Math.Round(lifeGainOnHit*healthRecoveryRate,1).ToString();
+            playerStatsHolder.Text+="\nIncreased dmg per debuff on self: "+Math.Round(damageIncreasedPerDebuff*100,0).ToString()+"%";
+            
+            if(showingStats){
+               return;
+            }
+            else {
+                showingStats=true;
+                GameScreen.Children.Add(playerStatsHolder);
+            }
+        }
+        public void hideStats(){
+            GameScreen.Children.Remove(playerStatsHolder);
+            showingStats=false;
+        }
         private void recalculateStats(List<Tuple<string, string, double>> listOfSkills)
         {
             
@@ -362,7 +412,7 @@ namespace BasicsOfGame
             if(shockResistance<0)shockResistance=0;
             if(nonElementalDotResistance<0)nonElementalDotResistance=0;
             if(igniteResistance<0)igniteResistance=0;
-            if(shockResistance<0)shockResistance=0;
+            
             if(stunResistance<0)stunResistance=0;
             cooldownBaseTime=cooldownTimeForActiveSkillsCalculations.Item1/(cooldownTimeForActiveSkillsCalculations.Item1+cooldownTimeForActiveSkillsCalculations.Item2);
             increasedFireDamage=fireDamageCalculations.Item1+fireDamageCalculations.Item2;
@@ -440,7 +490,7 @@ namespace BasicsOfGame
                     addedSpecialBuffs++;
                 }
             }
-            
+            if(showingStats)showStats();
         }
     
         private void updateHpBar(){

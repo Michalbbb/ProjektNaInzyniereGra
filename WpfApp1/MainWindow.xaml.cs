@@ -38,6 +38,7 @@ namespace BasicsOfGame
         private bool UpKey, DownKey, LeftKey, RightKey;
         private List<TextBox> boxes;
         Button LevelUp;
+        Button Equipment;
         System.Windows.Shapes.Rectangle BlackScreenOverlay = new System.Windows.Shapes.Rectangle();
         private const float Friction = 0.65f;
         bool tryingAssign = false;
@@ -196,20 +197,61 @@ namespace BasicsOfGame
             sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/levelUpSprite.png", UriKind.Absolute));
             LevelUp.Width = 50;
             LevelUp.Height = 50;
-            LevelUp.Style = (Style)FindResource("InformButton");
+            LevelUp.Style = (Style)FindResource("IButton");
             LevelUp.Background=sprite;
-            Canvas.SetLeft(LevelUp, 0);
+            Canvas.SetLeft(LevelUp, 50);
             Canvas.SetTop(LevelUp, 50);
             Canvas.SetZIndex(LevelUp, 50);
             LevelUp.IsEnabled = false;
             LevelUp.Visibility = Visibility.Hidden;
             GameScreen.Children.Add(LevelUp);
             LevelUp.Click += assignSkillPoints;
-
+            Equipment = new Button();
+            ImageBrush spriteEq = new ImageBrush();
+            spriteEq.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/equipmentClosedSprite.png", UriKind.Absolute));
+            Equipment.Width = 50;
+            Equipment.Height = 50;
+            Equipment.Style = (Style)FindResource("IButton");
+            Equipment.Background=spriteEq;
+            Canvas.SetLeft(Equipment, 0);
+            Canvas.SetTop(Equipment, 50);
+            Canvas.SetZIndex(Equipment, 50);
+            Equipment.IsEnabled=true;
+            Equipment.Click+=showScuffedEquipment;
+            Equipment.MouseEnter+=openBackpack;
+            Equipment.MouseLeave+=closeBackpack;
+            GameScreen.Children.Add(Equipment);
             Monster.deadToDot+=removeDeadToDot;
             isGameRunning = true;
             
         }
+
+        private void closeBackpack(object sender, MouseEventArgs e)
+        {
+            ImageBrush spriteEq = new ImageBrush();
+            spriteEq.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/equipmentClosedSprite.png", UriKind.Absolute));
+            Equipment.Background=spriteEq;
+        }
+
+        private void openBackpack(object sender, MouseEventArgs e)
+        {
+            ImageBrush spriteEq = new ImageBrush();
+            spriteEq.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/equipmentOpenSprite.png", UriKind.Absolute));
+            Equipment.Background=spriteEq;
+        }
+        bool statsAreShown=false;
+        private void showScuffedEquipment(object sender, RoutedEventArgs e)
+        {
+           if(!statsAreShown){
+            mainCharacter.showStats();
+            statsAreShown=true;
+           }
+           else{
+            mainCharacter.hideStats();
+            statsAreShown=false;
+           }
+        }
+
         private void removeDeadToDot(){
             getReadyToDeleteDeadToDot=true;
         }
@@ -297,8 +339,14 @@ namespace BasicsOfGame
                 getReadyToDeleteDeadToDot=false;
             }
             System.Windows.Point playerCoordinates=mainCharacter.playerCoordinates();
-            if(playerCoordinates.X<55&&playerCoordinates.Y<110)LevelUp.Opacity=0.5;
-            else LevelUp.Opacity=1;
+            if(playerCoordinates.X<100&&playerCoordinates.Y<110){
+                LevelUp.Opacity=0.5;
+                Equipment.Opacity=0.5;
+            }
+            else{
+                LevelUp.Opacity=1;
+                Equipment.Opacity=1;
+            }
         }
         private void checkOpacity(string tag)
         {
