@@ -8,10 +8,10 @@ Undying;Increase your max hp by;passive7;maximumHealth;flat;20;maximumHealth;fla
 Iron skin;Decrease damage taken from hits by;passive8;decreaseDamageTaken;percent;3;decreaseDamageTaken;percent;7;decreaseDamageTaken;percent;15;
 Shielded by mind;Gain Barrier that's block 1 enemy hit. Barrier renew every (seconds):|(You can have up to 1 barrier stack at time);passive9;shieldStack;flat;20;shieldStack;flat;12;
 Supreme vitality;Increases your health recovery by;passive10;healthRecoveryRate;percent;15;healthRecoveryRate;percent;40;healthRecoveryRate;percent;80;
-Playing with fire;Increase your fire damage by;passive11;fireDamage;percent;20;fireDamage;percent;50;fireDamage;percent;100;
-Bringer of storm;Increase your lightning damage by;passive12;lightningDamage;percent;20;lightningDamage;percent;50;lightningDamage;percent;100;
-Hypothermia;Increase your ice damage by;passive13;iceDamage;percent;20;iceDamage;percent;50;iceDamage;percent;100;
-Master of rot;Increase damage dealt by your poison and bleed by;passive14;nonElementalDotDamage;percent;20;nonElementalDotDamage;percent;50;nonElementalDotDamage;percent;100;
+Playing with fire;Increase your fire damage by;passive11;fireDamage;percent;20;fireDamage;percent;50;fireDamage;percent;100;fireDamage;percent;150;fireDamage;percent;200;
+Bringer of storm;Increase your lightning damage by;passive12;lightningDamage;percent;20;lightningDamage;percent;50;lightningDamage;percent;100;lightningDamage;percent;150;lightningDamage;percent;200;
+Hypothermia;Increase your ice damage by;passive13;iceDamage;percent;20;iceDamage;percent;50;iceDamage;percent;100;iceDamage;percent;150;iceDamage;percent;200;
+Master of rot;Increase damage dealt by your poison and bleed by;passive14;nonElementalDotDamage;percent;20;nonElementalDotDamage;percent;50;nonElementalDotDamage;percent;100;nonElementalDotDamage;percent;150;nonElementalDotDamage;percent;200;
 Illusion of time;Decreases your active skills cooldown time by|(Does not decrease cooldown of skills from passive tree );passive15;cooldownReduced;percent;5;cooldownReduced;percent;15;cooldownReduced;percent;30;
 Swift moves;Increases your movement speed by;passive16;movementSpeed;percent;5;movementSpeed;percent;10;movementSpeed;percent;20;
 Scavenger;Increases your chance to obtain items from enemies by;passive17;itemQuantity;percent;10;itemQuantity;percent;25;itemQuantity;percent;50;

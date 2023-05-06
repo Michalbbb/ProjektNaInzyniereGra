@@ -153,7 +153,7 @@ namespace BasicsOfGame
         public Player(Canvas GS)
         {
             playerStatsHolder=new TextBox();
-            Canvas.SetLeft(playerStatsHolder,300);
+            Canvas.SetLeft(playerStatsHolder,700);
             Canvas.SetTop(playerStatsHolder,100);
             Canvas.SetZIndex(playerStatsHolder,400);
             playerStatsHolder.Padding=new Thickness(20,20,20,20);
