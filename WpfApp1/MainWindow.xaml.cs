@@ -78,6 +78,19 @@ namespace BasicsOfGame
                 miniMapHolder.Opacity = 0.3;
                 
             }
+            if(e.Key == Key.P)
+            {
+                if (tryingAssign)
+                {
+                    mainCharacter.hideSkillTree();
+                    tryingAssign = false;
+                }
+                else
+                {
+                    tryingAssign = true;
+                    mainCharacter.showSkillTree();
+                }
+            }
             if (e.Key == Key.Escape)
             {
                 if(tryingAssign){
