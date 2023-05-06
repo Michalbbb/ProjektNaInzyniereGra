@@ -29,12 +29,11 @@ namespace BasicsOfGame
         public Pokoj(){ // Empty Room
                 type=0;
         }
-        public Pokoj(Canvas canv,int t,string usageOfRoom)
+        public Pokoj(Canvas canv,int t,string usageOfRoom, int roomWeight)
         {
             type = t;                       //type determines background image for that room
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
-            if(usageOfRoom=="startingRoom")enemyCount=0;    //from 2 up to 5 enemies
-            else enemyCount=rnd.Next(2,6);
+            enemyCount = 0;
             BelongTo = canv;
             visited = false;
 
@@ -108,36 +107,58 @@ namespace BasicsOfGame
 
             //below we do the same for monsters (placement)
             int x1, y1;
+            int currRoomWeight = 0; //Current "Weight" of the room, which we compare to roomWeight to check whether we made the room difficult enough
+            const int maxEnemyCount = 7;
 
-            for (int i=0;i<enemyCount;i++)
+            if (usageOfRoom != "startingRoom")
             {
-                Monster addMeToList;
-                int whichOne = rnd.Next(0, 4);
-
-                do
+                for (int i = 0; i < maxEnemyCount; i++)
                 {
-                    objectPlacementX = rnd.Next(0, gridX);
-                    objectPlacementY = rnd.Next(0, gridY);
+                    Monster addMeToList;
+                    int whichOne = rnd.Next(0, 4);
 
-                    if (availableOnGrid[objectPlacementX, objectPlacementY])
+                    switch (whichOne)
                     {
-                        correctPlacement = true;
-                        availableOnGrid[objectPlacementX, objectPlacementY] = false;
+                        case 0:
+                        case 1:
+                            currRoomWeight += 3;
+                            break;
+                        case 2:
+                            currRoomWeight += 5;
+                            break;
+                        case 3:
+                            currRoomWeight++;
+                            break;
                     }
-                    else
-                        correctPlacement = false;
+
+                    if (currRoomWeight > roomWeight) break; //if adding next monster would mean that the room would be "too difficult" then we break;
+
+                    do
+                    {
+                        objectPlacementX = rnd.Next(0, gridX);
+                        objectPlacementY = rnd.Next(0, gridY);
+
+                        if (availableOnGrid[objectPlacementX, objectPlacementY])
+                        {
+                            correctPlacement = true;
+                            availableOnGrid[objectPlacementX, objectPlacementY] = false;
+                        }
+                        else
+                            correctPlacement = false;
 
 
-                } while (!correctPlacement);
-                x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
-                y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
+                    } while (!correctPlacement);
+                    x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X;
+                    y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
 
-                if (whichOne == 0) addMeToList = new Spider(canv, x1, y1);
-                else if (whichOne == 1) addMeToList = new Imp(canv, x1, y1);
-                else if (whichOne == 2) addMeToList = new Golem(canv, x1, y1);
-                else addMeToList = new Goblin(canv, x1, y1);
+                    if (whichOne == 0) addMeToList = new Spider(canv, x1, y1);
+                    else if (whichOne == 1) addMeToList = new Imp(canv, x1, y1);
+                    else if (whichOne == 2) addMeToList = new Golem(canv, x1, y1);
+                    else addMeToList = new Goblin(canv, x1, y1);
 
-                monsters.Add(addMeToList);
+                    monsters.Add(addMeToList);
+                    enemyCount++;
+                }
             }
         }
         public void changeRoomUsage(string usage){
@@ -730,6 +751,7 @@ namespace BasicsOfGame
             Random generateType=new Random();
             bool unlock = false;
             double diff=0.00;
+            int firstRoomWeight=10;
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
@@ -739,7 +761,7 @@ namespace BasicsOfGame
                     {
                         unlock = true;
                         firstDoor = i * 10 + j;
-                        grid[i,j]=new Pokoj(canv,2,"startingRoom");
+                        grid[i,j]=new Pokoj(canv,2,"startingRoom", 0);
                        
                         grid[i, j].setVisited(true);
                         bool left = false, right = false, down = false, up = false;
@@ -754,7 +776,7 @@ namespace BasicsOfGame
                     else if (grid[i, j].getType() != 0)
                     {
                         int typeOfRoom=generateType.Next(1,2);
-                        grid[i,j]=new Pokoj(canv,typeOfRoom,"basicRoom");
+                        grid[i,j]=new Pokoj(canv,typeOfRoom,"basicRoom", firstRoomWeight++);
                         bool left = false, right = false, down = false, up = false;
                         lastDoor = i * 10 + j;
                         if (i > 0) { if (grid[i - 1, j].getType() != 0) up = true; } // up
