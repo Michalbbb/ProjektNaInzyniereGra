@@ -22,7 +22,7 @@ namespace BasicsOfGame
     internal class Player
     {
         TextBox playerStatsHolder;
-        bool allocateMode = true;
+        bool allocateMode = false;
         TextBox visualForShieldCooldown;
         TextBox visualForImmunityCooldown;
         System.Windows.Shapes.Rectangle immunityPassiveVisual;
