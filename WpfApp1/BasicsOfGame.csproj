@@ -109,6 +109,34 @@
     <None Remove="images\MonsterSprites\impAttack.png" />
     <None Remove="images\MonsterSprites\impMovement.png" />
     <None Remove="images\MonsterSprites\spiderFullAnimation.png" />
+    <None Remove="images\passives\passive1.png" />
+    <None Remove="images\passives\passive10.png" />
+    <None Remove="images\passives\passive11.png" />
+    <None Remove="images\passives\passive12.png" />
+    <None Remove="images\passives\passive13.png" />
+    <None Remove="images\passives\passive14.png" />
+    <None Remove="images\passives\passive15.png" />
+    <None Remove="images\passives\passive16.png" />
+    <None Remove="images\passives\passive17.png" />
+    <None Remove="images\passives\passive18.png" />
+    <None Remove="images\passives\passive19.png" />
+    <None Remove="images\passives\passive2.png" />
+    <None Remove="images\passives\passive20.png" />
+    <None Remove="images\passives\passive21.png" />
+    <None Remove="images\passives\passive22.png" />
+    <None Remove="images\passives\passive23.png" />
+    <None Remove="images\passives\passive24.png" />
+    <None Remove="images\passives\passive25.png" />
+    <None Remove="images\passives\passive3.png" />
+    <None Remove="images\passives\passive4.png" />
+    <None Remove="images\passives\passive5.png" />
+    <None Remove="images\passives\passive56.png" />
+    <None Remove="images\passives\passive6.png" />
+    <None Remove="images\passives\passive7.png" />
+    <None Remove="images\passives\passive8.png" />
+    <None Remove="images\passives\passive9.png" />
+    <None Remove="images\passives\passivesInfo.txt" />
+    <None Remove="images\passives\skillTreeBackground.png" />
     
     <None Remove="images\playerAssets\hpBar.png" />
    
@@ -140,17 +168,51 @@
     <None Remove="images\UI\Paint Layer 1.PNG" />
    
     <None Remove="images\UI\Start.PNG" />
-   
+    <None Remove="images\UI\levelUpSprite.png" />
     <None Remove="images\UI\StartH.PNG" />
+
+    <None Remove="images\UI\equipmentClosedSprite.png" />
+    <None Remove="images\UI\equipmentOpenSprite.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="images\Buffs_Debuffs\buff2.png" />
+    <Resource Include="images\UI\levelUpSprite.png" />
+     <Resource Include="images\UI\equipmentClosedSprite.png" />
+    <Resource Include="images\UI\equipmentOpenSprite.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="images\Buffs_Debuffs\buff1.png" />
     <Resource Include="images\Buffs_Debuffs\buff3.png" />
+    <Resource Include="images\passives\passive1.png" />
+    <Resource Include="images\passives\passive10.png" />
+    <Resource Include="images\passives\passive11.png" />
+    <Resource Include="images\passives\passive12.png" />
+    <Resource Include="images\passives\passive13.png" />
+    <Resource Include="images\passives\passive14.png" />
+    <Resource Include="images\passives\passive15.png" />
+    <Resource Include="images\passives\passive16.png" />
+    <Resource Include="images\passives\passive17.png" />
+    <Resource Include="images\passives\passive18.png" />
+    <Resource Include="images\passives\passive19.png" />
+    <Resource Include="images\passives\passive2.png" />
+    <Resource Include="images\passives\passive20.png" />
+    <Resource Include="images\passives\passive21.png" />
+    <Resource Include="images\passives\passive22.png" />
+    <Resource Include="images\passives\passive23.png" />
+    <Resource Include="images\passives\passive24.png" />
+    <Resource Include="images\passives\passive25.png" />
+    <Resource Include="images\passives\passive3.png" />
+    <Resource Include="images\passives\passive4.png" />
+    <Resource Include="images\passives\passive5.png" />
+    <Resource Include="images\passives\passive56.png" />
+    <Resource Include="images\passives\passive6.png" />
+    <Resource Include="images\passives\passive7.png" />
+    <Resource Include="images\passives\passive8.png" />
+    <Resource Include="images\passives\passive9.png" />
+    <Resource Include="images\passives\passivesInfo.txt" />
+    <Resource Include="images\passives\skillTreeBackground.png" />
     <Resource Include="images\UI\Credits.png" />
     <Resource Include="images\UI\Death.png" />
     <Resource Include="images\UI\guideBG.png" />

@@ -1,0 +1,23 @@
+damage - increase your damage by 
+criticalDamage - increases critical damage
+absoluteCriticalHitChance - increases critical hit by flat percent  
+criticalHitChance - increases critical hit by percent  
+attackSpeed - increase animation speed and cd for next attack
+bleedingChance - chance to inflict bleed ( bleed deals 120% of dealt dmg by attack over course of 4 seconds)
+armour - increases your armour (We still need good equation for it)
+maximumHealth - ...
+decreaseDamageTaken - % of dmg taken from hit is reduced
+shieldStack - Max one stack at time, stack negates incoming hit
+healthRecoveryRate - Increases hp gain from all sources
+fireDamage|lightningDamage|iceDamage - increase dmg of corresponding element by x%
+nonElementalDotDamage - posion and bleed dmg
+cooldownReduced - You can reuse active skills faster
+movementSpeed - faster player movement 
+itemQuantity - Better chance to drop eq 
+itemQuality - Dropped eq has higher chance to be of better quality
+immunityStack - Max 1 stack, removes 1 debuff from you
+lifeGainOnHit - Every time player hits something with attack/skill gain x hp
+selfIgniteEffect|selfShockEffect - reduces effect of shock on player
+selfNonElementalDotDamageEffect - reduces effect of bleed and poison on player
+selfStunEffect - reduces duration of stun to x
+

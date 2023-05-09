@@ -23,6 +23,7 @@ namespace BasicsOfGame
 {
     public class Monster
     {
+        protected List<Tuple<double, double, double, double, string>> DamagePerMilliseconds = new List<Tuple<double, double, double, double, string>>();
         protected string nameOfMonster;
         protected int expGiven;
         protected System.Windows.Shapes.Rectangle body = new System.Windows.Shapes.Rectangle();
@@ -36,6 +37,8 @@ namespace BasicsOfGame
         protected double timer = 0;
         protected bool gettingOut = false;
         protected bool prepareToAttack = false;
+        protected bool ignited;
+        protected bool stunned;
         protected int attackTicks;
         protected double attackTimer = 0;
         protected Canvas BelongTO;
@@ -60,7 +63,7 @@ namespace BasicsOfGame
         protected double maxHealthPoints;
         protected bool dead = false;
         protected static List<Tuple<int,Double,string>> damageOverTime=new List<Tuple<int,Double,string>>();
-        
+        static public Action deadToDot;
 
         public static void update(List<Tuple<int, Double,string>> listOfDots)
         {
@@ -80,6 +83,7 @@ namespace BasicsOfGame
             }
             else return false;
         }
+
         public void checkCollisions(ref double coordinateX, ref double coordinateY, double friction, System.Windows.Point playerCenter, double delta)
         {
             bool left = false, right = false, down = false, up = false, axisX = false, axisY = false;
@@ -341,6 +345,65 @@ namespace BasicsOfGame
             Canvas.SetTop(monsterHpBar,Canvas.GetTop(body)-2);
             
         }
+        public void addDot(double dmg,double timeInMs,string name){
+                double dmgPerMs=dmg/timeInMs;
+                if(name=="Ignite") ignited=true;
+                if(name=="Stun")stunned=true;
+                DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, timeInMs, name)); 
+        }
+        
+         protected void dotUpdate(double deltaTime)
+        {
+            
+            if (DamagePerMilliseconds.Count > 0)
+            {
+
+                List<Tuple<double, double, double, double, string>> toRemove = new List<Tuple<double, double, double, double, string>>();
+                
+                for (int i = 0; i < DamagePerMilliseconds.Count; i++)
+                {
+
+                    double currentDmg = DamagePerMilliseconds[i].Item2 + DamagePerMilliseconds[i].Item1 * deltaTime * 1000;
+                    if (currentDmg >= 1)
+                    {
+                        int substractMe = Convert.ToInt32(currentDmg);
+                        dotDamageTaken(substractMe);
+                        currentDmg -= substractMe;
+
+                    }
+                    double dmgPerMs = DamagePerMilliseconds[i].Item1;
+                    double timeElapsed = DamagePerMilliseconds[i].Item3 + deltaTime * 1000;
+                    double maxTime = DamagePerMilliseconds[i].Item4;
+                    string nameOfDot = DamagePerMilliseconds[i].Item5;
+                    DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(dmgPerMs, currentDmg, timeElapsed, maxTime, nameOfDot);
+                    if (maxTime <= timeElapsed) toRemove.Add(DamagePerMilliseconds[i]);
+                    
+                }
+
+                foreach (var x in toRemove)
+                {
+
+                    if (x.Item5 == "Ignite")
+                    {
+                        ignited = false;
+                      
+                    }
+                    if (x.Item5 == "Stun")
+                    {
+                        stunned = false;
+                        
+                    }
+                    DamagePerMilliseconds.Remove(x);
+
+                }
+            
+
+
+
+            }
+
+
+        }
         public void damageTaken(int dmg)
         {
             healthPoints -= dmg;
@@ -351,6 +414,21 @@ namespace BasicsOfGame
             }
             else
             {
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
+        public void dotDamageTaken(int dmg)
+        {
+            healthPoints -= dmg;
+            if(healthPoints>0)
+            {
+                double width = (healthPoints / maxHealthPoints) * (body.Width * 4) / 5;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                deadToDot.Invoke();
                 dead = true;
                 monsterHpBar.Width = 0;
             }
@@ -729,9 +807,11 @@ namespace BasicsOfGame
             if (delta > 1) return; // Starting delta value is about 3 billions 
 
             NormalizeSpeed(delta);
+            dotUpdate(delta);
             bool tryAttack = true;
+           
             setRelativeVisibility();
-
+           
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name)+(name.Width/2) , Canvas.GetTop(name));
             if (prepareToAttack)
             {
@@ -1139,10 +1219,16 @@ namespace BasicsOfGame
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
             
+        
             NormalizeSpeed(delta);
             bool tryAttack = true;
             setRelativeVisibility();
-
+            dotUpdate(delta);
+            if(stunned){
+                prepareToAttack=false;
+                return;
+                
+            }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {
@@ -1587,7 +1673,12 @@ namespace BasicsOfGame
             NormalizeSpeed(delta);
             bool tryAttack = true;
             setRelativeVisibility();
-
+            dotUpdate(delta);
+            if(stunned){
+                prepareToAttack=false;
+                return;
+                
+            }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {
@@ -1956,7 +2047,12 @@ namespace BasicsOfGame
             NormalizeSpeed(delta);
             bool tryAttack = true;
             setRelativeVisibility();
-
+            dotUpdate(delta);
+            if(stunned){
+                prepareToAttack=false;
+                return;
+                
+            }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
             {

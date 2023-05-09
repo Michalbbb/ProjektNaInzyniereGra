@@ -223,7 +223,7 @@ namespace BasicsOfGame
             boldInfo.FontFamily = new FontFamily("Algerian");
             boldInfo.FontSize = 20;
             boldInfo.BorderBrush = Brushes.Transparent;
-           boldInfo.Background = Brushes.Yellow;
+            boldInfo.Background = Brushes.Yellow;
             boldInfo.Foreground = Brushes.Black;
             boldInfo.FontWeight= FontWeights.Bold;
             Canvas.SetLeft(boldInfo, 200);

@@ -8,6 +8,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 using System.Numerics;
+using System.Windows.Shapes;
+using System.Windows.Navigation;
 
 namespace BasicsOfGame
 {
@@ -22,13 +24,18 @@ namespace BasicsOfGame
         Canvas BelongTo;
         Point[,] objectGrid;
         bool[,] availableOnGrid;
-
-        public Pokoj(Canvas canv,int t)
+        bool visited;
+        
+        public Pokoj(){ // Empty Room
+                type=0;
+        }
+        public Pokoj(Canvas canv,int t,string usageOfRoom, int roomWeight)
         {
             type = t;                       //type determines background image for that room
             objectCount = rnd.Next(0, 4);   //from 0 up to 3 objects
-            enemyCount = rnd.Next(2, 6);    //from 2 up to 5 enemies
+            enemyCount = 0;
             BelongTo = canv;
+            visited = false;
 
             //below we setup a grid for spawning objects
             int gridX = 7, gridY = 3, gridBlockSizeX=162, gridBlockSizeY=166;
@@ -100,6 +107,69 @@ namespace BasicsOfGame
 
             //below we do the same for monsters (placement)
             int x1, y1;
+            int currRoomWeight = 0; //Current "Weight" of the room, which we compare to roomWeight to check whether we made the room difficult enough
+            const int maxEnemyCount = 7;
+
+            if (usageOfRoom != "startingRoom")
+            {
+                for (int i = 0; i < maxEnemyCount; i++)
+                {
+                    Monster addMeToList;
+                    int whichOne = rnd.Next(0, 4);
+
+                    switch (whichOne)
+                    {
+                        case 0:
+                        case 1:
+                            currRoomWeight += 3;
+                            break;
+                        case 2:
+                            currRoomWeight += 5;
+                            break;
+                        case 3:
+                            currRoomWeight++;
+                            break;
+                    }
+
+                    if (currRoomWeight > roomWeight) break; //if adding next monster would mean that the room would be "too difficult" then we break;
+
+                    do
+                    {
+                        objectPlacementX = rnd.Next(0, gridX);
+                        objectPlacementY = rnd.Next(0, gridY);
+
+                        if (availableOnGrid[objectPlacementX, objectPlacementY])
+                        {
+                            correctPlacement = true;
+                            availableOnGrid[objectPlacementX, objectPlacementY] = false;
+                        }
+                        else
+                            correctPlacement = false;
+
+
+                    } while (!correctPlacement);
+                    x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X;
+                    y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
+
+                    if (whichOne == 0) addMeToList = new Spider(canv, x1, y1);
+                    else if (whichOne == 1) addMeToList = new Imp(canv, x1, y1);
+                    else if (whichOne == 2) addMeToList = new Golem(canv, x1, y1);
+                    else addMeToList = new Goblin(canv, x1, y1);
+
+                    monsters.Add(addMeToList);
+                    enemyCount++;
+                }
+            }
+        }
+        public void changeRoomUsage(string usage){
+            if(type==0) return; // In case if something goes wrong
+            if(usage=="bossRoom"){
+            monsters = new List<Monster>();
+            enemyCount=rnd.Next(6,9); // 6-8
+            int gridX = 7, gridY = 3;
+            int objectPlacementX, objectPlacementY;
+            bool correctPlacement;
+            int x1, y1;
 
             for (int i=0;i<enemyCount;i++)
             {
@@ -124,13 +194,15 @@ namespace BasicsOfGame
                 x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
                 y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
 
-                if (whichOne == 0) addMeToList = new Spider(canv, x1, y1);
-                else if (whichOne == 1) addMeToList = new Imp(canv, x1, y1);
-                else if (whichOne == 2) addMeToList = new Golem(canv, x1, y1);
-                else addMeToList = new Goblin(canv, x1, y1);
+                if (whichOne == 0) addMeToList = new Spider(BelongTo, x1, y1);
+                else if (whichOne == 1) addMeToList = new Imp(BelongTo, x1, y1);
+                else if (whichOne == 2) addMeToList = new Golem(BelongTo, x1, y1);
+                else addMeToList = new Goblin(BelongTo, x1, y1);
 
                 monsters.Add(addMeToList);
             }
+            }
+            // others else if
         }
         public bool isCleared()
         {
@@ -350,39 +422,70 @@ namespace BasicsOfGame
 
             
         }
+
+        public void setVisited(bool newValue)
+        {
+            visited = newValue;
+        }
+
+        public bool getVisited()
+        {
+            return visited;
+        }
     }
 
     internal class Grid
     {
         public Pokoj[,] grid;
-        int roomCount = 15;
+        int roomCount = 16;
         static int gridSize = 9;
         int currX, currY;
         static int gridMid = gridSize / 2;
         Random rnd = new Random();
         int direction;
         int firstDoor = -1, lastDoor;
-        
+        List<System.Windows.Shapes.Rectangle> miniMapRectangles = new List<System.Windows.Shapes.Rectangle>();
+        List<Label> miniMapQuestionMarks = new List<Label>();
+
+        private int[,] isAssignedAs = new int[gridSize, gridSize];
+        private const int NOTHING = 0;
+        private const int BASIC_ROOM = 1;
+        private const int QUESTION_MARK_ROOM = 2;
+        private const int BOSS_ROOM = 3;
+        private const int TREASURE_ROOM = 4;
+
+
+        Canvas canvas;
+        private bool isMiniMapBeingUsed=false;
+
         public Grid(Canvas canv)
         {
             grid = new Pokoj[gridSize, gridSize]; //if 0 then no room and 1,2,3,etc. mean different types of rooms
+            for(int i=0;i<gridSize; i++)
+            {
+                 for(int j=0;j<gridSize; j++)
+                {
+                    isAssignedAs[i, j] = NOTHING;
+                }
+            }
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    grid[i, j] = new Pokoj(canv,0);
+                    grid[i, j] = new Pokoj();
                     
                 }
             }
+            canvas = canv;
             grid[gridMid, gridMid].setType(1);
             roomCount--;
             currX = gridMid;
             currY = gridMid;
-            int type;
+            int type=1; // from now onwards we generate type of room in generateDoors
             while (roomCount > 0)
             {
                 direction = rnd.Next(0, 4);
-                type = rnd.Next(1, 2);
+            
                 switch (direction)
                 {
                     case 0:
@@ -390,6 +493,7 @@ namespace BasicsOfGame
                         {
                             if (!CheckRoom(currX - 1, currY))//check to left
                             {
+                                
                                 grid[currX - 1, currY].setType(type);
                                 roomCount--;
                                 currX -= 1;
@@ -401,7 +505,7 @@ namespace BasicsOfGame
                     case 1:
                         if (currY > 0)
                         {
-                            if (!CheckRoom(currX, currY - 1))//check) to up
+                            if (!CheckRoom(currX, currY - 1))//check to up
                             {
                                 grid[currX, currY - 1].setType(type);
                                 roomCount--;
@@ -440,19 +544,170 @@ namespace BasicsOfGame
                 }
 
             }
-            generateDoors();
+            generateDoors(canv);
         }
-        public void ShowMap(TextBox c)
+        public void updateMiniMap(GroupBox c)  //minimapa
         {
-            for (int i = 0; i < gridSize; i++)
+            if (isMiniMapBeingUsed)
             {
-                for(int j = 0; j < gridSize; j++)
-                {
-                    c.Text += grid[i, j].getType().ToString();
-                }
-                c.Text += "\n";
+                foreach (Rectangle rectangle in miniMapRectangles) canvas.Children.Remove(rectangle);
+                foreach (Label questionMark in miniMapQuestionMarks) canvas.Children.Remove(questionMark);
             }
             
+            if (grid[currX, currY].getVisited() && isAssignedAs[currX,currY]!= BASIC_ROOM)
+            {
+                if (isAssignedAs[currX, currY] == QUESTION_MARK_ROOM)
+                {
+                    for(int i = miniMapQuestionMarks.Count - 1; i >= 0; i--)
+                    {
+                        // Question mark room becoming basic room ( delete question mark remains from list of question mark rectangles)
+                        if (Canvas.GetLeft(miniMapQuestionMarks[i]) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(miniMapQuestionMarks[i]) ==(Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))) )
+                        {
+                            miniMapQuestionMarks.Remove(miniMapQuestionMarks[i]);
+                        }
+                    }
+                }
+                isAssignedAs[currX, currY] = BASIC_ROOM;
+                        
+                Rectangle square = new Rectangle();
+                square.Width = (c.Width / gridSize);
+                square.Height = (c.Height / gridSize);
+                square.Fill = Brushes.White;
+                square.Opacity = 0.55;
+                Canvas.SetZIndex(square, 1000);
+                Canvas.SetLeft(square, Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize)));
+                Canvas.SetTop(square, Canvas.GetTop(c) + (currX * ((c.Height) / gridSize)));
+
+                miniMapRectangles.Add(square);
+                        //rysujemy kwadracik
+        
+                if (currX - 1 >= 0 && !grid[currX - 1, currY].getVisited()&& grid[currX-1,currY].getType()!=0 && isAssignedAs[currX - 1, currY] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX-1, currY] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX - 1) * ((c.Height) / gridSize)));
+
+                    miniMapQuestionMarks.Add(question);
+                    //grid[currX-1,currY].getType()==0 oznacza, ze pokoj jest nie uzywany, więc !=0 oznacza, że jest używany.
+                    //rysujemy znak zapytania
+
+                }
+                if (currY - 1 >= 0 && !grid[currX, currY - 1].getVisited() && grid[currX, currY - 1].getType() != 0 && isAssignedAs[currX, currY - 1] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX, currY - 1] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + ((currY - 1) * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX) * ((c.Height) / gridSize)));
+
+                    miniMapQuestionMarks.Add(question);
+                    //rysujemy znak zapytania
+                }
+                if (currX + 1 < gridSize && !grid[currX + 1, currY].getVisited() && grid[currX + 1, currY].getType()!=0 && isAssignedAs[currX + 1, currY] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX + 1, currY] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX + 1) * ((c.Height) / gridSize)));
+
+                    miniMapQuestionMarks.Add(question);
+                    //rysujemy znak zapytania
+                }
+                if (currY + 1 < gridSize && !grid[currX, currY + 1].getVisited() && grid[currX, currY+1].getType() != 0 && isAssignedAs[currX, currY + 1] != QUESTION_MARK_ROOM)
+                {
+                    isAssignedAs[currX, currY + 1] = QUESTION_MARK_ROOM;
+                    Label question = new Label();
+                    question.Width = c.Width / gridSize;
+                    question.Height = c.Height / gridSize;
+                    question.Content = "  ?";
+                    question.Foreground = Brushes.White;
+                    question.BorderBrush = Brushes.White;
+                    question.FontSize = 20;
+                    question.Opacity = 0.55;
+                    Canvas.SetZIndex(question, 1000);
+                    Canvas.SetLeft(question, Canvas.GetLeft(c) + ((currY + 1) * ((c.Width) / gridSize)));
+                    Canvas.SetTop(question, Canvas.GetTop(c) + ((currX) * ((c.Height) / gridSize)));
+
+                    miniMapQuestionMarks.Add(question);
+                    //rysujemy znak zapytania
+                }
+                    
+                    //c.Text += grid[i, j].getType().ToString();
+                
+                //c.Text += "\n";
+            }
+
+            if (isMiniMapBeingUsed)
+            {
+                foreach (Rectangle rectangle in miniMapRectangles)
+                {
+                    if (Canvas.GetLeft(rectangle) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(rectangle) == (Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))))
+                    {
+                        rectangle.Opacity = 0.8;
+                    }
+                    else
+                    {
+                        rectangle.Opacity = 0.55;// w przyszłości może będzie tu zmienna żeby 2 razy nie pisać 0.55 bo się zepsuje
+                    }
+                    canvas.Children.Add(rectangle);
+                }
+                foreach (Label questionMark in miniMapQuestionMarks) canvas.Children.Add(questionMark);
+            }
+
+        }
+        public void showMiniMap(GroupBox c)
+        {
+            if (isMiniMapBeingUsed) return;
+            isMiniMapBeingUsed = true;
+            foreach (Rectangle rectangle in miniMapRectangles)
+            {
+                if (Canvas.GetLeft(rectangle) == (Canvas.GetLeft(c) + (currY * ((c.Width) / gridSize))) && Canvas.GetTop(rectangle) == (Canvas.GetTop(c) + (currX * ((c.Height) / gridSize))))
+                {
+                    rectangle.Opacity = 0.8;
+                }
+                else
+                {
+                    rectangle.Opacity = 0.55;// w przyszłości może będzie tu zmienna żeby 2 razy nie pisać 0.55 bo się zepsuje
+                }
+                canvas.Children.Add(rectangle);
+            }
+            foreach (Label questionMark in miniMapQuestionMarks) canvas.Children.Add(questionMark);
+        }
+        public void miniMapClear()
+        {
+            for(int i=0; i<miniMapRectangles.Count; i++)
+            {
+                canvas.Children.Remove(miniMapRectangles[i]);
+            }
+            for (int i = 0; i < miniMapQuestionMarks.Count; i++)
+            {
+                canvas.Children.Remove(miniMapQuestionMarks[i]);
+            }
+            isMiniMapBeingUsed = false;
         }
         public int getX()
         {
@@ -466,7 +721,11 @@ namespace BasicsOfGame
         {
             currX = firstDoor / 10;
             currY = firstDoor % 10;
+            //if (!grid[currX, currY].getVisited())
+            //{
+            //}
             
+            grid[currX, currY].setVisited(true);
             grid[currX,currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist,ref upDoorExist, ref downDoorExist, doorDirection);
         }
         public List<Monster> rMon()
@@ -475,18 +734,24 @@ namespace BasicsOfGame
         }
         public void goTo(int xAxis,int yAxis, Canvas GameScreen, ref bool leftDoorExist, ref bool rightDoorExist, ref bool upDoorExist, ref bool downDoorExist, int doorDirection)
         {
+            //if (!grid[currX, currY].getVisited())
+            //{
+            //}
             foreach (Monster x in grid[currX, currY].monArr())
             {
                 x.remove();
             }
             if (xAxis==1 || xAxis == -1) { currX += xAxis; }
             else if(yAxis==1 || yAxis == -1) { currY += yAxis; }
+            grid[currX, currY].setVisited(true);
             grid[currX, currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, doorDirection);
         }
-        private void generateDoors()
+        private void generateDoors(Canvas canv)
         {
+            Random generateType=new Random();
             bool unlock = false;
             double diff=0.00;
+            int firstRoomWeight=10;
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
@@ -496,11 +761,22 @@ namespace BasicsOfGame
                     {
                         unlock = true;
                         firstDoor = i * 10 + j;
-                        grid[i, j].setType(2);
+                        grid[i,j]=new Pokoj(canv,2,"startingRoom", 0);
+                       
+                        grid[i, j].setVisited(true);
+                        bool left = false, right = false, down = false, up = false;
+                        lastDoor = i * 10 + j;
+                        if (i > 0) { if (grid[i - 1, j].getType() != 0) up = true; } // up
+                        if (j > 0) { if (grid[i, j - 1].getType() != 0) left = true; } // left
+                        if (i < gridSize - 1) { if (grid[i + 1, j].getType() != 0) down = true; } // down
+                        if (j < gridSize - 1) { if (grid[i, j + 1].getType() != 0) right = true; ; } // right
+                        grid[i, j].setDoors(up, left, down, right);
 
                     }
-                    if (grid[i, j].getType() != 0)
+                    else if (grid[i, j].getType() != 0)
                     {
+                        int typeOfRoom=generateType.Next(1,2);
+                        grid[i,j]=new Pokoj(canv,typeOfRoom,"basicRoom", firstRoomWeight++);
                         bool left = false, right = false, down = false, up = false;
                         lastDoor = i * 10 + j;
                         if (i > 0) { if (grid[i - 1, j].getType() != 0) up = true; } // up
@@ -514,6 +790,7 @@ namespace BasicsOfGame
                 if(unlock)diff += 0.05;
             }
             grid[lastDoor/10,lastDoor%10].setType(2);
+            grid[lastDoor/10,lastDoor%10].changeRoomUsage("bossRoom");
             grid[lastDoor / 10, lastDoor % 10].setDiff(0.20);
         }
         private bool CheckRoom(int x, int y)
