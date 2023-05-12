@@ -153,7 +153,7 @@ namespace BasicsOfGame
 
 
             }
-             /* 
+
             if (inCollision)
             {
 
@@ -275,7 +275,7 @@ namespace BasicsOfGame
                     if (coordinateX < 0) savedDirectionX = -1;
                     else savedDirectionX = 1;
                 }
-            }*/
+            }
             if (collisionsDetected == 0)
             {
                 if (inCollision && !gettingOut)
