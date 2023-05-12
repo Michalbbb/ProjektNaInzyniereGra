@@ -109,8 +109,8 @@ namespace BasicsOfGame
                 if ((string)x.Tag != "enemy" && (string)x.Tag != "collision") continue;
 
                 Rect hitBoxOfObject;
-                if ((string)x.Tag == "enemy") { hitBoxOfObject = new Rect(Canvas.GetLeft(x) + (9 * x.Width / 20), Canvas.GetTop(x) + (9 * x.Height / 20), x.Width / 10, x.Height / 10); }
-                else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+               if ((string)x.Tag == "enemy") { hitBoxOfObject = new Rect(Canvas.GetLeft(x) + (9 * x.Width / 20), Canvas.GetTop(x) + (9 * x.Height / 20), x.Width / 10, x.Height / 10); }
+               else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
 
 
 
@@ -153,6 +153,7 @@ namespace BasicsOfGame
 
 
             }
+             /* 
             if (inCollision)
             {
 
@@ -164,7 +165,7 @@ namespace BasicsOfGame
                 if (collisionsDetected == collisionsWithKin)
                 {
                     Rect myBody = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body), body.Width, body.Height);
-                    foreach (Goblin g in BelongTO.Children.OfType<Goblin>())
+                    foreach (Monster g in BelongTO.Children.OfType<Monster>())
                     {
                         if (body == g.body) continue;
                         else
@@ -197,14 +198,14 @@ namespace BasicsOfGame
                 coordinateX = savedDirectionX * Speed * friction;
             }
 
-            else if (axisX || axisY) // 1 side collision ( not stucked )
+          else if (axisX || axisY) // 1 side collision ( not stucked )
             {
                 if (collisionsDetected == collisionsWithKin && collisionsDetected > 0)
                 {
 
 
                     Rect myBody = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body), body.Width, body.Height);
-                    foreach (Goblin g in BelongTO.Children.OfType<Goblin>())
+                    foreach (Monster g in BelongTO.Children.OfType<Monster>())
                     {
                         if (body == g.body) continue;
                         else
@@ -274,7 +275,7 @@ namespace BasicsOfGame
                     if (coordinateX < 0) savedDirectionX = -1;
                     else savedDirectionX = 1;
                 }
-            }
+            }*/
             if (collisionsDetected == 0)
             {
                 if (inCollision && !gettingOut)
