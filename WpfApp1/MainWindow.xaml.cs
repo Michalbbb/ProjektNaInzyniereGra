@@ -102,7 +102,8 @@ namespace BasicsOfGame
             }
             if(e.Key == Key.D1)
             {
-                System.Windows.Point mousePosition = Mouse.GetPosition(this);
+                System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
+                
                 mainCharacter.useDemoSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
             }
             

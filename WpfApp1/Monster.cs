@@ -1319,6 +1319,7 @@ namespace BasicsOfGame
             dotUpdate(delta);
             if(stunned){
                 prepareToAttack=false;
+                weapon.Fill = Brushes.Transparent;
                 return;
                 
             }
@@ -1769,9 +1770,10 @@ namespace BasicsOfGame
             setRelativeVisibility();
             dotUpdate(delta);
             if(stunned){
-                prepareToAttack=false;
+                prepareToAttack = false;
+                weapon.Fill = Brushes.Transparent;
                 return;
-                
+
             }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
@@ -2144,9 +2146,10 @@ namespace BasicsOfGame
             setRelativeVisibility();
             dotUpdate(delta);
             if(stunned){
-                prepareToAttack=false;
+                prepareToAttack = false;
+                weapon.Fill = Brushes.Transparent;
                 return;
-                
+
             }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)

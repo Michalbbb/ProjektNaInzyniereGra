@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="images\ActiveSkills\fireball.png" />
     <None Remove="images\att1.png" />
     <None Remove="images\att1d.png" />
     <None Remove="images\att1l.png" />
@@ -176,6 +177,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\ActiveSkills\fireball.png" />
     <Resource Include="images\Buffs_Debuffs\buff2.png" />
     <Resource Include="images\UI\levelUpSprite.png" />
      <Resource Include="images\UI\equipmentClosedSprite.png" />

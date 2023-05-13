@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Ribbon;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace BasicsOfGame
 {
@@ -67,10 +68,11 @@ namespace BasicsOfGame
         int stunChance = 100;
         double moveByX;
         double moveByY;
-        int rotation;
+       
         int speed;
         ImageBrush fireballSprite; // NEED GRAPHIC
-        System.Windows.Shapes.Rectangle fireballImg;
+        
+        System.Windows.Shapes.Rectangle fireballHitbox;
         Canvas canvas;
         public Fireball(Canvas canv)
         {
@@ -80,7 +82,7 @@ namespace BasicsOfGame
             minDamage = 40;
             maxDamage = 80;
             baseCooldown = 6; // 6Seconds
-            cooldown = baseCooldown;
+            cooldown = 0;
             currentCooldown = 0;
             Type = "Offensive";
             isUsingSkill = false;
@@ -89,10 +91,12 @@ namespace BasicsOfGame
             
             speed = 700;
             fireballSprite = new ImageBrush();
-            fireballImg = new System.Windows.Shapes.Rectangle();
-            fireballImg.Fill = Brushes.Black;
-            fireballImg.Width = 50;
-            fireballImg.Height = 50;
+            fireballHitbox = new System.Windows.Shapes.Rectangle();
+            fireballSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/fireball.png", UriKind.Absolute)); ;
+            fireballHitbox.Fill = fireballSprite;
+            fireballHitbox.Width = 50;
+            fireballHitbox.Height = 50;
+            
 
         }
         public override void updateState(double delta, List<Monster> monsters)
@@ -105,16 +109,16 @@ namespace BasicsOfGame
             else if (isUsingSkill)
             {
                 distanceToTravel -= speed*delta;
-                if(distanceToTravel<=0) {; currentCooldown = cooldown; canvas.Children.Remove(fireballImg); isUsingSkill = false; }
-                Canvas.SetLeft(fireballImg,Canvas.GetLeft(fireballImg)+speed*moveByX*delta);
-                Canvas.SetTop(fireballImg, Canvas.GetTop(fireballImg) + speed * moveByY * delta);
+                if(distanceToTravel<=0) {; currentCooldown = cooldown; canvas.Children.Remove(fireballHitbox); isUsingSkill = false; }
+                Canvas.SetLeft(fireballHitbox,Canvas.GetLeft(fireballHitbox)+(speed*moveByX* delta));
+                Canvas.SetTop(fireballHitbox, Canvas.GetTop(fireballHitbox) + (speed  * moveByY * delta));
                 
                 int damageDealt=Skill.rnd.Next(minDamage,maxDamage);
-                tryDamaging.Invoke(fireballImg, damageDealt, statusEffects, canCrit);
+                tryDamaging.Invoke(fireballHitbox, damageDealt, statusEffects, canCrit);
                 if (Skill.hitsToDisappear == 0)
                 {
                     isUsingSkill = false;
-                    canvas.Children.Remove(fireballImg);
+                    canvas.Children.Remove(fireballHitbox);
                     currentCooldown = cooldown;
                 }  
                   
@@ -138,11 +142,45 @@ namespace BasicsOfGame
             {
                 isUsingSkill = true;
                 distanceToTravel = 600;
-                moveByX=(mousePosition.X-playerPosition.X)/speed;
-                moveByY=(mousePosition.Y-playerPosition.Y)/speed;
-                Canvas.SetLeft(fireballImg, playerPosition.X);
-                Canvas.SetTop(fireballImg, playerPosition.Y);
-                canvas.Children.Add(fireballImg);
+                moveByX=(mousePosition.X-playerPosition.X)/(mousePosition.X+playerPosition.X);
+                moveByY=(mousePosition.Y-playerPosition.Y) / (mousePosition.Y + playerPosition.Y);
+                
+                Canvas.SetLeft(fireballHitbox, playerPosition.X);
+                Canvas.SetTop(fireballHitbox, playerPosition.Y);
+                //MessageBox.Show(moveByY + "<y x>" + moveByX);
+                RotateTransform rotateByAngle;
+                if(Math.Abs(Math.Abs(moveByX) - Math.Abs(moveByY)) < 0.20)
+                {
+                   
+                        if (moveByX > 0) { 
+                            if(moveByY > 0) rotateByAngle = new RotateTransform(45);
+                            else rotateByAngle = new RotateTransform(315);
+
+                        }
+                        else
+                        {
+                            if (moveByY > 0) rotateByAngle = new RotateTransform(135);
+                            else rotateByAngle = new RotateTransform(225);
+                        }
+                    
+                   
+                }
+                else if (Math.Abs(moveByX) > Math.Abs(moveByY))
+                {
+                    if(moveByX>0) { rotateByAngle = new RotateTransform(0); }
+                    else
+                    {
+                        rotateByAngle = new RotateTransform(180);
+                    }
+                }
+                else
+                {
+                    if(moveByY>0) { rotateByAngle = new RotateTransform(90); }
+                    else rotateByAngle = new RotateTransform(270);
+                }
+                
+                fireballHitbox.RenderTransform= rotateByAngle;
+                canvas.Children.Add(fireballHitbox);
                 Skill.hitsToDisappear = 1;
 
                 
