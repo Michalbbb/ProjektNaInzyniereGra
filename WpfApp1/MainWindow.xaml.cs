@@ -100,6 +100,11 @@ namespace BasicsOfGame
                 else SwitchState();
                 
             }
+            if(e.Key == Key.D1)
+            {
+                System.Windows.Point mousePosition = Mouse.GetPosition(this);
+                mainCharacter.useDemoSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
+            }
             
             
 
@@ -251,6 +256,7 @@ namespace BasicsOfGame
             ImageBrush spriteEq = new ImageBrush();
             spriteEq.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/equipmentOpenSprite.png", UriKind.Absolute));
             Equipment.Background=spriteEq;
+          
         }
         bool statsAreShown=false;
         private void showScuffedEquipment(object sender, RoutedEventArgs e)

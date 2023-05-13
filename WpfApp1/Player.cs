@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -145,13 +146,15 @@ namespace BasicsOfGame
         private Tuple<double, double> nonElementalDotResistanceCalculations;
         private Tuple<double, double> stunResitanceCalculations;
         private Tuple<double,double>damageIncreasedPerDebuffCalculations;
-
-
+        Skill demoSkill;
+        
         bool showingStats=false;
 
 
         public Player(Canvas GS)
         {
+            demoSkill = new Fireball(GS);
+            demoSkill.tryDamaging += tryDamagingAnyEnemy;
             playerStatsHolder=new TextBox();
             Canvas.SetLeft(playerStatsHolder,700);
             Canvas.SetTop(playerStatsHolder,100);
@@ -168,8 +171,8 @@ namespace BasicsOfGame
             shieldPassiveVisual.Fill=shieldSprite;
             ImageBrush immunitySprite = new ImageBrush();
             immunitySprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive19.png", UriKind.Absolute));
-            immunityPassiveVisual.Fill=immunitySprite;
-            visualForShieldCooldown=new TextBox();
+            immunityPassiveVisual.Fill=immunitySprite;          
+            visualForShieldCooldown =new TextBox();
             visualForImmunityCooldown=new TextBox();
             isImmunityAdded=false;
             isShieldAdded=false;
@@ -289,6 +292,24 @@ namespace BasicsOfGame
             createDotBar();
             activeBuffs();
 
+        }
+        System.Windows.Shapes.Rectangle currentSkillBody;
+        int damageOfCurrentSkill;
+        int[] statusEffectsForSkill;
+        bool canCurrentSkillCrit;
+        bool tryingInvoke;
+        private void tryDamagingAnyEnemy(System.Windows.Shapes.Rectangle body, int damage, int[] statusEffects, bool canCrit)
+        {
+            tryingInvoke = true;
+            damageOfCurrentSkill = damage;
+            statusEffectsForSkill= statusEffects;
+            canCurrentSkillCrit = canCrit;
+            currentSkillBody = body;
+        }
+
+        public void useDemoSkill(System.Windows.Point mouse, System.Windows.Point player)
+        {
+            demoSkill.useSkill(mouse, player);
         }
         public void showStats(){
             playerStatsHolder.Text="";
@@ -1057,11 +1078,21 @@ namespace BasicsOfGame
 
 
         }
+        public System.Windows.Shapes.Rectangle getBody()
+        {
+            return player;
+        }
+        
         public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes, Action updateMiniMap)
         {
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed / 2 * deltaTime;
-
+            demoSkill.updateState(deltaTime,map.rMon());
+            if (tryingInvoke)
+            {
+                tryingInvoke = false;
+                checkAttackCollision(ref map, ref boxes, currentSkillBody, damageOfCurrentSkill, statusEffectsForSkill, canCurrentSkillCrit);
+            }
             timeUntilImmunityAvailable-=Convert.ToDouble(1000 * deltaTime);
             if(timeUntilImmunityAvailable<0)timeUntilImmunityAvailable=0;
             timeUntilShieldAvailable-=Convert.ToDouble(1000 * deltaTime);
@@ -1324,6 +1355,111 @@ namespace BasicsOfGame
                     updateExp();
                 }
                 }
+        }
+        const int BLEED_CHANCE = 0;
+        const int IGNITE_CHANCE = 1;
+        const int CHILL_CHANCE = 2;
+        const int SHOCK_CHANCE = 3;
+        const int POISON_CHANCE = 4;
+        const int STUN_CHANCE = 5;
+     
+        private void checkAttackCollision(ref Grid map, ref List<TextBox> boxes,System.Windows.Shapes.Rectangle skillBody,int damage,int[] statusEffects,bool canCrit)
+        {
+            if (Skill.hitsToDisappear <= 0) return;
+            int i = 0;
+            
+            if (ignited)
+            {
+                double igniteEffect = 1 - (0.2 * igniteResistance);
+                damage = Convert.ToInt32(damage * igniteEffect);
+                
+            }
+            List<Monster> updateState = map.rMon();
+            foreach (Monster x in updateState)
+            {
+                
+
+                int rand = getRand.Next(0, 100); // ONLY 1 check for better optimization
+                Rect hitbox = new Rect(Canvas.GetLeft(skillBody), Canvas.GetTop(skillBody), skillBody.ActualWidth, skillBody.ActualHeight);  ;
+                Rect collisionChecker = new Rect(Canvas.GetLeft(x.getBody()), Canvas.GetTop(x.getBody()), x.getBody().ActualWidth, x.getBody().ActualHeight);
+                if (determinateCollision(hitbox, collisionChecker)&&Skill.hitsToDisappear>0)
+                {
+                    
+                    if (rand < statusEffects[BLEED_CHANCE])
+                    {
+                        double dmg = damage * 1.2 * (increasedDamage + increasedNonElementalDotDamage);
+                        x.addDot(dmg, 4000, "Bleed");
+                        
+                    }
+                    if (rand < statusEffects[IGNITE_CHANCE])
+                    {
+                        double dmg = damage * 1.2 * (increasedDamage + increasedFireDamage);
+                        x.addDot(dmg, 2000, "Ignite");
+
+                    }
+                    if (rand < statusEffects[CHILL_CHANCE])
+                    {
+                        double dmg = 0;
+                        x.addDot(dmg, 5000, "Chill");
+
+                    }
+                    if (rand < statusEffects[SHOCK_CHANCE])
+                    {
+                        double dmg =0;
+                        x.addDot(dmg, 4000, "Shock");
+
+                    }
+                    if (rand < statusEffects[POISON_CHANCE])
+                    {
+                        double dmg = damage * 1.8 * (increasedDamage + increasedNonElementalDotDamage);
+                        x.addDot(dmg, 3000, "Bleed");
+
+                    }
+                    if (rand < statusEffects[STUN_CHANCE])
+                    {
+                        double dmg = 0;
+                        x.addDot(dmg, 1000, "Stun");
+
+                    }
+                    if (canCrit&& rand < criticalHitChance)
+                    { // 0 - 99 < 1 - 100
+                        damage = Convert.ToInt16(damage * criticalHitDamage);
+                        boxes[i].Text = damage.ToString() + "!";
+                    }
+                    else
+                    {
+                        boxes[i].Text = damage.ToString();
+                    }
+
+
+
+                    x.damageTaken(damage);
+                    boxes[i].Foreground = Brushes.BlanchedAlmond;
+                    boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 14;
+                    boxes[i].Opacity = 1;
+                    Canvas.SetLeft(boxes[i], Canvas.GetLeft(x.getBody()) + (x.getBody().ActualWidth / 2) - (boxes[i].Width / 2));
+                    Canvas.SetTop(boxes[i], (Canvas.GetTop(x.getBody()) - (x.getBody().Height - x.getBody().ActualHeight)) - (boxes[i].Height) - 15);
+
+
+                    healPlayerBy(lifeGainOnHit);
+                    Skill.hitsToDisappear--;
+                }
+
+
+                i++;
+
+            }
+
+            for (int j = i - 1; j >= 0; j--)
+            {
+                if (map.grid[map.getX(), map.getY()].checkIfDead(updateState[j], ref exp))
+                {
+
+                    GameScreen.Children.Remove(boxes[j]);
+                    boxes.RemoveAt(j);
+                    updateExp();
+                }
+            }
         }
         private void checkAttackCollision(ref Grid map,ref List<TextBox> boxes)
         {
