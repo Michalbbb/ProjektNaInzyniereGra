@@ -191,4 +191,209 @@ namespace BasicsOfGame
             }
         }
     }
+    internal class IceBurst : Skill
+    {
+
+        int chillChance = 100;
+        int sequence;
+        double timeBetween;
+        string direction;
+        ImageBrush iceBurstSprite; // NEED GRAPHIC
+
+        System.Windows.Shapes.Rectangle iceBurstHitBox;
+        Canvas canvas;
+        public IceBurst(Canvas canv)
+        {
+            canvas = canv;
+            baseMinDamage = 15;
+            baseMaxDamage = 30;
+            minDamage = 15;
+            maxDamage = 30;
+            baseCooldown = 0; // 10Seconds
+            cooldown = baseCooldown;
+            currentCooldown = 0;
+            Type = "Offensive";
+            isUsingSkill = false;
+            statusEffects[CHILL_CHANCE] = chillChance;
+            canCrit = false;
+
+
+            iceBurstSprite = new ImageBrush();
+            iceBurstHitBox = new System.Windows.Shapes.Rectangle();
+            iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst1.png", UriKind.Absolute)); ;
+            iceBurstHitBox.Fill = iceBurstSprite;
+            iceBurstHitBox.Width = 75;
+            iceBurstHitBox.Height = 75;
+
+
+        }
+        public override void updateState(double delta, List<Monster> monsters)
+        {
+            if (currentCooldown > 0)
+            {
+
+                currentCooldown -= delta;
+            }
+            else if (isUsingSkill)
+            {
+
+                System.Windows.Shapes.Rectangle modifiedHitBox = new System.Windows.Shapes.Rectangle(); ;
+
+                if (sequence == 0)
+                {
+                    canvas.Children.Add(iceBurstHitBox);
+                      int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(iceBurstHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.1;
+                    sequence++;
+
+                }
+                if(sequence == 1&&timeBetween<=0) {
+                    iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst2.png", UriKind.Absolute)); ;
+                    iceBurstHitBox.Fill = iceBurstSprite;
+                    iceBurstHitBox.Width = 120;
+                    iceBurstHitBox.Height = 75;
+                    if (direction == "left")
+                    {
+                        Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox) - 45);
+                        
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
+                        modifiedHitBox.Width = iceBurstHitBox.Width - 75;
+                        modifiedHitBox.Height = iceBurstHitBox.Height;
+
+
+                    }
+                    else
+                    {
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox) + 75);
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
+                        modifiedHitBox.Width = iceBurstHitBox.Width - 75;
+                        modifiedHitBox.Height = iceBurstHitBox.Height;
+                    }
+
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(modifiedHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.1;
+                    sequence++;
+                }
+                if (sequence == 2 && timeBetween <= 0)
+                {
+                    iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst3.png", UriKind.Absolute)); ;
+                    iceBurstHitBox.Fill = iceBurstSprite;
+                    iceBurstHitBox.Width = 171;
+                    iceBurstHitBox.Height = 75;
+                    if (direction == "left")
+                    {
+                        Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox) - 51);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
+                        modifiedHitBox.Width = iceBurstHitBox.Width - 120;
+                        modifiedHitBox.Height = iceBurstHitBox.Height;
+
+                    }
+                    else
+                    {
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox) + 120);
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
+                        modifiedHitBox.Width = iceBurstHitBox.Width - 120;
+                        modifiedHitBox.Height = iceBurstHitBox.Height;
+                    }
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(modifiedHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.1;
+                    sequence++;
+                }
+                if (sequence == 3 && timeBetween <= 0)
+                {
+                    iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst4.png", UriKind.Absolute)); ;
+                    iceBurstHitBox.Fill = iceBurstSprite;
+                    Canvas.SetTop(iceBurstHitBox, Canvas.GetTop(iceBurstHitBox) - 31);
+                    iceBurstHitBox.Width = 256;
+                    iceBurstHitBox.Height = 106;
+                    if (direction == "left")
+                    {
+                        Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox) - 85);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
+                        modifiedHitBox.Width = iceBurstHitBox.Width - 171;
+                        modifiedHitBox.Height = iceBurstHitBox.Height;
+                    }
+                    else
+                    {
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox) + 171);
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
+                        modifiedHitBox.Width = iceBurstHitBox.Width - 171;
+                        modifiedHitBox.Height = iceBurstHitBox.Height;
+                    }
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(modifiedHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.05;
+                    sequence++;
+                   
+                }
+              
+
+
+                if (sequence == 4&&timeBetween<=0)
+                {
+                   
+                    isUsingSkill = false;
+                    canvas.Children.Remove(iceBurstHitBox);
+                    currentCooldown = cooldown;
+                }
+                timeBetween -= delta;
+
+            }
+
+
+        }
+
+        // Call below function every time any stats get updated
+        public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
+        {
+            cooldown = baseCooldown * cooldownReduction;
+            double increasedDamage = increasedDamageList[DAMAGE] + increasedDamageList[ICE_DAMAGE];
+            minDamage = Convert.ToInt32(increasedDamage * baseMinDamage);
+            maxDamage = Convert.ToInt32(increasedDamage * baseMaxDamage);
+
+        }
+        public override void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition)
+        {
+            if (currentCooldown > 0) return;
+            if (!isUsingSkill)
+            {
+                isUsingSkill = true;
+                sequence = 0;
+                timeBetween = 0;
+               
+
+                Canvas.SetLeft(iceBurstHitBox, playerPosition.X);
+                Canvas.SetTop(iceBurstHitBox, playerPosition.Y);
+                //MessageBox.Show(moveByY + "<y x>" + moveByX);
+               
+                if (mousePosition.X > playerPosition.X) direction = "right";
+                else direction = "left";
+                iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst1.png", UriKind.Absolute)); ;
+                iceBurstHitBox.Fill = iceBurstSprite;
+                iceBurstHitBox.Width = 75;
+                Canvas.SetTop(iceBurstHitBox, playerPosition.Y - 25);
+                iceBurstHitBox.Height = 75;
+                if (direction == "left")
+                {
+                    Canvas.SetLeft(iceBurstHitBox, playerPosition.X-75);
+                  
+                    
+                }
+
+                
+                
+                Skill.hitsToDisappear = 999;
+
+
+
+
+            }
+        }
+    }
 }
