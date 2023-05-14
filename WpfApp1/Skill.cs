@@ -82,7 +82,7 @@ namespace BasicsOfGame
             minDamage = 40;
             maxDamage = 80;
             baseCooldown = 6; // 6Seconds
-            cooldown = 0;
+            cooldown = baseCooldown;
             currentCooldown = 0;
             Type = "Offensive";
             isUsingSkill = false;
@@ -110,8 +110,8 @@ namespace BasicsOfGame
             {
                 distanceToTravel -= speed*delta;
                 if(distanceToTravel<=0) {; currentCooldown = cooldown; canvas.Children.Remove(fireballHitbox); isUsingSkill = false; }
-                Canvas.SetLeft(fireballHitbox,Canvas.GetLeft(fireballHitbox)+(speed*moveByX* delta));
-                Canvas.SetTop(fireballHitbox, Canvas.GetTop(fireballHitbox) + (speed  * moveByY * delta));
+                Canvas.SetLeft(fireballHitbox,Canvas.GetLeft(fireballHitbox)+(moveByX* delta));
+                Canvas.SetTop(fireballHitbox, Canvas.GetTop(fireballHitbox) + (moveByY * delta));
                 
                 int damageDealt=Skill.rnd.Next(minDamage,maxDamage);
                 tryDamaging.Invoke(fireballHitbox, damageDealt, statusEffects, canCrit);
@@ -134,6 +134,7 @@ namespace BasicsOfGame
             double increasedDamage = increasedDamageList[DAMAGE] + increasedDamageList[FIRE_DAMAGE];
             minDamage = Convert.ToInt32(increasedDamage * baseMinDamage);
             maxDamage = Convert.ToInt32(increasedDamage * baseMaxDamage);
+            
         }
         public override void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition)
         {
@@ -142,8 +143,9 @@ namespace BasicsOfGame
             {
                 isUsingSkill = true;
                 distanceToTravel = 600;
-                moveByX=(mousePosition.X-playerPosition.X)/(mousePosition.X+playerPosition.X);
-                moveByY=(mousePosition.Y-playerPosition.Y) / (mousePosition.Y + playerPosition.Y);
+                double time = (Math.Abs(mousePosition.X - playerPosition.X) + Math.Abs(mousePosition.Y - playerPosition.Y))/speed;
+                moveByX =(mousePosition.X-playerPosition.X)/time;
+                moveByY=(mousePosition.Y-playerPosition.Y) /time;
                 
                 Canvas.SetLeft(fireballHitbox, playerPosition.X);
                 Canvas.SetTop(fireballHitbox, playerPosition.Y);

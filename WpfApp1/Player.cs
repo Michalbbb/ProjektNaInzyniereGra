@@ -23,7 +23,7 @@ namespace BasicsOfGame
     internal class Player
     {
         TextBox playerStatsHolder;
-        bool allocateMode = false;
+        bool allocateMode = true;
         TextBox visualForShieldCooldown;
         TextBox visualForImmunityCooldown;
         System.Windows.Shapes.Rectangle immunityPassiveVisual;
@@ -511,6 +511,15 @@ namespace BasicsOfGame
                     addedSpecialBuffs++;
                 }
             }
+            List<double> dmgIncreased = new List<double>();
+            dmgIncreased.Add(increasedDamage);
+            dmgIncreased.Add(increasedFireDamage);
+            dmgIncreased.Add(increasedIceDamage);
+            dmgIncreased.Add(increasedLightningDamage);
+            dmgIncreased.Add(increasedNonElementalDotDamage);
+            
+            // HERE IMPLEMENT FOREACH SKILLS LOOP IN FUTURE
+            demoSkill.recalculateStats(dmgIncreased, cooldownBaseTime);
             if(showingStats)showStats();
         }
     
