@@ -691,6 +691,7 @@ namespace BasicsOfGame
                 }
                 if (sequence == 6 && timeBetween <= 0)
                 {
+                    currentCooldown = cooldown;
                     sequence = 0;
                     isUsingSkill = false;
                     canvas.Children.Remove(hammerHitBox);
@@ -724,22 +725,22 @@ namespace BasicsOfGame
                 isUsingSkill = true;
                 sequence = 0;
                 timeBetween = 0;
-                
+
 
 
 
                 //MessageBox.Show(moveByY + "<y x>" + moveByX);
 
-                
+
 
 
                 hammerSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/hammer1.png", UriKind.Absolute)); ;
                 hammerHitBox.Fill = hammerSprite;
                 hammerHitBox.Width = 200;
                 hammerHitBox.Height = 120;
-                Canvas.SetTop(hammerHitBox, mousePosition.Y-90);
+                Canvas.SetTop(hammerHitBox, mousePosition.Y - 90);
                 Canvas.SetLeft(hammerHitBox, mousePosition.X - 150);
-                
+
                 canvas.Children.Add(hammerHitBox);
 
 
@@ -752,4 +753,49 @@ namespace BasicsOfGame
             }
         }
     }
+
+
+    internal class HolyGrenade : Skill
+    {
+        double timeBetween;
+        Canvas canvas;
+        ImageBrush grenadeSprite; // NEED GRAPHIC
+
+        System.Windows.Shapes.Rectangle grenadeHitBox;
+        public HolyGrenade(Canvas canv)
+        {
+            canvas = canv;
+            baseMinDamage = 60; 
+            baseMaxDamage = 150;
+            minDamage = 60;
+            maxDamage = 150;
+            baseCooldown = 20; // 20Seconds
+            Type = "Offensive";
+            isUsingSkill = false;
+            canCrit = false;
+
+            grenadeSprite = new ImageBrush();
+            grenadeHitBox = new System.Windows.Shapes.Rectangle();
+            grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade1.png", UriKind.Absolute)); ;
+            grenadeHitBox.Fill = grenadeSprite;
+            grenadeHitBox.Width = 200;
+            grenadeHitBox.Height = 150;
+
+        }
+        public override void updateState(double delta, List<Monster> monsters)
+        {
+
+        }
+        public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
+        {
+
+        }
+
+        public override void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition)
+        {
+
+        }
+
+    }
+    
 }

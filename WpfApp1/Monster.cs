@@ -32,12 +32,7 @@ namespace BasicsOfGame
         protected int savedDirectionY = 0;
         protected int attackRange ;
         protected double Speed;
-        protected bool chilled;
-        protected bool shocked;
         protected double baseSpeed;
-        protected double speedMultiplier=1;
-        protected double damageMultiplier=1;
-        protected double damageTakenMultiplier=1;
         protected bool inCollision = false;
         protected double timer = 0;
         protected bool gettingOut = false;
@@ -114,8 +109,8 @@ namespace BasicsOfGame
                 if ((string)x.Tag != "enemy" && (string)x.Tag != "collision") continue;
 
                 Rect hitBoxOfObject;
-               if ((string)x.Tag == "enemy") { hitBoxOfObject = new Rect(Canvas.GetLeft(x) + (9 * x.Width / 20), Canvas.GetTop(x) + (9 * x.Height / 20), x.Width / 10, x.Height / 10); }
-               else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+                if ((string)x.Tag == "enemy") { hitBoxOfObject = new Rect(Canvas.GetLeft(x) + (9 * x.Width / 20), Canvas.GetTop(x) + (9 * x.Height / 20), x.Width / 10, x.Height / 10); }
+                else hitBoxOfObject = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
 
 
 
@@ -158,7 +153,6 @@ namespace BasicsOfGame
 
 
             }
-
             if (inCollision)
             {
 
@@ -170,7 +164,7 @@ namespace BasicsOfGame
                 if (collisionsDetected == collisionsWithKin)
                 {
                     Rect myBody = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body), body.Width, body.Height);
-                    foreach (Monster g in BelongTO.Children.OfType<Monster>())
+                    foreach (Monster g in BelongTO.Children.OfType<Monster> ())
                     {
                         if (body == g.body) continue;
                         else
@@ -203,7 +197,7 @@ namespace BasicsOfGame
                 coordinateX = savedDirectionX * Speed * friction;
             }
 
-          else if (axisX || axisY) // 1 side collision ( not stucked )
+            else if (axisX || axisY) // 1 side collision ( not stucked )
             {
                 if (collisionsDetected == collisionsWithKin && collisionsDetected > 0)
                 {
@@ -238,7 +232,7 @@ namespace BasicsOfGame
                     }
 
                 }
-                if (!axisX && (left || right)) coordinateX = 0;
+                if (!axisX && (left || right)) coordinateX = 0;// nie możesz ruszać się po X 
                 if (!axisY && (up || down)) coordinateY = 0;
                 return;
             }
@@ -351,80 +345,11 @@ namespace BasicsOfGame
             Canvas.SetTop(monsterHpBar,Canvas.GetTop(body)-2);
             
         }
-        public void addDot(double dmg,double timeInMs,string name)
-        {
-                
-            double dmgPerMs=dmg/timeInMs;
-            if (name == "Ignite" )
-            {
-                if (ignited)
-                {
-                    for (int i = DamagePerMilliseconds.Count - 1; i >= 0; i--)
-                    {
-                        if (DamagePerMilliseconds[i].Item5 == "Ignite")
-                        {
-                            DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(DamagePerMilliseconds[i].Item1, DamagePerMilliseconds[i].Item2, DamagePerMilliseconds[i].Item3, DamagePerMilliseconds[i].Item4 + timeInMs, DamagePerMilliseconds[i].Item5);
-                        }
-                    }
-                    return;
-                }
-                ignited = true;
-                
-            }
-            
-            if (name == "Stun")
-            {
-                if (stunned)
-                {
-                    for (int i = DamagePerMilliseconds.Count - 1; i >= 0; i--)
-                    {
-                        if (DamagePerMilliseconds[i].Item5 == "Ignite")
-                        {
-                            DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(DamagePerMilliseconds[i].Item1, DamagePerMilliseconds[i].Item2, DamagePerMilliseconds[i].Item3, DamagePerMilliseconds[i].Item4 + timeInMs, DamagePerMilliseconds[i].Item5);
-                        }
-                    }
-                    return;
-                }
-                stunned = true;
-            }
-            
-            if (name == "Chill") 
-            {
-                if (chilled)
-                {
-                    for (int i = DamagePerMilliseconds.Count - 1; i >= 0; i--)
-                    {
-                        if (DamagePerMilliseconds[i].Item5 == "Ignite")
-                        {
-                            DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(DamagePerMilliseconds[i].Item1, DamagePerMilliseconds[i].Item2, DamagePerMilliseconds[i].Item3, DamagePerMilliseconds[i].Item4 + timeInMs, DamagePerMilliseconds[i].Item5);
-                        }
-                    }
-                    return;
-                }
-                chilled = true;
-                
-            }
-           
-            if (name == "Shock") {
-
-                if (shocked)
-                {
-                    for (int i = DamagePerMilliseconds.Count - 1; i >= 0; i--)
-                    {
-                        if (DamagePerMilliseconds[i].Item5 == "Ignite")
-                        {
-                            DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(DamagePerMilliseconds[i].Item1, DamagePerMilliseconds[i].Item2, DamagePerMilliseconds[i].Item3, DamagePerMilliseconds[i].Item4 + timeInMs, DamagePerMilliseconds[i].Item5);
-                        }
-                    }
-                    return;
-                }
-                shocked = true;
-                
-            }
-            
-
-
-            DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, timeInMs, name)); 
+        public void addDot(double dmg,double timeInMs,string name){
+                double dmgPerMs=dmg/timeInMs;
+                if(name=="Ignite") ignited=true;
+                if(name=="Stun")stunned=true;
+                DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, timeInMs, name)); 
         }
         
          protected void dotUpdate(double deltaTime)
@@ -434,12 +359,10 @@ namespace BasicsOfGame
             {
 
                 List<Tuple<double, double, double, double, string>> toRemove = new List<Tuple<double, double, double, double, string>>();
-                damageMultiplier = 1;
-                damageTakenMultiplier = 1;
-                speedMultiplier = 1;
+                
                 for (int i = 0; i < DamagePerMilliseconds.Count; i++)
                 {
-                    
+
                     double currentDmg = DamagePerMilliseconds[i].Item2 + DamagePerMilliseconds[i].Item1 * deltaTime * 1000;
                     if (currentDmg >= 1)
                     {
@@ -452,9 +375,6 @@ namespace BasicsOfGame
                     double timeElapsed = DamagePerMilliseconds[i].Item3 + deltaTime * 1000;
                     double maxTime = DamagePerMilliseconds[i].Item4;
                     string nameOfDot = DamagePerMilliseconds[i].Item5;
-                    if (nameOfDot == "Chill") speedMultiplier = 0.7;
-                    if (nameOfDot == "Shock") damageTakenMultiplier = 1.4;
-                    if (nameOfDot == "Ignite") damageMultiplier = 0.8;
                     DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(dmgPerMs, currentDmg, timeElapsed, maxTime, nameOfDot);
                     if (maxTime <= timeElapsed) toRemove.Add(DamagePerMilliseconds[i]);
                     
@@ -473,16 +393,6 @@ namespace BasicsOfGame
                         stunned = false;
                         
                     }
-                    if (x.Item5 == "Chill")
-                    {
-                        chilled = false;
-
-                    }
-                    if (x.Item5 == "Shock")
-                    {
-                        shocked = false;
-
-                    }
                     DamagePerMilliseconds.Remove(x);
 
                 }
@@ -496,7 +406,6 @@ namespace BasicsOfGame
         }
         public void damageTaken(int dmg)
         {
-            dmg = Convert.ToInt32(dmg * damageTakenMultiplier);
             healthPoints -= dmg;
             if(healthPoints>0)
             {
@@ -700,7 +609,6 @@ namespace BasicsOfGame
 
                 
                 int dealtDamage = rnd.Next(min, max + 1);
-                dealtDamage = Convert.ToInt32(dealtDamage * damageMultiplier);
                 dealDmg(dealtDamage,nameOfMonster);
                 string statusEffect = "Stun";
                 Monster.damageOverTime.Add(new Tuple<int, double, string>(0, stunDuration, statusEffect));
@@ -1021,8 +929,8 @@ namespace BasicsOfGame
             }
 
 
-            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX*speedMultiplier);
-            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY * speedMultiplier);
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93 - (body.Height * 3 / 4)) Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
             Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body) + (body.Width * 1) / 10);
@@ -1294,8 +1202,7 @@ namespace BasicsOfGame
                     
                        
                         int dealtDamage= rnd.Next(minDmg, maxDmg + 1);
-                    dealtDamage = Convert.ToInt32(dealtDamage * damageMultiplier);
-                    dealDmg(dealtDamage, nameOfMonster);
+                        dealDmg(dealtDamage, nameOfMonster);
                    
                     
                 }
@@ -1319,7 +1226,6 @@ namespace BasicsOfGame
             dotUpdate(delta);
             if(stunned){
                 prepareToAttack=false;
-                weapon.Fill = Brushes.Transparent;
                 return;
                 
             }
@@ -1440,8 +1346,8 @@ namespace BasicsOfGame
             }
             
             
-            Canvas.SetLeft(body, Canvas.GetLeft(body) + speedMultiplier*moveMonsterByX);
-            Canvas.SetTop(body, Canvas.GetTop(body) + speedMultiplier * moveMonsterByY);
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93-(body.Height*3/4))Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
             Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body) + (body.Width * 1) / 10);
@@ -1738,7 +1644,6 @@ namespace BasicsOfGame
 
                     
                     int dealtDamage = rnd.Next(minDmg, maxDmg + 1);
-                    dealtDamage = Convert.ToInt32(dealtDamage * damageMultiplier);
                     dealDmg(dealtDamage, nameOfMonster);
                     string dotName = "Ignite";
                     Monster.damageOverTime.Add(new Tuple<int, double, string>(igniteDot, dotDuration, dotName));
@@ -1770,10 +1675,9 @@ namespace BasicsOfGame
             setRelativeVisibility();
             dotUpdate(delta);
             if(stunned){
-                prepareToAttack = false;
-                weapon.Fill = Brushes.Transparent;
+                prepareToAttack=false;
                 return;
-
+                
             }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
@@ -1892,8 +1796,8 @@ namespace BasicsOfGame
             }
 
 
-            Canvas.SetLeft(body, Canvas.GetLeft(body) + speedMultiplier * moveMonsterByX);
-            Canvas.SetTop(body, Canvas.GetTop(body) + speedMultiplier * moveMonsterByY);
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93 - (body.Height * 3 / 4)) Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
             Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body) + (body.Width * 1) / 10);
@@ -2121,7 +2025,6 @@ namespace BasicsOfGame
 
                     
                     int dealtDamage = rnd.Next(minDmg, maxDmg + 1);
-                    dealtDamage = Convert.ToInt32(dealtDamage * damageMultiplier);
                     dealDmg(dealtDamage, nameOfMonster);
                     string dotName = "Poison";
                     Monster.damageOverTime.Add(new Tuple<int,double,string>(poisonDot, dotDuration,dotName));
@@ -2146,10 +2049,9 @@ namespace BasicsOfGame
             setRelativeVisibility();
             dotUpdate(delta);
             if(stunned){
-                prepareToAttack = false;
-                weapon.Fill = Brushes.Transparent;
+                prepareToAttack=false;
                 return;
-
+                
             }
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name) + (name.Height / 2));
             if (prepareToAttack)
@@ -2268,8 +2170,8 @@ namespace BasicsOfGame
             }
 
 
-            Canvas.SetLeft(body, Canvas.GetLeft(body) + speedMultiplier * moveMonsterByX);
-            Canvas.SetTop(body, Canvas.GetTop(body) + speedMultiplier * moveMonsterByY);
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93 - (body.Height * 3 / 4)) Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
             Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body) + (body.Width * 1) / 10);
