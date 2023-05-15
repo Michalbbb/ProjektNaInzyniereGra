@@ -753,8 +753,6 @@ namespace BasicsOfGame
             }
         }
     }
-
-
     internal class HolyGrenade : Skill
     {
         double timeBetween;
@@ -929,5 +927,110 @@ namespace BasicsOfGame
         }
 
     }
+
+
+    internal class StunShock : Skill
+    {
+
+        int igniteChance = 100;
+        int stunChance = 100;
+
+
+
+        ImageBrush StunShockSprite; // NEED GRAPHIC
+
+        System.Windows.Shapes.Rectangle StunShockHitBox;
+        Canvas canvas;
+
+        public StunShock(Canvas canv)
+        {
+            canvas = canv;
+            baseMinDamage = 0; // Duration of 2 seconds with hit every 100ms yield about 60-140 dmg at max and on averge 10 ignites that deal 4dmg each
+            baseMaxDamage = 0;
+            minDamage = 0;
+            maxDamage = 0;
+            baseCooldown = 10; // 10Seconds
+            cooldown = baseCooldown;
+            currentCooldown = 0;
+            Type = "Offensive";
+            isUsingSkill = false;
+            statusEffects[IGNITE_CHANCE] = igniteChance;
+            statusEffects[STUN_CHANCE] = stunChance;
+            canCrit = false;
+
+            StunShockSprite = new ImageBrush();
+            StunShockHitBox = new System.Windows.Shapes.Rectangle();
+
+            StunShockHitBox.Fill = Brushes.Black;
+            StunShockHitBox.Opacity = 0.1;
+            StunShockHitBox.Width = 1200;
+            StunShockHitBox.Height = 600;
+
+
+        }
+        public override void updateState(double delta, List<Monster> monsters)
+        {
+            if (currentCooldown > 0)
+            {
+
+                currentCooldown -= delta;
+            }
+            else if (isUsingSkill)
+            {
+
+                tryDamaging.Invoke(StunShockHitBox, 0, statusEffects, canCrit);
+                isUsingSkill = false;
+                canvas.Children.Remove(StunShockHitBox);
+
+
+
+
+
+
+
+            }
+
+
+        }
+
+        // Call below function every time any stats get updated
+        public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
+        {
+            cooldown = baseCooldown * cooldownReduction;
+            double increasedDamage = increasedDamageList[DAMAGE] + increasedDamageList[FIRE_DAMAGE];
+            minDamage = Convert.ToInt32(increasedDamage * baseMinDamage);
+            maxDamage = Convert.ToInt32(increasedDamage * baseMaxDamage);
+
+        }
+        public override void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition)
+        {
+            if (currentCooldown > 0) return;
+            if (!isUsingSkill)
+            {
+                isUsingSkill = true;
+                
+
+
+
+
+
+                StunShockHitBox.Width = 1200;
+                Canvas.SetTop(StunShockHitBox, 0);
+                Canvas.SetLeft(StunShockHitBox, 0);
+                StunShockHitBox.Height = 600;
+
+                canvas.Children.Add(StunShockHitBox);
+
+
+
+                Skill.hitsToDisappear = 999;
+
+
+
+
+            }
+        }
+    }
     
+
 }

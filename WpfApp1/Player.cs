@@ -153,7 +153,7 @@ namespace BasicsOfGame
 
         public Player(Canvas GS)
         {
-            demoSkill = new HolyGrenade(GS);
+            demoSkill = new StunShock(GS);
             demoSkill.tryDamaging += tryDamagingAnyEnemy;
             playerStatsHolder=new TextBox();
             Canvas.SetLeft(playerStatsHolder,700);
@@ -1620,6 +1620,6 @@ namespace BasicsOfGame
             }
         }
 
-        
+       
     }
 }
