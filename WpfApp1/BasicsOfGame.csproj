@@ -9,10 +9,24 @@
 
   <ItemGroup>
     <None Remove="images\ActiveSkills\fireball.png" />
+    <None Remove="images\ActiveSkills\fireStorm1.PNG" />
+    <None Remove="images\ActiveSkills\fireStorm2.PNG" />
+    <None Remove="images\ActiveSkills\fireStorm3.PNG" />
+    <None Remove="images\ActiveSkills\fireStorm4.PNG" />
+    <None Remove="images\ActiveSkills\hammer1.PNG" />
+    <None Remove="images\ActiveSkills\hammer2.PNG" />
+    <None Remove="images\ActiveSkills\hammer3.PNG" />
+    <None Remove="images\ActiveSkills\hammer4.PNG" />
+    <None Remove="images\ActiveSkills\hammer5.PNG" />
+    <None Remove="images\ActiveSkills\hammer6.png" />
     <None Remove="images\ActiveSkills\iceBurst1.PNG" />
+    <None Remove="images\ActiveSkills\iceBurst1l.PNG" />
     <None Remove="images\ActiveSkills\iceBurst2.PNG" />
+    <None Remove="images\ActiveSkills\iceBurst2l.PNG" />
     <None Remove="images\ActiveSkills\iceBurst3.PNG" />
+    <None Remove="images\ActiveSkills\iceBurst3l.PNG" />
     <None Remove="images\ActiveSkills\iceBurst4.PNG" />
+    <None Remove="images\ActiveSkills\iceBurst4l.PNG" />
     <None Remove="images\att1.png" />
     <None Remove="images\att1d.png" />
     <None Remove="images\att1l.png" />
@@ -182,10 +196,24 @@
 
   <ItemGroup>
     <Resource Include="images\ActiveSkills\fireball.png" />
+    <Resource Include="images\ActiveSkills\fireStorm1.PNG" />
+    <Resource Include="images\ActiveSkills\fireStorm2.PNG" />
+    <Resource Include="images\ActiveSkills\fireStorm3.PNG" />
+    <Resource Include="images\ActiveSkills\fireStorm4.PNG" />
+    <Resource Include="images\ActiveSkills\hammer1.PNG" />
+    <Resource Include="images\ActiveSkills\hammer2.PNG" />
+    <Resource Include="images\ActiveSkills\hammer3.PNG" />
+    <Resource Include="images\ActiveSkills\hammer4.PNG" />
+    <Resource Include="images\ActiveSkills\hammer5.PNG" />
+    <Resource Include="images\ActiveSkills\hammer6.png" />
     <Resource Include="images\ActiveSkills\iceBurst1.PNG" />
+    <Resource Include="images\ActiveSkills\iceBurst1l.PNG" />
     <Resource Include="images\ActiveSkills\iceBurst2.PNG" />
+    <Resource Include="images\ActiveSkills\iceBurst2l.PNG" />
     <Resource Include="images\ActiveSkills\iceBurst3.PNG" />
+    <Resource Include="images\ActiveSkills\iceBurst3l.PNG" />
     <Resource Include="images\ActiveSkills\iceBurst4.PNG" />
+    <Resource Include="images\ActiveSkills\iceBurst4l.PNG" />
     <Resource Include="images\Buffs_Debuffs\buff2.png" />
     <Resource Include="images\UI\levelUpSprite.png" />
      <Resource Include="images\UI\equipmentClosedSprite.png" />

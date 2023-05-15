@@ -153,7 +153,7 @@ namespace BasicsOfGame
 
         public Player(Canvas GS)
         {
-            demoSkill = new IceBurst(GS);
+            demoSkill = new HammerOfJudgment(GS);
             demoSkill.tryDamaging += tryDamagingAnyEnemy;
             playerStatsHolder=new TextBox();
             Canvas.SetLeft(playerStatsHolder,700);
@@ -1402,7 +1402,7 @@ namespace BasicsOfGame
                     }
                     if (rand < statusEffects[IGNITE_CHANCE])
                     {
-                        double dmg = damage * 1.2 * (increasedDamage + increasedFireDamage);
+                        double dmg = 4 * (increasedDamage + increasedFireDamage);
                         x.addDot(dmg, 2000, "Ignite");
 
                     }
