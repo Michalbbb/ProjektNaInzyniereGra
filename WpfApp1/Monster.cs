@@ -62,7 +62,7 @@ namespace BasicsOfGame
         protected double healthPoints;
         protected double maxHealthPoints;
         protected bool dead = false;
-        protected static List<Tuple<int,Double,string>> damageOverTime=new List<Tuple<int,Double,string>>();
+        public static List<Tuple<int,Double,string>> damageOverTime=new List<Tuple<int,Double,string>>();
         static public Action deadToDot;
 
         public static void update(List<Tuple<int, Double,string>> listOfDots)

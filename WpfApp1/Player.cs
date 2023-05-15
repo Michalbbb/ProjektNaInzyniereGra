@@ -788,6 +788,11 @@ namespace BasicsOfGame
                     DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName));
                     poisonStacks++;
                 }
+                else if (dotName == "Heal")
+                {
+                    healPlayerBy(dmg);
+
+                }
                 else if (dotName == "Ignite")
                 {
                     dmgPerMs=dmgPerMs*igniteResistance;
@@ -1427,7 +1432,7 @@ namespace BasicsOfGame
                     if (rand < statusEffects[STUN_CHANCE])
                     {
                         double dmg = 0;
-                        x.addDot(dmg, 1000, "Stun");
+                        x.addDot(dmg, 2400, "Stun");
 
                     }
                     if (canCrit&& rand < criticalHitChance)
