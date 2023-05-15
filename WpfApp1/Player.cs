@@ -153,7 +153,7 @@ namespace BasicsOfGame
 
         public Player(Canvas GS)
         {
-            demoSkill = new StunShock(GS);
+            demoSkill = new LightningStrike(GS);
             demoSkill.tryDamaging += tryDamagingAnyEnemy;
             playerStatsHolder=new TextBox();
             Canvas.SetLeft(playerStatsHolder,700);

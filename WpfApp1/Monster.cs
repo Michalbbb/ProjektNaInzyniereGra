@@ -313,7 +313,7 @@ namespace BasicsOfGame
         protected void NormalizeSpeed(double delta)
         {
             ticks += baseSpeed / 2 * delta;
-            Speed = Convert.ToInt32(baseSpeed * delta);
+            Speed = baseSpeed * delta;
         }
         public void add()
         {

@@ -1115,4 +1115,224 @@ namespace BasicsOfGame
         }
 
     }
+
+    internal class LightningStrike : Skill
+    {
+        ImageBrush LightningStrikeSprite; // Currently sprite doesn't exist.
+        System.Windows.Shapes.Rectangle LightningStrikeHitbox;
+        int shockChance = 100;
+        Canvas canvas;
+        int sequence;
+        double timeBetween;
+        string direction;
+        public LightningStrike(Canvas canv)
+        {
+            canvas = canv;
+            baseMinDamage = 40;
+            baseMaxDamage = 80;
+            minDamage = baseMinDamage;
+            maxDamage = baseMaxDamage;
+            baseCooldown = 15; // 15Seconds
+            cooldown = baseCooldown;
+            currentCooldown = 0;
+            Type = "Offensive";
+            isUsingSkill = false;
+            statusEffects[SHOCK_CHANCE] = shockChance;
+            canCrit = true;
+
+            LightningStrikeSprite = new ImageBrush();
+            LightningStrikeHitbox = new System.Windows.Shapes.Rectangle();
+            LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/fireball.png", UriKind.Absolute)); ;
+            LightningStrikeHitbox.Fill = LightningStrikeSprite;
+            LightningStrikeHitbox.Width = 50;
+            LightningStrikeHitbox.Height = 50;
+
+        }
+        public override void updateState(double delta, List<Monster> monsters)
+        {
+            if (currentCooldown > 0)
+            {
+
+                currentCooldown -= delta;
+            }
+            else if (isUsingSkill)
+            {
+
+                System.Windows.Shapes.Rectangle modifiedHitBox = new System.Windows.Shapes.Rectangle(); ;
+
+                if (sequence == 0)
+                {
+                    canvas.Children.Add(LightningStrikeHitbox);
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(LightningStrikeHitbox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.1;
+                    sequence++;
+
+                }
+                if (sequence == 1 && timeBetween <= 0)
+                {
+
+                    LightningStrikeHitbox.Width = 120;
+                    LightningStrikeHitbox.Height = 75;
+                    if (direction == "left")
+                    {
+                        LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst2l.png", UriKind.Absolute)); ;
+                        LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                        Canvas.SetLeft(LightningStrikeHitbox, Canvas.GetLeft(LightningStrikeHitbox) - 45);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox));
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 75;
+                        modifiedHitBox.Height = LightningStrikeHitbox.Height;
+
+
+                    }
+                    else
+                    {
+                        LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst2.png", UriKind.Absolute)); ;
+                        LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox) + 75);
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 75;
+                        modifiedHitBox.Height = LightningStrikeHitbox.Height;
+                    }
+
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(modifiedHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.1;
+                    sequence++;
+                }
+                if (sequence == 2 && timeBetween <= 0)
+                {
+
+                    LightningStrikeHitbox.Width = 171;
+                    LightningStrikeHitbox.Height = 75;
+                    if (direction == "left")
+                    {
+                        LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst3l.png", UriKind.Absolute)); ;
+                        LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                        Canvas.SetLeft(LightningStrikeHitbox, Canvas.GetLeft(LightningStrikeHitbox) - 51);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox));
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 120;
+                        modifiedHitBox.Height = LightningStrikeHitbox.Height;
+
+                    }
+                    else
+                    {
+
+                        LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst3.png", UriKind.Absolute)); ;
+                        LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox) + 120);
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 120;
+                        modifiedHitBox.Height = LightningStrikeHitbox.Height;
+                    }
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(modifiedHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.1;
+                    sequence++;
+                }
+                if (sequence == 3 && timeBetween <= 0)
+                {
+
+                    Canvas.SetTop(LightningStrikeHitbox, Canvas.GetTop(LightningStrikeHitbox) - 31);
+                    LightningStrikeHitbox.Width = 256;
+                    LightningStrikeHitbox.Height = 106;
+                    if (direction == "left")
+                    {
+                        LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst4l.png", UriKind.Absolute)); ;
+                        LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                        Canvas.SetLeft(LightningStrikeHitbox, Canvas.GetLeft(LightningStrikeHitbox) - 85);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox));
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 171;
+                        modifiedHitBox.Height = LightningStrikeHitbox.Height;
+                    }
+                    else
+                    {
+                        LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst4.png", UriKind.Absolute)); ;
+                        LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox) + 171);
+                        Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 171;
+                        modifiedHitBox.Height = LightningStrikeHitbox.Height;
+                    }
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                    tryDamaging.Invoke(modifiedHitBox, damageDealt, statusEffects, canCrit);
+                    timeBetween = 0.05;
+                    sequence++;
+
+                }
+
+
+
+                if (sequence == 4 && timeBetween <= 0)
+                {
+
+                    isUsingSkill = false;
+                    canvas.Children.Remove(LightningStrikeHitbox);
+                    currentCooldown = cooldown;
+                }
+                timeBetween -= delta;
+
+            }
+
+
+        }
+
+        // Call below function every time any stats get updated
+        public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
+        {
+            cooldown = baseCooldown * cooldownReduction;
+            double increasedDamage = increasedDamageList[DAMAGE] + increasedDamageList[ICE_DAMAGE];
+            minDamage = Convert.ToInt32(increasedDamage * baseMinDamage);
+            maxDamage = Convert.ToInt32(increasedDamage * baseMaxDamage);
+
+        }
+        public override void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition)
+        {
+            if (currentCooldown > 0) return;
+            if (!isUsingSkill)
+            {
+                isUsingSkill = true;
+                sequence = 0;
+                timeBetween = 0;
+
+
+                Canvas.SetLeft(LightningStrikeHitbox, playerPosition.X);
+                Canvas.SetTop(LightningStrikeHitbox, playerPosition.Y);
+                //MessageBox.Show(moveByY + "<y x>" + moveByX);
+
+                if (mousePosition.X > playerPosition.X) direction = "right";
+                else direction = "left";
+
+                LightningStrikeHitbox.Width = 75;
+                Canvas.SetTop(LightningStrikeHitbox, playerPosition.Y - 25);
+                LightningStrikeHitbox.Height = 75;
+                if (direction == "left")
+                {
+                    Canvas.SetLeft(LightningStrikeHitbox, playerPosition.X - 75);
+                    LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst1l.png", UriKind.Absolute)); ;
+                    LightningStrikeHitbox.Fill = LightningStrikeSprite;
+
+                }
+                else
+                {
+                    LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst1.png", UriKind.Absolute)); ;
+                    LightningStrikeHitbox.Fill = LightningStrikeSprite;
+                }
+
+
+
+                Skill.hitsToDisappear = 999;
+
+
+
+
+            }
+        }
+    }
+    //lightning strike still needs a lot of work, new animation, sprite, effects, ideally it will find the nearest enemy and connect from player to enemy and deal shock and damage
+
+    //tbd - Poisonous cloud, a cloud that spreads around the player for a few seconds and deals poison damage to enemies inside possibly like golem shock (further away from center, less poison time)
 }
