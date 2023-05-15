@@ -13,6 +13,12 @@
     <None Remove="images\ActiveSkills\fireStorm2.PNG" />
     <None Remove="images\ActiveSkills\fireStorm3.PNG" />
     <None Remove="images\ActiveSkills\fireStorm4.PNG" />
+    <None Remove="images\ActiveSkills\grenade0.png" />
+    <None Remove="images\ActiveSkills\grenade1.png" />
+    <None Remove="images\ActiveSkills\grenade2.png" />
+    <None Remove="images\ActiveSkills\grenade3.png" />
+    <None Remove="images\ActiveSkills\grenade4.png" />
+    <None Remove="images\ActiveSkills\grenade5.png" />
     <None Remove="images\ActiveSkills\hammer1.PNG" />
     <None Remove="images\ActiveSkills\hammer2.PNG" />
     <None Remove="images\ActiveSkills\hammer3.PNG" />
@@ -200,6 +206,12 @@
     <Resource Include="images\ActiveSkills\fireStorm2.PNG" />
     <Resource Include="images\ActiveSkills\fireStorm3.PNG" />
     <Resource Include="images\ActiveSkills\fireStorm4.PNG" />
+    <Resource Include="images\ActiveSkills\grenade0.png" />
+    <Resource Include="images\ActiveSkills\grenade1.png" />
+    <Resource Include="images\ActiveSkills\grenade2.png" />
+    <Resource Include="images\ActiveSkills\grenade3.png" />
+    <Resource Include="images\ActiveSkills\grenade4.png" />
+    <Resource Include="images\ActiveSkills\grenade5.png" />
     <Resource Include="images\ActiveSkills\hammer1.PNG" />
     <Resource Include="images\ActiveSkills\hammer2.PNG" />
     <Resource Include="images\ActiveSkills\hammer3.PNG" />

@@ -760,10 +760,12 @@ namespace BasicsOfGame
         double timeBetween;
         Canvas canvas;
         ImageBrush grenadeSprite; // NEED GRAPHIC
+        int sequence;
 
         System.Windows.Shapes.Rectangle grenadeHitBox;
         public HolyGrenade(Canvas canv)
         {
+            
             canvas = canv;
             baseMinDamage = 60; 
             baseMaxDamage = 150;
@@ -778,22 +780,152 @@ namespace BasicsOfGame
             grenadeHitBox = new System.Windows.Shapes.Rectangle();
             grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade1.png", UriKind.Absolute)); ;
             grenadeHitBox.Fill = grenadeSprite;
-            grenadeHitBox.Width = 200;
-            grenadeHitBox.Height = 150;
+            grenadeHitBox.Width = 60;
+            grenadeHitBox.Height = 90;
 
+            sequence = 0;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
+            if (currentCooldown > 0)
+            {
+
+                currentCooldown -= delta;
+            }
+            else if (isUsingSkill)
+            {
+
+                timeBetween -= delta;
+
+
+                if (sequence == 0 && timeBetween <= 0)
+                {
+
+                    grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade0.png", UriKind.Absolute)); ;
+                    grenadeHitBox.Fill = grenadeSprite;
+                    sequence++;
+                    timeBetween = 1.38;
+
+                }
+                if (sequence == 1 && timeBetween <= 0)
+                {
+
+                    grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade2.png", UriKind.Absolute)); ;
+                    grenadeHitBox.Fill = grenadeSprite;
+                    sequence++;
+                    timeBetween = 0.08;
+
+                }
+                if (sequence == 2 && timeBetween <= 0)
+                {
+
+                    grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade3.png", UriKind.Absolute)); ;
+                    grenadeHitBox.Fill = grenadeSprite;
+                    sequence++;
+                    timeBetween = 0.08;
+                }
+                if (sequence == 3 && timeBetween <= 0)
+                {
+
+                    grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade4.png", UriKind.Absolute)); ;
+                    grenadeHitBox.Fill = grenadeSprite;
+                    sequence++;
+                    timeBetween = 0.08;
+
+
+
+                }
+                if (sequence == 4 && timeBetween <= 0)
+                {
+                    grenadeHitBox.Width = 250;
+                    grenadeHitBox.Height = 250;
+                    Canvas.SetTop(grenadeHitBox, Canvas.GetTop(grenadeHitBox) - 70);
+                    Canvas.SetLeft(grenadeHitBox, Canvas.GetLeft(grenadeHitBox) - 95);
+                    grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade5.png", UriKind.Absolute)); ;
+                    grenadeHitBox.Fill = grenadeSprite;
+                    sequence++;
+                    timeBetween = 0.08;
+                }
+                if (sequence == 5 && timeBetween <= 0)
+                {
+                    grenadeHitBox.Width = 250;
+                    grenadeHitBox.Height = 250;
+                    //Canvas.SetTop(grenadeHitBox, Canvas.GetTop(grenadeHitBox) - 70);
+                    //Canvas.SetLeft(grenadeHitBox, Canvas.GetLeft(grenadeHitBox) - 95);
+                    grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade5.png", UriKind.Absolute)); ;
+                    grenadeHitBox.Fill = grenadeSprite;
+                    int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+
+                    tryDamaging(grenadeHitBox, damageDealt, statusEffects, canCrit);
+
+                    sequence++;
+                    timeBetween = 0.25;
+
+                }
+                if (sequence == 6 && timeBetween <= 0)
+                {
+                    currentCooldown = cooldown;
+                    sequence = 0;
+                    isUsingSkill = false;
+                    canvas.Children.Remove(grenadeHitBox);
+                    return;
+                }
+
+
+
+
+
+
+            }
+
 
         }
+
         public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
         {
+            cooldown = baseCooldown * cooldownReduction;
+            double increasedDamage = increasedDamageList[DAMAGE];
+            minDamage = Convert.ToInt32(increasedDamage * baseMinDamage);
+            maxDamage = Convert.ToInt32(increasedDamage * baseMaxDamage);
 
         }
+
+
 
         public override void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition)
         {
+            if (currentCooldown > 0) return;
+            if (!isUsingSkill)
+            {
+                isUsingSkill = true;
+                sequence = 0;
+                timeBetween = 0;
 
+
+
+                
+
+
+
+
+
+                grenadeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade1.png", UriKind.Absolute)); ;
+                grenadeHitBox.Fill = grenadeSprite;
+                grenadeHitBox.Width = 60;
+                grenadeHitBox.Height = 90;
+                Canvas.SetTop(grenadeHitBox, playerPosition.Y );
+                Canvas.SetLeft(grenadeHitBox, playerPosition.X );
+
+                canvas.Children.Add(grenadeHitBox);
+
+
+
+                Skill.hitsToDisappear = 999;
+
+
+
+
+            }
         }
 
     }
