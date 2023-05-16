@@ -38,6 +38,7 @@ namespace BasicsOfGame
         private bool UpKey, DownKey, LeftKey, RightKey;
         private List<TextBox> boxes;
         Button LevelUp;
+        Button SkillsAvailable;
         Button Equipment;
         System.Windows.Shapes.Rectangle BlackScreenOverlay = new System.Windows.Shapes.Rectangle();
         private const float Friction = 0.65f;
@@ -104,10 +105,34 @@ namespace BasicsOfGame
             {
                 System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
                 
-                mainCharacter.useDemoSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
+                mainCharacter.useFirstSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
             }
-            
-            
+            if (e.Key == Key.D2)
+            {
+                System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
+
+                mainCharacter.useSecondSkill(mousePosition, new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width / 2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
+            }
+            if (e.Key == Key.D3)
+            {
+                System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
+
+                mainCharacter.useThirdSkill(mousePosition, new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width / 2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
+            }
+            if (e.Key == Key.D4)
+            {
+                System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
+
+                mainCharacter.useFourthSkill(mousePosition, new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width / 2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
+            }
+            if (e.Key == Key.D5)
+            {
+                System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
+
+                mainCharacter.useFifthSkill(mousePosition, new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width / 2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
+            }
+
+
 
 
         }
@@ -225,6 +250,20 @@ namespace BasicsOfGame
             LevelUp.Visibility = Visibility.Hidden;
             GameScreen.Children.Add(LevelUp);
             LevelUp.Click += assignSkillPoints;
+            SkillsAvailable = new Button();
+            ImageBrush spriteSkill = new ImageBrush();
+            spriteSkill.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/SkillPicker.png", UriKind.Absolute));
+            SkillsAvailable.Width = 70;
+            SkillsAvailable.Height = 70;
+            SkillsAvailable.Style = (Style)FindResource("IButton");
+            SkillsAvailable.Background = spriteSkill;
+            Canvas.SetLeft(SkillsAvailable, 1130);
+            Canvas.SetTop(SkillsAvailable, 530);
+            Canvas.SetZIndex(SkillsAvailable, 50);
+            SkillsAvailable.IsEnabled = false;
+            SkillsAvailable.Visibility = Visibility.Hidden;
+            GameScreen.Children.Add(SkillsAvailable);
+            SkillsAvailable.Click += allocateActiveSkill;
             Equipment = new Button();
             ImageBrush spriteEq = new ImageBrush();
             spriteEq.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/equipmentClosedSprite.png", UriKind.Absolute));
@@ -243,6 +282,12 @@ namespace BasicsOfGame
             Monster.deadToDot+=removeDeadToDot;
             isGameRunning = true;
             
+        }
+
+        private void allocateActiveSkill(object sender, RoutedEventArgs e)
+        {
+            mainCharacter.pickSkill();
+
         }
 
         private void closeBackpack(object sender, MouseEventArgs e)
@@ -342,6 +387,21 @@ namespace BasicsOfGame
             {
                 LevelUp.Visibility = Visibility.Hidden;
                 LevelUp.IsEnabled = false;
+            }
+            if (mainCharacter.checkIfCanObtainSkills())
+            {
+                SkillsAvailable.Content = mainCharacter.returnHowManyActiveSkillsCanBeAllocated();
+                SkillsAvailable.FontSize = 30;
+                SkillsAvailable.FontFamily = new FontFamily("Algerian");
+                SkillsAvailable.Foreground = Brushes.Black;
+                SkillsAvailable.BorderBrush = Brushes.Transparent;
+                SkillsAvailable.Visibility = Visibility.Visible;
+                SkillsAvailable.IsEnabled = true;
+            }
+            else
+            {
+                SkillsAvailable.Visibility = Visibility.Hidden;
+                SkillsAvailable.IsEnabled = false;
             }
             if (Player.isDead||mainCharacter.getHp()<=0)
             {

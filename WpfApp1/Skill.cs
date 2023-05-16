@@ -18,6 +18,7 @@ namespace BasicsOfGame
     {
         //RotateTransform rotateByX = new RotateTransform(ANGLE);
         //example.RenderTransform=rotateByX;
+        public static bool Fireball1hit;
         static protected Random rnd = new Random();
         protected const int DAMAGE = 0;
         protected const int FIRE_DAMAGE = 1;
@@ -38,17 +39,23 @@ namespace BasicsOfGame
         protected double baseCooldown;
         protected double cooldown;
         protected double currentCooldown;
+
         protected bool isUsingSkill;
         protected bool canCrit;
         protected double distanceToTravel;
         protected int[] statusEffects = new int[] { 0, 0, 0, 0, 0, 0 };
-        public static int hitsToDisappear;
+        protected string name;
+        
+        
         public Action<System.Windows.Shapes.Rectangle, int, int[], bool> tryDamaging;
         public double getCooldown()
         {
             if (currentCooldown < 0) return 0;
             return currentCooldown;
         }
+        virtual public ImageBrush getMiniature() { return new ImageBrush(); }
+        public string getName() { return name; }
+        
         protected bool determinateCollision(Rect skill, Rect obj)
         {
             if (obj.X < (skill.X + skill.Width) && (obj.X + obj.Width) > skill.X)
@@ -62,14 +69,16 @@ namespace BasicsOfGame
         virtual public void useSkill(System.Windows.Point mousePosition, System.Windows.Point playerPosition) { }
         virtual public void updateState(double delta, List<Monster> monsters) { }
         virtual public void recalculateStats(List<double> increasedDamageList, double cooldownReduction) { }
+        virtual public string returnDescription() { return "Null"; }
     }
     internal class Fireball : Skill
     {
 
         int stunChance = 100;
+        int igniteChance = 100;
         double moveByX;
         double moveByY;
-
+          
         int speed;
         ImageBrush fireballSprite; // NEED GRAPHIC
 
@@ -77,6 +86,7 @@ namespace BasicsOfGame
         Canvas canvas;
         public Fireball(Canvas canv)
         {
+            
             canvas = canv;
             baseMinDamage = 40;
             baseMaxDamage = 80;
@@ -88,8 +98,9 @@ namespace BasicsOfGame
             Type = "Offensive";
             isUsingSkill = false;
             statusEffects[STUN_CHANCE] = stunChance;
+            statusEffects[IGNITE_CHANCE] = igniteChance;
             canCrit = false;
-
+            name = "Fireball";
             speed = 700;
             fireballSprite = new ImageBrush();
             fireballHitbox = new System.Windows.Shapes.Rectangle();
@@ -99,6 +110,10 @@ namespace BasicsOfGame
             fireballHitbox.Height = 50;
 
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/fireball.png", UriKind.Absolute)));
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -110,24 +125,24 @@ namespace BasicsOfGame
             else if (isUsingSkill)
             {
                 distanceToTravel -= speed * delta;
-                if (distanceToTravel <= 0) {; currentCooldown = cooldown; canvas.Children.Remove(fireballHitbox); isUsingSkill = false; }
+                if (distanceToTravel <= 0) { currentCooldown = cooldown; canvas.Children.Remove(fireballHitbox); isUsingSkill = false; }
                 Canvas.SetLeft(fireballHitbox, Canvas.GetLeft(fireballHitbox) + (moveByX * delta));
                 Canvas.SetTop(fireballHitbox, Canvas.GetTop(fireballHitbox) + (moveByY * delta));
 
                 int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
+                if (!Fireball1hit) { currentCooldown = cooldown; canvas.Children.Remove(fireballHitbox); isUsingSkill = false; return; }
                 tryDamaging.Invoke(fireballHitbox, damageDealt, statusEffects, canCrit);
-                if (Skill.hitsToDisappear == 0)
-                {
-                    isUsingSkill = false;
-                    canvas.Children.Remove(fireballHitbox);
-                    currentCooldown = cooldown;
-                }
+                
 
             }
 
 
         }
-
+        public override string returnDescription()
+        {
+            string info = $"Cast a fireball that deals \ndamage to one enemy, igniting\nand stunning him.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown, 2)} seconds";
+            return info;
+        }
         // Call below function every time any stats get updated
         public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
         {
@@ -182,10 +197,10 @@ namespace BasicsOfGame
                     if (moveByY > 0) { rotateByAngle = new RotateTransform(90); }
                     else rotateByAngle = new RotateTransform(270);
                 }
-
+                Fireball1hit = true;
                 fireballHitbox.RenderTransform = rotateByAngle;
                 canvas.Children.Add(fireballHitbox);
-                Skill.hitsToDisappear = 1;
+                
 
 
 
@@ -206,6 +221,8 @@ namespace BasicsOfGame
         Canvas canvas;
         public IceBurst(Canvas canv)
         {
+            name = "Ice Burst";
+
             canvas = canv;
             baseMinDamage = 15;
             baseMaxDamage = 30;
@@ -228,6 +245,15 @@ namespace BasicsOfGame
             iceBurstHitBox.Height = 75;
 
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst1.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"Spawns a wall of icicle in direction\nyou are facing that deals damage to\nevery hit enemy, chilling them.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -405,7 +431,6 @@ namespace BasicsOfGame
 
 
 
-                Skill.hitsToDisappear = 999;
 
 
 
@@ -427,6 +452,7 @@ namespace BasicsOfGame
         int speed;
         public FireStorm(Canvas canv)
         {
+            name = "Fire Storm";
             canvas = canv;
             baseMinDamage = 3; // Duration of 2 seconds with hit every 100ms yield about 60-140 dmg at max and on averge 10 ignites that deal 4dmg each
             baseMaxDamage = 7;
@@ -449,6 +475,15 @@ namespace BasicsOfGame
             fireStormHitBox.Height = 110;
 
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/fireStorm1.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"Spawns a storm of fire in direction you\nare facing that deals damage to every\nhit enemy every 50ms and \nhas chance to ignite them.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -573,7 +608,6 @@ namespace BasicsOfGame
 
 
 
-                Skill.hitsToDisappear = 999;
 
 
 
@@ -595,6 +629,7 @@ namespace BasicsOfGame
 
         public HammerOfJudgment(Canvas canv)
         {
+            name = "Judgement";
             canvas = canv;
             baseMinDamage = 60; // Duration of 2 seconds with hit every 100ms yield about 60-140 dmg at max and on averge 10 ignites that deal 4dmg each
             baseMaxDamage = 150;
@@ -617,6 +652,15 @@ namespace BasicsOfGame
             hammerHitBox.Height = 200;
 
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/hammer3.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"Spawns a hammer from above at your\nmouse location and deals devasting damage\nto every hit enemy. Can stun and crit.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -747,7 +791,6 @@ namespace BasicsOfGame
 
 
 
-                Skill.hitsToDisappear = 999;
 
 
 
@@ -765,13 +808,13 @@ namespace BasicsOfGame
         System.Windows.Shapes.Rectangle grenadeHitBox;
         public HolyGrenade(Canvas canv)
         {
-
+            name = "Holy grenade";
             canvas = canv;
             baseMinDamage = 60;
             baseMaxDamage = 150;
             minDamage = 60;
             maxDamage = 150;
-            baseCooldown = 20; // 20Seconds
+            baseCooldown = 14; // 14Seconds
             Type = "Offensive";
             isUsingSkill = false;
             canCrit = false;
@@ -784,6 +827,15 @@ namespace BasicsOfGame
             grenadeHitBox.Height = 90;
 
             sequence = 0;
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade1.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"Spawns a grenade under you that \nexplodes after some time and \ndeals damage to all enemies.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -920,7 +972,6 @@ namespace BasicsOfGame
 
 
 
-                Skill.hitsToDisappear = 999;
 
 
 
@@ -944,6 +995,7 @@ namespace BasicsOfGame
 
         public StunShock(Canvas canv)
         {
+            name = "Earthquake";
             canvas = canv;
             baseMinDamage = 0; // Duration of 2 seconds with hit every 100ms yield about 60-140 dmg at max and on averge 10 ignites that deal 4dmg each
             baseMaxDamage = 0;
@@ -952,7 +1004,7 @@ namespace BasicsOfGame
             baseCooldown = 10; // 10Seconds
             cooldown = baseCooldown;
             currentCooldown = 0;
-            Type = "Offensive";
+            Type = "Support";
             isUsingSkill = false;
             statusEffects[SHOCK_CHANCE] = shockChance;
             statusEffects[STUN_CHANCE] = stunChance;
@@ -967,6 +1019,15 @@ namespace BasicsOfGame
             StunShockHitBox.Height = 600;
             
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/grenade5.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"You are intiating earthquake\nstunning and shocking all enemy.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -1036,7 +1097,6 @@ namespace BasicsOfGame
 
 
 
-                Skill.hitsToDisappear = 999;
 
 
 
@@ -1053,6 +1113,7 @@ namespace BasicsOfGame
         Canvas canvas;
         public HolyHands(Canvas canv)
         {
+            name = "Rejuvenation";
             canvas = canv;
             baseMinDamage = 40;
             baseMaxDamage = 80;
@@ -1068,6 +1129,15 @@ namespace BasicsOfGame
 
 
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive10.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"You are healed by power of nature.\nHeals you by {minDamage} to {maxDamage} health.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -1127,9 +1197,10 @@ namespace BasicsOfGame
         string direction;
         public LightningStrike(Canvas canv)
         {
+            name = "Lightning Strike";
             canvas = canv;
-            baseMinDamage = 40;
-            baseMaxDamage = 80;
+            baseMinDamage = 1;
+            baseMaxDamage = 99;
             minDamage = baseMinDamage;
             maxDamage = baseMaxDamage;
             baseCooldown = 15; // 15Seconds
@@ -1147,6 +1218,15 @@ namespace BasicsOfGame
             LightningStrikeHitbox.Width = 50;
             LightningStrikeHitbox.Height = 50;
 
+        }
+        public override ImageBrush getMiniature()
+        {
+            return new ImageBrush(new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive12.png", UriKind.Absolute)));
+        }
+        public override string returnDescription()
+        {
+            string info = $"Spawns a wall of lightning in direction\nyou are facing that deals damage to every\nhit enemy, shocking them.\nDeals {minDamage} to {maxDamage} damage.\nCooldown:{Math.Round(cooldown,2)} seconds";
+            return info;
         }
         public override void updateState(double delta, List<Monster> monsters)
         {
@@ -1284,7 +1364,7 @@ namespace BasicsOfGame
         public override void recalculateStats(List<double> increasedDamageList, double cooldownReduction)
         {
             cooldown = baseCooldown * cooldownReduction;
-            double increasedDamage = increasedDamageList[DAMAGE] + increasedDamageList[ICE_DAMAGE];
+            double increasedDamage = increasedDamageList[DAMAGE] + increasedDamageList[LIGHTNING_DAMAGE];
             minDamage = Convert.ToInt32(increasedDamage * baseMinDamage);
             maxDamage = Convert.ToInt32(increasedDamage * baseMaxDamage);
 
@@ -1324,7 +1404,6 @@ namespace BasicsOfGame
 
 
 
-                Skill.hitsToDisappear = 999;
 
 
 

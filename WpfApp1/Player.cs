@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
@@ -47,7 +48,7 @@ namespace BasicsOfGame
         private int maxDmg;
         public static int unassignedSkillPoints;
         public static int assignedSkillPoints;
-
+        
         ImageBrush playerSprite = new ImageBrush();
         ImageBrush weaponSprite = new ImageBrush();
         private const int animations = 6;
@@ -62,7 +63,7 @@ namespace BasicsOfGame
         private double ticksDone = 0;
         private int currentMovementAnimation = 0;
         private int attackRange, attackDirection;
-        private double unlockAttack ;
+        private double unlockAttack;
         private double attackCooldown;
         System.Windows.Shapes.Rectangle hpBar;
         System.Windows.Shapes.Rectangle hpBarWindow;
@@ -118,8 +119,9 @@ namespace BasicsOfGame
         public static string killedBy;
         public static bool isDead;
         public static int lastDamage;
+        System.Windows.Shapes.Rectangle blackOverlay;
         // Following tuples have up to 5 arguments : BASE VALUE(Always),FLAT VALUE(optionally),PERCENT VALUE(optionally)
-        private Tuple<int,int> healthPointsToDistribute;
+        private Tuple<int, int> healthPointsToDistribute;
         private Tuple<int, double, double> healthPointsCalculations;
         private Tuple<double, double, double> healthRecoveryRateCalculations;
         private Tuple<int, int, double, double> damageCalculations;
@@ -133,7 +135,7 @@ namespace BasicsOfGame
         private Tuple<int, double> chanceToBleedCalculations;
         private Tuple<double, double> increasedNonElementalDotDamageCalculations;
         private Tuple<int, double, double> armourCalculations;
-        private Tuple<double,double,double> decreasedDamageTakenCalculations;
+        private Tuple<double, double, double> decreasedDamageTakenCalculations;
         private Tuple<bool, double> shield;
         private Tuple<bool, double> immunity;
         private Tuple<double, double> cooldownTimeForActiveSkillsCalculations;
@@ -145,53 +147,125 @@ namespace BasicsOfGame
         private Tuple<double, double> shockResistanceCalculations;
         private Tuple<double, double> nonElementalDotResistanceCalculations;
         private Tuple<double, double> stunResitanceCalculations;
-        private Tuple<double,double>damageIncreasedPerDebuffCalculations;
-        Skill demoSkill;
+        private Tuple<double, double> damageIncreasedPerDebuffCalculations;
+        TextBox descActiveSkills;
+        bool showingStats = false;
+        List<Skill> obtainedSkills;
+        List<Skill> skillsThatCanBeObtained;
+        int skillsToPick;
+        int pickedSkills;
+        TextBox descSkillOne;
+        TextBox descSkillTwo;
+        TextBox[] cdSkills=new TextBox[5];
         
-        bool showingStats=false;
+        System.Windows.Shapes.Rectangle[] visualsSkills=new System.Windows.Shapes.Rectangle[5];
+       
 
 
         public Player(Canvas GS)
         {
-            demoSkill = new LightningStrike(GS);
-            demoSkill.tryDamaging += tryDamagingAnyEnemy;
-            playerStatsHolder=new TextBox();
-            Canvas.SetLeft(playerStatsHolder,700);
-            Canvas.SetTop(playerStatsHolder,100);
-            Canvas.SetZIndex(playerStatsHolder,400);
-            playerStatsHolder.Padding=new Thickness(20,20,20,20);
-             playerStatsHolder.IsEnabled=false;
-            playerStatsHolder.Background=Brushes.Black;
-            playerStatsHolder.Foreground=Brushes.White;
-            playerStatsHolder.BorderBrush=Brushes.White;
-            shieldPassiveVisual=new System.Windows.Shapes.Rectangle();
-            immunityPassiveVisual=new System.Windows.Shapes.Rectangle();
+            descActiveSkills=new TextBox();
+            descActiveSkills.Text = "PICK ONE SKILL";
+            descActiveSkills.FontFamily = new FontFamily("Algerian");
+            descActiveSkills.FontSize = 50;
+            descActiveSkills.Foreground = Brushes.White;
+            descActiveSkills.Background = Brushes.Transparent;
+            descActiveSkills.BorderBrush = Brushes.Transparent;
+            descActiveSkills.IsHitTestVisible = false;
+
+            Canvas.SetLeft(descActiveSkills, 420);
+            Canvas.SetTop(descActiveSkills, 140);
+            Canvas.SetZIndex(descActiveSkills, 999);
+
+            descSkillOne = new TextBox();
+            descSkillOne.Text = "TBD";
+            descSkillOne.FontFamily = new FontFamily("Algerian");
+            descSkillOne.FontSize = 13;
+            descSkillOne.Foreground = Brushes.White;
+            descSkillOne.Background = Brushes.Transparent;
+            descSkillOne.BorderBrush = Brushes.Transparent;
+            descSkillOne.IsHitTestVisible = false;
+
+            Canvas.SetLeft(descSkillOne, 300);
+            Canvas.SetTop(descSkillOne, 200);
+            Canvas.SetZIndex(descSkillOne, 999);
+            descSkillTwo = new TextBox();
+            descSkillTwo.Text = "TBD";
+            descSkillTwo.FontFamily = new FontFamily("Algerian");
+            descSkillTwo.FontSize = 13;
+            descSkillTwo.Foreground = Brushes.White;
+            descSkillTwo.Background = Brushes.Transparent;
+            descSkillTwo.BorderBrush = Brushes.Transparent;
+            descSkillTwo.IsHitTestVisible = false;
+
+            Canvas.SetLeft(descSkillTwo, 610);
+            Canvas.SetTop(descSkillTwo, 200);
+            Canvas.SetZIndex(descSkillTwo, 999);
+            pickedSkills = 0;
+            skillsThatCanBeObtained = new List<Skill>();
+            obtainedSkills = new List<Skill>();
+            fillSkills(GS);
+            blackOverlay = new System.Windows.Shapes.Rectangle();
+            blackOverlay.Width = 700;
+            blackOverlay.Height = 400;
+            Canvas.SetLeft(blackOverlay, 250);
+            Canvas.SetTop(blackOverlay, 120);
+            Canvas.SetZIndex(blackOverlay, 998);
+            blackOverlay.Opacity = 0.6;
+            blackOverlay.Fill = Brushes.Black;
+            firstChoice = new Button();
+            secondChoice = new Button();
+            secondChoice.Visibility = Visibility.Hidden;
+            firstChoice.Visibility = Visibility.Hidden;
+            secondChoice.IsEnabled = false;
+            firstChoice.IsEnabled = false;
+            firstChoice.Width = 100;
+            firstChoice.Height = 50;
+            Canvas.SetLeft(firstChoice, 360);
+            Canvas.SetTop(firstChoice, 450);
+            secondChoice.Width = 100;
+            secondChoice.Height = 50;
+            Canvas.SetLeft(secondChoice, 700);
+            Canvas.SetTop(secondChoice, 450);
+
+            skillsToPick = 0;
+            playerStatsHolder = new TextBox();
+            Canvas.SetLeft(playerStatsHolder, 700);
+            Canvas.SetTop(playerStatsHolder, 100);
+            Canvas.SetZIndex(playerStatsHolder, 400);
+            playerStatsHolder.Padding = new Thickness(20, 20, 20, 20);
+            playerStatsHolder.IsEnabled = false;
+            playerStatsHolder.Background = Brushes.Black;
+            playerStatsHolder.Foreground = Brushes.White;
+            playerStatsHolder.BorderBrush = Brushes.White;
+            shieldPassiveVisual = new System.Windows.Shapes.Rectangle();
+            immunityPassiveVisual = new System.Windows.Shapes.Rectangle();
             ImageBrush shieldSprite = new ImageBrush();
             shieldSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive9.png", UriKind.Absolute));
-            shieldPassiveVisual.Fill=shieldSprite;
+            shieldPassiveVisual.Fill = shieldSprite;
             ImageBrush immunitySprite = new ImageBrush();
             immunitySprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/passives/passive19.png", UriKind.Absolute));
-            immunityPassiveVisual.Fill=immunitySprite;          
-            visualForShieldCooldown =new TextBox();
-            visualForImmunityCooldown=new TextBox();
-            isImmunityAdded=false;
-            isShieldAdded=false;
-            addedSpecialBuffs=0;
+            immunityPassiveVisual.Fill = immunitySprite;
+            visualForShieldCooldown = new TextBox();
+            visualForImmunityCooldown = new TextBox();
+            isImmunityAdded = false;
+            isShieldAdded = false;
+            addedSpecialBuffs = 0;
             attackCooldown = 400;
-            unlockAttack=0;
-            chanceToInflictBleed=0;
-            increasedDamage=1.0;
-            increasedFireDamage=0.0;
-            increasedIceDamage=0.0;
-            increasedLightningDamage=0.0;
-            increasedNonElementalDotDamage=0.0;
-            damageTakenReduction=0;
-            armour=0;
-            timeUntilShieldAvailable=0;
-            timeUntilImmunityAvailable=0;
-            cooldownBaseTime=1.0;
-            isShieldActive=false;
-            isImmunityActive=false;
+            unlockAttack = 0;
+            chanceToInflictBleed = 0;
+            increasedDamage = 1.0;
+            increasedFireDamage = 0.0;
+            increasedIceDamage = 0.0;
+            increasedLightningDamage = 0.0;
+            increasedNonElementalDotDamage = 0.0;
+            damageTakenReduction = 0;
+            armour = 0;
+            timeUntilShieldAvailable = 0;
+            timeUntilImmunityAvailable = 0;
+            cooldownBaseTime = 1.0;
+            isShieldActive = false;
+            isImmunityActive = false;
             shieldCooldown = 30;
             immunityCooldown = 18;
             igniteResistance = 1;
@@ -205,35 +279,35 @@ namespace BasicsOfGame
             criticalHitDamage = 1.5;
             criticalHitChance = 0;
             lifeGainOnHit = 0;
-            increasedDamageDueToDebuffs=0;
-            
-            healthPointsCalculations=new Tuple<int,double, double>(200,0,0);
-            healthPointsToDistribute=new Tuple<int, int>(0,0);
-            healthRecoveryRateCalculations=new Tuple<double, double, double>(1,0,0);
-            damageCalculations=new Tuple<int,int,double,double>(10, 15, 0, 0);
-            iceDamageCalculations=new Tuple<double, double>(0,0);
+            increasedDamageDueToDebuffs = 0;
+
+            healthPointsCalculations = new Tuple<int, double, double>(200, 0, 0);
+            healthPointsToDistribute = new Tuple<int, int>(0, 0);
+            healthRecoveryRateCalculations = new Tuple<double, double, double>(1, 0, 0);
+            damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0);
+            iceDamageCalculations = new Tuple<double, double>(0, 0);
             fireDamageCalculations = new Tuple<double, double>(0, 0);
             lightningDamageCalculations = new Tuple<double, double>(0, 0);
-            criticalDamageCalculations=new Tuple<double, double,double>(1.5,0,1);
-            criticalHitChanceCalculations=new Tuple<int, double, double>(0,0,1);
+            criticalDamageCalculations = new Tuple<double, double, double>(1.5, 0, 1);
+            criticalHitChanceCalculations = new Tuple<int, double, double>(0, 0, 1);
             attackSpeedCalculations = new Tuple<double, double>(30, 0);
             attackCooldownCalculations = new Tuple<double, double>(400, 0);
-            chanceToBleedCalculations=new Tuple<int, double>(0,0);
-            increasedNonElementalDotDamageCalculations=new Tuple<double, double>(0,0);
-            armourCalculations=new Tuple<int, double, double>(0,0,0);
-            decreasedDamageTakenCalculations=new Tuple<double, double, double>(0,0,0);
-            shield=new Tuple<bool, double>(false,30);
-            immunity=new Tuple<bool, double>(false,18);
-            cooldownTimeForActiveSkillsCalculations=new Tuple<double, double>(1,0);
-            movementSpeedCalculations=new Tuple<double, double>(100,0);
-            itemQuantityCalculations=new Tuple<double, double>(1,0);
+            chanceToBleedCalculations = new Tuple<int, double>(0, 0);
+            increasedNonElementalDotDamageCalculations = new Tuple<double, double>(0, 0);
+            armourCalculations = new Tuple<int, double, double>(0, 0, 0);
+            decreasedDamageTakenCalculations = new Tuple<double, double, double>(0, 0, 0);
+            shield = new Tuple<bool, double>(false, 30);
+            immunity = new Tuple<bool, double>(false, 18);
+            cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(1, 0);
+            movementSpeedCalculations = new Tuple<double, double>(100, 0);
+            itemQuantityCalculations = new Tuple<double, double>(1, 0);
             itemQualityCalculations = new Tuple<double, double>(1, 0);
             lifeGainOnHitCalculations = new Tuple<double, double, double>(0, 0, 1);
             igniteResistanceCalculations = new Tuple<double, double>(1, 0);
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
             stunResitanceCalculations = new Tuple<double, double>(1, 0);
-            damageIncreasedPerDebuffCalculations=new Tuple<double, double>(0,0);
+            damageIncreasedPerDebuffCalculations = new Tuple<double, double>(0, 0);
             unassignedSkillPoints = 0;
             assignedSkillPoints = 0;
             killedBy = "Damage over time";
@@ -252,7 +326,7 @@ namespace BasicsOfGame
             exp = 0;
             minDmg = 10;
             maxDmg = 15;
-            if (allocateMode) { unassignedSkillPoints = 25; level = 25; }
+            if (allocateMode) { unassignedSkillPoints = 25; level = 25;skillsToPick = 5; }
             Speed = 100;
             baseSpeed = 100;
             player.Name = "Player";
@@ -291,7 +365,69 @@ namespace BasicsOfGame
             createExpBar();
             createDotBar();
             activeBuffs();
+            for(int i = 0; i < 5; i++)
+            {
+                visualsSkills[i] = new System.Windows.Shapes.Rectangle();
+                cdSkills[i] = new TextBox();
+            }
 
+        }
+        private void updateSkills()
+        {
+            foreach(System.Windows.Shapes.Rectangle vs in visualsSkills)
+            {
+                GameScreen.Children.Remove(vs);
+            }
+            foreach (TextBox cs in cdSkills)
+            {
+                GameScreen.Children.Remove(cs);
+            }
+            for (int i = 0; i < obtainedSkills.Count; i++)
+            {
+                visualsSkills[i].Width = 50;
+                visualsSkills[i].Height = 50;
+                visualsSkills[i].Fill = obtainedSkills[i].getMiniature();
+                Canvas.SetLeft(visualsSkills[i], 0 + i * 50);
+                Canvas.SetTop(visualsSkills[i], 550);
+                Canvas.SetZIndex(visualsSkills[i], 50);
+                GameScreen.Children.Add(visualsSkills[i]);
+               
+                cdSkills[i].Width = 40;
+                cdSkills[i].Height = 20;
+                cdSkills[i].Background = Brushes.White;
+                cdSkills[i].Foreground = Brushes.Black;
+                cdSkills[i].BorderBrush = Brushes.Black;
+
+                Canvas.SetLeft(cdSkills[i], 5+i*50);
+                Canvas.SetTop(cdSkills[i], 580);
+                Canvas.SetZIndex(cdSkills[i], 51);
+                cdSkills[i].IsHitTestVisible = false;
+                GameScreen.Children.Add(cdSkills[i]);
+                cdSkills[i].TextAlignment = TextAlignment.Center;
+                
+            }
+        }
+        private void updateCd()
+        {
+            for (int i = 0; i < obtainedSkills.Count; i++)
+            {
+                double x = obtainedSkills[i].getCooldown();
+                if (x != 0)
+                {
+                    if (Math.Round(x, 1) % 1 == 0) cdSkills[i].Text = Math.Round(x, 1).ToString() + ",0";
+                    else cdSkills[i].Text = Math.Round(x, 1).ToString();
+                }
+                else cdSkills[i].Text = "0,0";
+            }
+        }
+        public int returnHowManyActiveSkillsCanBeAllocated()
+        {
+            return skillsToPick-pickedSkills;
+        }
+        public bool checkIfCanObtainSkills()
+        {
+            if (pickedSkills < skillsToPick) return true;
+            return false;
         }
         System.Windows.Shapes.Rectangle currentSkillBody;
         int damageOfCurrentSkill;
@@ -302,58 +438,181 @@ namespace BasicsOfGame
         {
             tryingInvoke = true;
             damageOfCurrentSkill = damage;
-            statusEffectsForSkill= statusEffects;
+            statusEffectsForSkill = statusEffects;
             canCurrentSkillCrit = canCrit;
             currentSkillBody = body;
         }
-
-        public void useDemoSkill(System.Windows.Point mouse, System.Windows.Point player)
+        int savedFirstSkill;
+        int savedSecondSkill;
+        bool saveSkillsForLater;
+        Button firstChoice;
+        Button secondChoice;
+        bool pickingActive;
+        public void pickSkill()
         {
-            demoSkill.useSkill(mouse, player);
-        }
-        public void showStats(){
-            playerStatsHolder.Text="";
-           
-            playerStatsHolder.Text+="Damage: "+minDmg.ToString()+"-"+maxDmg.ToString();
-            playerStatsHolder.Text+="\nIncreased damage: "+Math.Round((increasedDamage-1)*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nIncreased fire damage: "+Math.Round((increasedFireDamage)*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nIncreased lightning damage: "+Math.Round((increasedLightningDamage)*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nIncreased ice damage: "+Math.Round((increasedIceDamage)*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nIncreased bleeding and poison damage: "+Math.Round((increasedNonElementalDotDamage)*100).ToString()+"%";
-            playerStatsHolder.Text+="\nChance to inflict bleed on hit: "+(chanceToInflictBleed).ToString()+"%";
-            playerStatsHolder.Text+="\nAttack speed: "+(100+attackSpeedCalculations.Item2).ToString()+"% of base";
-            playerStatsHolder.Text+="\nCritical hit chance: "+criticalHitChance.ToString()+"%";
-            playerStatsHolder.Text+="\nCritical hit damage: "+(criticalHitDamage*100).ToString()+"% of non critical damage";
-            playerStatsHolder.Text+="\nArmour:"+armour.ToString();
-            playerStatsHolder.Text+="\nMax life: "+maxHealthPoints.ToString();
-            playerStatsHolder.Text+="\nDamage Reduction from hits: "+(damageTakenReduction*100).ToString()+"%";
-            playerStatsHolder.Text+="\nLife recovery rate: "+Math.Round(healthRecoveryRate*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nIgnite effect reduction: "+((1-igniteResistance)*100).ToString()+"%";
-            playerStatsHolder.Text+="\nShock effect reduction: "+((1-shockResistance)*100).ToString()+"%";
-            playerStatsHolder.Text+="\nStun duration reduction: "+((1-stunResistance)*100).ToString()+"%";
-            playerStatsHolder.Text+="\nBleed and poison effect reduction: "+((1-nonElementalDotResistance)*100).ToString()+"%";
-            playerStatsHolder.Text+="\nMovement speed: "+baseSpeed.ToString()+"%";
-            playerStatsHolder.Text+="\nCooldown Reduction: "+(cooldownTimeForActiveSkillsCalculations.Item2*100).ToString()+"%";
-            playerStatsHolder.Text+="\nIncrease of item quality dropped: "+Math.Round((itemQuality-1)*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nIncrease of amount of items dropped: "+Math.Round((itemQuantity-1)*100,0).ToString()+"%";
-            playerStatsHolder.Text+="\nLife gain per hit(including life recovery rate): "+Math.Round(lifeGainOnHit*healthRecoveryRate,1).ToString();
-            playerStatsHolder.Text+="\nIncreased dmg per debuff on self: "+Math.Round(damageIncreasedPerDebuff*100,0).ToString()+"%";
-            
-            if(showingStats){
-               return;
+            if (pickingActive) return;
+            if (!saveSkillsForLater)
+            {
+                saveSkillsForLater = true;
+                savedFirstSkill = getRand.Next(0, skillsThatCanBeObtained.Count );
+                savedSecondSkill = getRand.Next(0, skillsThatCanBeObtained.Count );
+                if (savedFirstSkill == savedSecondSkill)
+                {
+                    while (savedSecondSkill == savedFirstSkill)
+                    {
+                        savedSecondSkill= getRand.Next(0, skillsThatCanBeObtained.Count - 1);
+                    }
+                }
             }
-            else {
-                showingStats=true;
+
+
+            descSkillOne.Text = skillsThatCanBeObtained[savedFirstSkill].getName()+"\n\n"+skillsThatCanBeObtained[savedFirstSkill].returnDescription();
+            descSkillTwo.Text = skillsThatCanBeObtained[savedSecondSkill].getName() + "\n\n" + skillsThatCanBeObtained[savedSecondSkill].returnDescription();
+            pickingActive = true;
+            firstChoice.Content = skillsThatCanBeObtained[savedFirstSkill].getName();
+            firstChoice.Click += pickFirstSkill;
+            secondChoice.Content = skillsThatCanBeObtained[savedSecondSkill].getName();
+            secondChoice.Click += pickSecondSkill;
+            firstChoice.Visibility = Visibility.Visible;
+            secondChoice.Visibility = Visibility.Visible;
+            firstChoice.IsEnabled = true;
+            secondChoice.IsEnabled = true;
+            Canvas.SetZIndex(firstChoice, 999);
+            Canvas.SetZIndex(secondChoice, 999);
+            GameScreen.Children.Add(firstChoice);
+            GameScreen.Children.Add(secondChoice);
+            GameScreen.Children.Add(blackOverlay);
+            GameScreen.Children.Add(descActiveSkills);
+            GameScreen.Children.Add(descSkillOne);
+            GameScreen.Children.Add(descSkillTwo);
+            
+        }
+        public void closePicker()
+        {
+            pickingActive = false;
+            updateSkills();
+            GameScreen.Focus();
+            GameScreen.Children.Remove(firstChoice);
+            GameScreen.Children.Remove(secondChoice);
+            GameScreen.Children.Remove(blackOverlay);
+            GameScreen.Children.Remove(descActiveSkills);
+            GameScreen.Children.Remove(descSkillOne);
+            GameScreen.Children.Remove(descSkillTwo);
+            firstChoice.Visibility = Visibility.Hidden;
+            secondChoice.Visibility = Visibility.Hidden;
+            firstChoice.IsEnabled = false;
+            secondChoice.IsEnabled = false;
+        }
+
+        private void pickFirstSkill(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            
+            pickedSkills++;
+            skillsThatCanBeObtained[savedFirstSkill].tryDamaging += tryDamagingAnyEnemy;
+            obtainedSkills.Add(skillsThatCanBeObtained[savedFirstSkill]);
+            skillsThatCanBeObtained.RemoveAt(savedFirstSkill);
+            saveSkillsForLater = false;
+            closePicker();
+
+        }
+        private void pickSecondSkill(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+
+            
+            pickedSkills++;
+            skillsThatCanBeObtained[savedSecondSkill].tryDamaging += tryDamagingAnyEnemy;
+            obtainedSkills.Add(skillsThatCanBeObtained[savedSecondSkill]);
+            skillsThatCanBeObtained.RemoveAt(savedSecondSkill);
+            saveSkillsForLater=false;
+            closePicker();
+
+        }
+        private void fillSkills(Canvas GS)
+        {
+            skillsThatCanBeObtained.Add(new Fireball(GS));
+            skillsThatCanBeObtained.Add(new IceBurst(GS));
+            skillsThatCanBeObtained.Add(new FireStorm(GS));
+            skillsThatCanBeObtained.Add(new HammerOfJudgment(GS));
+            skillsThatCanBeObtained.Add(new HolyGrenade(GS));
+            skillsThatCanBeObtained.Add(new StunShock(GS));
+            skillsThatCanBeObtained.Add(new HolyHands(GS));
+            skillsThatCanBeObtained.Add(new LightningStrike(GS));
+
+        }
+        public void useFirstSkill(System.Windows.Point mouse, System.Windows.Point player)
+        {
+            if(obtainedSkills.Count>=1)
+                obtainedSkills[0].useSkill(mouse, player);
+        }
+        public void useSecondSkill(System.Windows.Point mouse, System.Windows.Point player)
+        {
+            if (obtainedSkills.Count >= 2)
+                obtainedSkills[1].useSkill(mouse, player);
+        }
+        public void useThirdSkill(System.Windows.Point mouse, System.Windows.Point player)
+        {
+            if (obtainedSkills.Count >= 3)
+                obtainedSkills[2].useSkill(mouse, player);
+        }
+        public void useFourthSkill(System.Windows.Point mouse, System.Windows.Point player)
+        {
+            if (obtainedSkills.Count >= 4)
+                obtainedSkills[3].useSkill(mouse, player);
+        }
+        public void useFifthSkill(System.Windows.Point mouse, System.Windows.Point player)
+        {
+            if (obtainedSkills.Count >= 5)
+                obtainedSkills[4].useSkill(mouse, player);
+        }
+        public void showStats()
+        {
+            playerStatsHolder.Text = "";
+
+            playerStatsHolder.Text += "Damage: " + minDmg.ToString() + "-" + maxDmg.ToString();
+            playerStatsHolder.Text += "\nIncreased damage: " + Math.Round((increasedDamage - 1) * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nIncreased fire damage: " + Math.Round((increasedFireDamage) * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nIncreased lightning damage: " + Math.Round((increasedLightningDamage) * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nIncreased ice damage: " + Math.Round((increasedIceDamage) * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nIncreased bleeding and poison damage: " + Math.Round((increasedNonElementalDotDamage) * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nChance to inflict bleed on hit: " + (chanceToInflictBleed).ToString() + "%";
+            playerStatsHolder.Text += "\nAttack speed: " + (100 + attackSpeedCalculations.Item2).ToString() + "% of base";
+            playerStatsHolder.Text += "\nCritical hit chance: " + criticalHitChance.ToString() + "%";
+            playerStatsHolder.Text += "\nCritical hit damage: " + (criticalHitDamage * 100).ToString() + "% of non critical damage";
+            playerStatsHolder.Text += "\nArmour:" + armour.ToString();
+            playerStatsHolder.Text += "\nMax life: " + maxHealthPoints.ToString();
+            playerStatsHolder.Text += "\nDamage Reduction from hits: " + (damageTakenReduction * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nLife recovery rate: " + Math.Round(healthRecoveryRate * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nIgnite effect reduction: " + ((1 - igniteResistance) * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nShock effect reduction: " + ((1 - shockResistance) * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nStun duration reduction: " + ((1 - stunResistance) * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nBleed and poison effect reduction: " + ((1 - nonElementalDotResistance) * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nMovement speed: " + baseSpeed.ToString() + "%";
+            playerStatsHolder.Text += "\nCooldown Reduction: " + (cooldownTimeForActiveSkillsCalculations.Item2 * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nIncrease of item quality dropped: " + Math.Round((itemQuality - 1) * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nIncrease of amount of items dropped: " + Math.Round((itemQuantity - 1) * 100, 0).ToString() + "%";
+            playerStatsHolder.Text += "\nLife gain per hit(including life recovery rate): " + Math.Round(lifeGainOnHit * healthRecoveryRate, 1).ToString();
+            playerStatsHolder.Text += "\nIncreased dmg per debuff on self: " + Math.Round(damageIncreasedPerDebuff * 100, 0).ToString() + "%";
+
+            if (showingStats)
+            {
+                return;
+            }
+            else
+            {
+                showingStats = true;
                 GameScreen.Children.Add(playerStatsHolder);
             }
         }
-        public void hideStats(){
+        public void hideStats()
+        {
             GameScreen.Children.Remove(playerStatsHolder);
-            showingStats=false;
+            showingStats = false;
         }
         private void recalculateStats(List<Tuple<string, string, double>> listOfSkills)
         {
-            
+
             healthPointsCalculations = new Tuple<int, double, double>(200, 0, 0);
             healthRecoveryRateCalculations = new Tuple<double, double, double>(1, 0, 0);
             damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0);
@@ -379,133 +638,137 @@ namespace BasicsOfGame
             shockResistanceCalculations = new Tuple<double, double>(1, 0);
             nonElementalDotResistanceCalculations = new Tuple<double, double>(1, 0);
             stunResitanceCalculations = new Tuple<double, double>(1, 0);
-            damageIncreasedPerDebuffCalculations=new Tuple<double, double>(0,0);
-            foreach(var skills in listOfSkills)
+            damageIncreasedPerDebuffCalculations = new Tuple<double, double>(0, 0);
+            foreach (var skills in listOfSkills)
             {
-                if(skills.Item1 == "absoluteCriticalHitChance"){ criticalHitChanceCalculations= new Tuple<int, double, double>(criticalHitChanceCalculations.Item1, criticalHitChanceCalculations.Item2+skills.Item3, criticalHitChanceCalculations.Item3);}
-                if(skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2+equippedPieces*skills.Item3, armourCalculations.Item3); }
-                if(skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2+skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "criticalDamage") { criticalDamageCalculations = new Tuple<double, double, double>(criticalDamageCalculations.Item1, criticalDamageCalculations.Item2+skills.Item3, criticalDamageCalculations.Item3); }
-                if(skills.Item1 == "damage") { damageCalculations = new Tuple<int, int, double, double>(damageCalculations.Item1, damageCalculations.Item2, damageCalculations.Item3, damageCalculations.Item4+skills.Item3); }
-                if(skills.Item1 == "damagePerDebuff") {damageIncreasedPerDebuffCalculations= new Tuple<double, double>(damageIncreasedPerDebuffCalculations.Item1,damageIncreasedPerDebuffCalculations.Item2+skills.Item3/100);}
-                if(skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(decreasedDamageTakenCalculations.Item1, decreasedDamageTakenCalculations.Item2+skills.Item3/100, decreasedDamageTakenCalculations.Item3); }
-                if(skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(fireDamageCalculations.Item1,fireDamageCalculations.Item2+skills.Item3/100); }
-                if(skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalculations = new Tuple<double, double, double>(healthRecoveryRateCalculations.Item1,healthRecoveryRateCalculations.Item2,healthRecoveryRateCalculations.Item3+skills.Item3); }
-                if(skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(iceDamageCalculations.Item1,iceDamageCalculations.Item2+skills.Item3/100); }
-                if(skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(true, skills.Item3*1000); } // ms
-                if(skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<double, double>(itemQualityCalculations.Item1,itemQualityCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<double, double>(itemQuantityCalculations.Item1,itemQuantityCalculations.Item2+skills.Item3); }
-                if(skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<double, double, double>(lifeGainOnHitCalculations.Item1,lifeGainOnHitCalculations.Item2+skills.Item3,lifeGainOnHitCalculations.Item3); }
-                if(skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1,lightningDamageCalculations.Item2+skills.Item3/100); }
-                if(skills.Item1 == "maximumHealth") { healthPointsCalculations = new Tuple<int, double, double>(healthPointsCalculations.Item1,healthPointsCalculations.Item2+skills.Item3,healthPointsCalculations.Item3); }
-                if(skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<double, double>(movementSpeedCalculations.Item1,movementSpeedCalculations.Item2+skills.Item3/100); }
-                if(skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(increasedNonElementalDotDamageCalculations.Item1,increasedNonElementalDotDamageCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(igniteResistanceCalculations.Item1,igniteResistanceCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(nonElementalDotResistanceCalculations.Item1,nonElementalDotResistanceCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(shockResistanceCalculations.Item1,shockResistanceCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(stunResitanceCalculations.Item1,stunResitanceCalculations.Item2+(skills.Item3/100)); }
-                if(skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(true, skills.Item3*1000); } //ms
-                
+                if (skills.Item1 == "absoluteCriticalHitChance") { criticalHitChanceCalculations = new Tuple<int, double, double>(criticalHitChanceCalculations.Item1, criticalHitChanceCalculations.Item2 + skills.Item3, criticalHitChanceCalculations.Item3); }
+                if (skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2 + equippedPieces * skills.Item3, armourCalculations.Item3); }
+                if (skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2 + skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2 + skills.Item3); }
+                if (skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2 + skills.Item3); }
+                if (skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2 + (skills.Item3 / 100)); }
+                if (skills.Item1 == "criticalDamage") { criticalDamageCalculations = new Tuple<double, double, double>(criticalDamageCalculations.Item1, criticalDamageCalculations.Item2 + skills.Item3, criticalDamageCalculations.Item3); }
+                if (skills.Item1 == "damage") { damageCalculations = new Tuple<int, int, double, double>(damageCalculations.Item1, damageCalculations.Item2, damageCalculations.Item3, damageCalculations.Item4 + skills.Item3); }
+                if (skills.Item1 == "damagePerDebuff") { damageIncreasedPerDebuffCalculations = new Tuple<double, double>(damageIncreasedPerDebuffCalculations.Item1, damageIncreasedPerDebuffCalculations.Item2 + skills.Item3 / 100); }
+                if (skills.Item1 == "decreaseDamageTaken") { decreasedDamageTakenCalculations = new Tuple<double, double, double>(decreasedDamageTakenCalculations.Item1, decreasedDamageTakenCalculations.Item2 + skills.Item3 / 100, decreasedDamageTakenCalculations.Item3); }
+                if (skills.Item1 == "fireDamage") { fireDamageCalculations = new Tuple<double, double>(fireDamageCalculations.Item1, fireDamageCalculations.Item2 + skills.Item3 / 100); }
+                if (skills.Item1 == "healthRecoveryRate") { healthRecoveryRateCalculations = new Tuple<double, double, double>(healthRecoveryRateCalculations.Item1, healthRecoveryRateCalculations.Item2, healthRecoveryRateCalculations.Item3 + skills.Item3); }
+                if (skills.Item1 == "iceDamage") { iceDamageCalculations = new Tuple<double, double>(iceDamageCalculations.Item1, iceDamageCalculations.Item2 + skills.Item3 / 100); }
+                if (skills.Item1 == "immunityStack") { immunity = new Tuple<bool, double>(true, skills.Item3 * 1000); } // ms
+                if (skills.Item1 == "itemQuality") { itemQualityCalculations = new Tuple<double, double>(itemQualityCalculations.Item1, itemQualityCalculations.Item2 + skills.Item3); }
+                if (skills.Item1 == "itemQuantity") { itemQuantityCalculations = new Tuple<double, double>(itemQuantityCalculations.Item1, itemQuantityCalculations.Item2 + skills.Item3); }
+                if (skills.Item1 == "lifeGainOnHit") { lifeGainOnHitCalculations = new Tuple<double, double, double>(lifeGainOnHitCalculations.Item1, lifeGainOnHitCalculations.Item2 + skills.Item3, lifeGainOnHitCalculations.Item3); }
+                if (skills.Item1 == "lightningDamage") { lightningDamageCalculations = new Tuple<double, double>(lightningDamageCalculations.Item1, lightningDamageCalculations.Item2 + skills.Item3 / 100); }
+                if (skills.Item1 == "maximumHealth") { healthPointsCalculations = new Tuple<int, double, double>(healthPointsCalculations.Item1, healthPointsCalculations.Item2 + skills.Item3, healthPointsCalculations.Item3); }
+                if (skills.Item1 == "movementSpeed") { movementSpeedCalculations = new Tuple<double, double>(movementSpeedCalculations.Item1, movementSpeedCalculations.Item2 + skills.Item3 / 100); }
+                if (skills.Item1 == "nonElementalDotDamage") { increasedNonElementalDotDamageCalculations = new Tuple<double, double>(increasedNonElementalDotDamageCalculations.Item1, increasedNonElementalDotDamageCalculations.Item2 + (skills.Item3 / 100)); }
+                if (skills.Item1 == "selfIgniteEffect") { igniteResistanceCalculations = new Tuple<double, double>(igniteResistanceCalculations.Item1, igniteResistanceCalculations.Item2 + (skills.Item3 / 100)); }
+                if (skills.Item1 == "selfNonElementalDotDamageEffect") { nonElementalDotResistanceCalculations = new Tuple<double, double>(nonElementalDotResistanceCalculations.Item1, nonElementalDotResistanceCalculations.Item2 + (skills.Item3 / 100)); }
+                if (skills.Item1 == "selfShockEffect") { shockResistanceCalculations = new Tuple<double, double>(shockResistanceCalculations.Item1, shockResistanceCalculations.Item2 + (skills.Item3 / 100)); }
+                if (skills.Item1 == "selfStunEffect") { stunResitanceCalculations = new Tuple<double, double>(stunResitanceCalculations.Item1, stunResitanceCalculations.Item2 + (skills.Item3 / 100)); }
+                if (skills.Item1 == "shieldStack") { shield = new Tuple<bool, double>(true, skills.Item3 * 1000); } //ms
+
 
             }
-            healthPointsToDistribute=new Tuple<int, int>(Convert.ToInt16(healthPointsCalculations.Item2*(1+healthPointsCalculations.Item3/100)),Convert.ToInt16(healthPointsToDistribute.Item2));
-            maxHealthPoints=Convert.ToInt16(Convert.ToDouble(healthPointsCalculations.Item1+healthPointsCalculations.Item2)*Convert.ToDouble(1+healthPointsCalculations.Item3/100));
-            
-            int healthBoost=healthPointsToDistribute.Item1-healthPointsToDistribute.Item2;
-            if(healthBoost<=0)healthBoost=0;
-            else healthPointsToDistribute=new Tuple<int, int>(healthPointsToDistribute.Item1,healthPointsToDistribute.Item2+healthBoost);
-            healthPoints+=healthBoost;
-            updateHpBar();
-            itemQuality=itemQualityCalculations.Item1+itemQualityCalculations.Item1*(itemQualityCalculations.Item2/100);
-            itemQuantity=itemQuantityCalculations.Item1+itemQuantityCalculations.Item1*(itemQuantityCalculations.Item2/100);
-            
-            minDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item1+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
-            maxDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item2+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
+            healthPointsToDistribute = new Tuple<int, int>(Convert.ToInt16(healthPointsCalculations.Item2 * (1 + healthPointsCalculations.Item3 / 100)), Convert.ToInt16(healthPointsToDistribute.Item2));
+            maxHealthPoints = Convert.ToInt16(Convert.ToDouble(healthPointsCalculations.Item1 + healthPointsCalculations.Item2) * Convert.ToDouble(1 + healthPointsCalculations.Item3 / 100));
 
-            increasedDamage=1+damageCalculations.Item4/100+increasedDamageDueToDebuffs;
-            healthRecoveryRate=(healthRecoveryRateCalculations.Item1+healthRecoveryRateCalculations.Item2)*(1+healthRecoveryRateCalculations.Item3/100);
-            shockResistance=shockResistanceCalculations.Item1-shockResistanceCalculations.Item2;
-            nonElementalDotResistance=nonElementalDotResistanceCalculations.Item1-nonElementalDotResistanceCalculations.Item2;
-            igniteResistance=igniteResistanceCalculations.Item1-igniteResistanceCalculations.Item2;
-            stunResistance=stunResitanceCalculations.Item1-stunResitanceCalculations.Item2;
-            if(shockResistance<0)shockResistance=0;
-            if(nonElementalDotResistance<0)nonElementalDotResistance=0;
-            if(igniteResistance<0)igniteResistance=0;
-            
-            if(stunResistance<0)stunResistance=0;
-            cooldownBaseTime=cooldownTimeForActiveSkillsCalculations.Item1/(cooldownTimeForActiveSkillsCalculations.Item1+cooldownTimeForActiveSkillsCalculations.Item2);
-            increasedFireDamage=fireDamageCalculations.Item1+fireDamageCalculations.Item2;
-            increasedIceDamage=iceDamageCalculations.Item1+iceDamageCalculations.Item2;
-            increasedLightningDamage=lightningDamageCalculations.Item1+lightningDamageCalculations.Item2;
-            increasedNonElementalDotDamage=increasedNonElementalDotDamageCalculations.Item1+increasedNonElementalDotDamageCalculations.Item2;
-            criticalHitChance=Convert.ToInt16((criticalHitChanceCalculations.Item1+criticalHitChanceCalculations.Item2)*criticalHitChanceCalculations.Item3);
-            criticalHitDamage=(criticalDamageCalculations.Item1+criticalDamageCalculations.Item2/100)*criticalDamageCalculations.Item3;
-            lifeGainOnHit=(lifeGainOnHitCalculations.Item1+lifeGainOnHitCalculations.Item2)*lifeGainOnHitCalculations.Item3;
-            armour=Convert.ToInt16((armourCalculations.Item1+armourCalculations.Item2)*(1+armourCalculations.Item3/100));
-            baseSpeed=movementSpeedCalculations.Item1*(1+movementSpeedCalculations.Item2);
-            damageTakenReduction=(decreasedDamageTakenCalculations.Item1+decreasedDamageTakenCalculations.Item2)*(1+decreasedDamageTakenCalculations.Item3);
-            if(damageTakenReduction>1)damageTakenReduction=1;
-            isImmunityActive=immunity.Item1;
-            immunityCooldown=immunity.Item2;
-            isShieldActive=shield.Item1;
-            shieldCooldown=shield.Item2;
-            damageIncreasedPerDebuff=damageIncreasedPerDebuffCalculations.Item1+damageIncreasedPerDebuffCalculations.Item2;
-            intervalForAttackAnimations=attackSpeedCalculations.Item1*(attackSpeedCalculations.Item1/(attackSpeedCalculations.Item1+(attackSpeedCalculations.Item1*attackSpeedCalculations.Item2/100)));
-            attackCooldown=attackCooldownCalculations.Item1*(attackCooldownCalculations.Item1/(attackCooldownCalculations.Item1+(attackCooldownCalculations.Item1*attackCooldownCalculations.Item2/100)));;
-            chanceToInflictBleed=Convert.ToInt16(chanceToBleedCalculations.Item1+chanceToBleedCalculations.Item2);
-            
-            if(isShieldActive){
-                if(!isShieldAdded){
-                    isShieldAdded=true;
-                    
-                    shieldPassiveVisual.Width=40;
-                    shieldPassiveVisual.Height=40;
-               
-                    Canvas.SetTop(shieldPassiveVisual,0);
-                    Canvas.SetLeft(shieldPassiveVisual,1160-40*addedSpecialBuffs);
-                    visualForShieldCooldown.Text="0.0";
-                    visualForShieldCooldown.FontSize=10;
-                    visualForShieldCooldown.Height=15;
-                    visualForShieldCooldown.Width=30;
-                    visualForShieldCooldown.Foreground=Brushes.Black;
-                    visualForShieldCooldown.IsHitTestVisible=false;
-                    visualForShieldCooldown.Background=Brushes.White;
-                    visualForShieldCooldown.Opacity=1;
-                    visualForShieldCooldown.TextAlignment=TextAlignment.Center;
-                    Canvas.SetZIndex(shieldPassiveVisual,49);
-                    Canvas.SetZIndex(visualForShieldCooldown,50);
-                    Canvas.SetTop(visualForShieldCooldown,25);
-                    Canvas.SetLeft(visualForShieldCooldown,1165-40*addedSpecialBuffs);
+            int healthBoost = healthPointsToDistribute.Item1 - healthPointsToDistribute.Item2;
+            if (healthBoost <= 0) healthBoost = 0;
+            else healthPointsToDistribute = new Tuple<int, int>(healthPointsToDistribute.Item1, healthPointsToDistribute.Item2 + healthBoost);
+            healthPoints += healthBoost;
+            updateHpBar();
+            itemQuality = itemQualityCalculations.Item1 + itemQualityCalculations.Item1 * (itemQualityCalculations.Item2 / 100);
+            itemQuantity = itemQuantityCalculations.Item1 + itemQuantityCalculations.Item1 * (itemQuantityCalculations.Item2 / 100);
+
+            minDmg = Convert.ToInt16(Convert.ToInt16(damageCalculations.Item1 + damageCalculations.Item3) * Convert.ToDouble(1 + (damageCalculations.Item4 / 100) + increasedDamageDueToDebuffs));
+            maxDmg = Convert.ToInt16(Convert.ToInt16(damageCalculations.Item2 + damageCalculations.Item3) * Convert.ToDouble(1 + (damageCalculations.Item4 / 100) + increasedDamageDueToDebuffs));
+
+            increasedDamage = 1 + damageCalculations.Item4 / 100 + increasedDamageDueToDebuffs;
+            healthRecoveryRate = (healthRecoveryRateCalculations.Item1 + healthRecoveryRateCalculations.Item2) * (1 + healthRecoveryRateCalculations.Item3 / 100);
+            shockResistance = shockResistanceCalculations.Item1 - shockResistanceCalculations.Item2;
+            nonElementalDotResistance = nonElementalDotResistanceCalculations.Item1 - nonElementalDotResistanceCalculations.Item2;
+            igniteResistance = igniteResistanceCalculations.Item1 - igniteResistanceCalculations.Item2;
+            stunResistance = stunResitanceCalculations.Item1 - stunResitanceCalculations.Item2;
+            if (shockResistance < 0) shockResistance = 0;
+            if (nonElementalDotResistance < 0) nonElementalDotResistance = 0;
+            if (igniteResistance < 0) igniteResistance = 0;
+
+            if (stunResistance < 0) stunResistance = 0;
+            cooldownBaseTime = cooldownTimeForActiveSkillsCalculations.Item1 / (cooldownTimeForActiveSkillsCalculations.Item1 + cooldownTimeForActiveSkillsCalculations.Item2);
+            increasedFireDamage = fireDamageCalculations.Item1 + fireDamageCalculations.Item2;
+            increasedIceDamage = iceDamageCalculations.Item1 + iceDamageCalculations.Item2;
+            increasedLightningDamage = lightningDamageCalculations.Item1 + lightningDamageCalculations.Item2;
+            increasedNonElementalDotDamage = increasedNonElementalDotDamageCalculations.Item1 + increasedNonElementalDotDamageCalculations.Item2;
+            criticalHitChance = Convert.ToInt16((criticalHitChanceCalculations.Item1 + criticalHitChanceCalculations.Item2) * criticalHitChanceCalculations.Item3);
+            criticalHitDamage = (criticalDamageCalculations.Item1 + criticalDamageCalculations.Item2 / 100) * criticalDamageCalculations.Item3;
+            lifeGainOnHit = (lifeGainOnHitCalculations.Item1 + lifeGainOnHitCalculations.Item2) * lifeGainOnHitCalculations.Item3;
+            armour = Convert.ToInt16((armourCalculations.Item1 + armourCalculations.Item2) * (1 + armourCalculations.Item3 / 100));
+            baseSpeed = movementSpeedCalculations.Item1 * (1 + movementSpeedCalculations.Item2);
+            damageTakenReduction = (decreasedDamageTakenCalculations.Item1 + decreasedDamageTakenCalculations.Item2) * (1 + decreasedDamageTakenCalculations.Item3);
+            if (damageTakenReduction > 1) damageTakenReduction = 1;
+            isImmunityActive = immunity.Item1;
+            immunityCooldown = immunity.Item2;
+            isShieldActive = shield.Item1;
+            shieldCooldown = shield.Item2;
+            damageIncreasedPerDebuff = damageIncreasedPerDebuffCalculations.Item1 + damageIncreasedPerDebuffCalculations.Item2;
+            intervalForAttackAnimations = attackSpeedCalculations.Item1 * (attackSpeedCalculations.Item1 / (attackSpeedCalculations.Item1 + (attackSpeedCalculations.Item1 * attackSpeedCalculations.Item2 / 100)));
+            attackCooldown = attackCooldownCalculations.Item1 * (attackCooldownCalculations.Item1 / (attackCooldownCalculations.Item1 + (attackCooldownCalculations.Item1 * attackCooldownCalculations.Item2 / 100))); ;
+            chanceToInflictBleed = Convert.ToInt16(chanceToBleedCalculations.Item1 + chanceToBleedCalculations.Item2);
+
+            if (isShieldActive)
+            {
+                if (!isShieldAdded)
+                {
+                    isShieldAdded = true;
+
+                    shieldPassiveVisual.Width = 40;
+                    shieldPassiveVisual.Height = 40;
+
+                    Canvas.SetTop(shieldPassiveVisual, 0);
+                    Canvas.SetLeft(shieldPassiveVisual, 1160 - 40 * addedSpecialBuffs);
+                    visualForShieldCooldown.Text = "0.0";
+                    visualForShieldCooldown.FontSize = 10;
+                    visualForShieldCooldown.Height = 15;
+                    visualForShieldCooldown.Width = 30;
+                    visualForShieldCooldown.Foreground = Brushes.Black;
+                    visualForShieldCooldown.IsHitTestVisible = false;
+                    visualForShieldCooldown.Background = Brushes.White;
+                    visualForShieldCooldown.Opacity = 1;
+                    visualForShieldCooldown.TextAlignment = TextAlignment.Center;
+                    Canvas.SetZIndex(shieldPassiveVisual, 49);
+                    Canvas.SetZIndex(visualForShieldCooldown, 50);
+                    Canvas.SetTop(visualForShieldCooldown, 25);
+                    Canvas.SetLeft(visualForShieldCooldown, 1165 - 40 * addedSpecialBuffs);
                     GameScreen.Children.Add(shieldPassiveVisual);
                     GameScreen.Children.Add(visualForShieldCooldown);
-                     addedSpecialBuffs++;
+                    addedSpecialBuffs++;
                 }
             }
-             if(isImmunityActive){
-                if(!isImmunityAdded){
-                    isImmunityAdded=true;
-                    
-                    immunityPassiveVisual.Width=40;
-                    immunityPassiveVisual.Height=40;
-                    
-                    Canvas.SetTop(immunityPassiveVisual,0);
-                    Canvas.SetLeft(immunityPassiveVisual,1160-40*addedSpecialBuffs);
-                    
-                    visualForImmunityCooldown.Text="0.0";
-                    visualForImmunityCooldown.TextAlignment=TextAlignment.Center;
-                    visualForImmunityCooldown.FontSize=10;
-                    visualForImmunityCooldown.Height=15;
-                    visualForImmunityCooldown.Width=30;
-                    visualForImmunityCooldown.Foreground=Brushes.Black;
-                    visualForImmunityCooldown.IsHitTestVisible=false;
-                    visualForImmunityCooldown.Background=Brushes.White;
-                    visualForImmunityCooldown.Opacity=1;
-                    Canvas.SetZIndex(immunityPassiveVisual,49);
-                    Canvas.SetZIndex(visualForImmunityCooldown,50);
-                    Canvas.SetTop(visualForImmunityCooldown,25);
-                    Canvas.SetLeft(visualForImmunityCooldown,1165-40*addedSpecialBuffs);
+            if (isImmunityActive)
+            {
+                if (!isImmunityAdded)
+                {
+                    isImmunityAdded = true;
+
+                    immunityPassiveVisual.Width = 40;
+                    immunityPassiveVisual.Height = 40;
+
+                    Canvas.SetTop(immunityPassiveVisual, 0);
+                    Canvas.SetLeft(immunityPassiveVisual, 1160 - 40 * addedSpecialBuffs);
+
+                    visualForImmunityCooldown.Text = "0.0";
+                    visualForImmunityCooldown.TextAlignment = TextAlignment.Center;
+                    visualForImmunityCooldown.FontSize = 10;
+                    visualForImmunityCooldown.Height = 15;
+                    visualForImmunityCooldown.Width = 30;
+                    visualForImmunityCooldown.Foreground = Brushes.Black;
+                    visualForImmunityCooldown.IsHitTestVisible = false;
+                    visualForImmunityCooldown.Background = Brushes.White;
+                    visualForImmunityCooldown.Opacity = 1;
+                    Canvas.SetZIndex(immunityPassiveVisual, 49);
+                    Canvas.SetZIndex(visualForImmunityCooldown, 50);
+                    Canvas.SetTop(visualForImmunityCooldown, 25);
+                    Canvas.SetLeft(visualForImmunityCooldown, 1165 - 40 * addedSpecialBuffs);
                     GameScreen.Children.Add(immunityPassiveVisual);
                     GameScreen.Children.Add(visualForImmunityCooldown);
                     addedSpecialBuffs++;
@@ -517,20 +780,24 @@ namespace BasicsOfGame
             dmgIncreased.Add(increasedIceDamage);
             dmgIncreased.Add(increasedLightningDamage);
             dmgIncreased.Add(increasedNonElementalDotDamage);
-            
+
             // HERE IMPLEMENT FOREACH SKILLS LOOP IN FUTURE
-            demoSkill.recalculateStats(dmgIncreased, cooldownBaseTime);
-            if(showingStats)showStats();
+            foreach(Skill skill in obtainedSkills)
+                skill.recalculateStats(dmgIncreased, cooldownBaseTime);
+            foreach (Skill skill in skillsThatCanBeObtained)
+                skill.recalculateStats(dmgIncreased, cooldownBaseTime);
+            if (showingStats) showStats();
         }
-    
-        private void updateHpBar(){
-            if(healthPoints>maxHealthPoints)healthPoints=maxHealthPoints;
+
+        private void updateHpBar()
+        {
+            if (healthPoints > maxHealthPoints) healthPoints = maxHealthPoints;
             hpVisualization.Text = healthPoints + "/" + maxHealthPoints;
             double w = Convert.ToDouble(healthPoints) / Convert.ToDouble(maxHealthPoints) * 200;
             if (w < 0) w = 0;
             hpBar.Width = Convert.ToInt32(w);
         }
-        private void updateStats(List<Tuple<string,string,double>> listOfSkills)
+        private void updateStats(List<Tuple<string, string, double>> listOfSkills)
         {
             recalculateStats(listOfSkills);
         }
@@ -643,7 +910,7 @@ namespace BasicsOfGame
         private void activeBuffs()//poison
         {
 
-            howManyBuffsAndDebuffsImplemented=3;
+            howManyBuffsAndDebuffsImplemented = 3;
             for (int i = 0; i < howManyBuffsAndDebuffsImplemented; i++)
             {
                 buffsContainer[i] = new System.Windows.Shapes.Rectangle();
@@ -784,7 +1051,7 @@ namespace BasicsOfGame
                 dotName = x.Item3;
                 if (dotName == "Poison")
                 {
-                    dmgPerMs=dmgPerMs*nonElementalDotResistance;
+                    dmgPerMs = dmgPerMs * nonElementalDotResistance;
                     DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName));
                     poisonStacks++;
                 }
@@ -795,7 +1062,7 @@ namespace BasicsOfGame
                 }
                 else if (dotName == "Ignite")
                 {
-                    dmgPerMs=dmgPerMs*igniteResistance;
+                    dmgPerMs = dmgPerMs * igniteResistance;
                     double currentDmg;
                     double elapsedTime;
                     bool foundIgnite = false;
@@ -827,8 +1094,8 @@ namespace BasicsOfGame
                 {
                     if (!stunned)
                     {
-                        time=time*stunResistance;
-                        if(time==0)continue;
+                        time = time * stunResistance;
+                        if (time == 0) continue;
                         DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(0, 0, 0, time, dotName));
                         Canvas.SetZIndex(buffsContainer[2], 1000);
                         stunned = true;
@@ -850,21 +1117,22 @@ namespace BasicsOfGame
                 }
                 else { DamagePerMilliseconds.Add(new Tuple<double, double, double, double, string>(dmgPerMs, 0, 0, time, dotName)); }
             }
-            
+
             if (DamagePerMilliseconds.Count > 0)
             {
 
                 List<Tuple<double, double, double, double, string>> toRemove = new List<Tuple<double, double, double, double, string>>();
-                if(isImmunityActive&&timeUntilImmunityAvailable==0)
+                if (isImmunityActive && timeUntilImmunityAvailable == 0)
                 {
-                    Tuple<double,double,double,double,string> LongestDot;
-                    LongestDot=DamagePerMilliseconds[0];
-                    for (int i = 1; i < DamagePerMilliseconds.Count; i++){
-                            if((DamagePerMilliseconds[i].Item4-DamagePerMilliseconds[i].Item3)>(LongestDot.Item4-LongestDot.Item3))
-                            LongestDot=DamagePerMilliseconds[i];
+                    Tuple<double, double, double, double, string> LongestDot;
+                    LongestDot = DamagePerMilliseconds[0];
+                    for (int i = 1; i < DamagePerMilliseconds.Count; i++)
+                    {
+                        if ((DamagePerMilliseconds[i].Item4 - DamagePerMilliseconds[i].Item3) > (LongestDot.Item4 - LongestDot.Item3))
+                            LongestDot = DamagePerMilliseconds[i];
                     }
                     toRemove.Add(LongestDot);
-                    timeUntilImmunityAvailable=immunityCooldown;
+                    timeUntilImmunityAvailable = immunityCooldown;
 
                 }
                 foreach (var x in toRemove)
@@ -876,7 +1144,7 @@ namespace BasicsOfGame
                         if (poisonStacks <= 0)
                         {
                             Canvas.SetZIndex(buffsContainer[0], 800);
-                            poisonStacks=0;
+                            poisonStacks = 0;
                         }
                     }
                     if (x.Item5 == "Ignite")
@@ -912,7 +1180,7 @@ namespace BasicsOfGame
                     string nameOfDot = DamagePerMilliseconds[i].Item5;
                     DamagePerMilliseconds[i] = new Tuple<double, double, double, double, string>(dmgPerMs, currentDmg, timeElapsed, maxTime, nameOfDot);
                     if (maxTime <= timeElapsed) toRemove.Add(DamagePerMilliseconds[i]);
-                    
+
                 }
 
                 foreach (var x in toRemove)
@@ -924,7 +1192,7 @@ namespace BasicsOfGame
                         if (poisonStacks <= 0)
                         {
                             Canvas.SetZIndex(buffsContainer[0], 800);
-                            poisonStacks=0;
+                            poisonStacks = 0;
                         }
                     }
                     if (x.Item5 == "Ignite")
@@ -940,21 +1208,22 @@ namespace BasicsOfGame
                     DamagePerMilliseconds.Remove(x);
 
                 }
-                
-                int currentDebuffs=0;
-                for(int i=0;i<howManyBuffsAndDebuffsImplemented;i++) // 7 debuffs & 7 buffs
+
+                int currentDebuffs = 0;
+                for (int i = 0; i < howManyBuffsAndDebuffsImplemented; i++) // 7 debuffs & 7 buffs
                 {
-                    if(Canvas.GetZIndex(buffsContainer[i])==1000){
-                        
+                    if (Canvas.GetZIndex(buffsContainer[i]) == 1000)
+                    {
+
                         currentDebuffs++;
                     }
                 }
-               
-                increasedDamageDueToDebuffs=currentDebuffs*damageIncreasedPerDebuff;
-                 minDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item1+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
-                maxDmg=Convert.ToInt16(Convert.ToInt16(damageCalculations.Item2+damageCalculations.Item3)*Convert.ToDouble(1+(damageCalculations.Item4/100)+increasedDamageDueToDebuffs));
-                
-                increasedDamage=1+damageCalculations.Item4/100+increasedDamageDueToDebuffs;
+
+                increasedDamageDueToDebuffs = currentDebuffs * damageIncreasedPerDebuff;
+                minDmg = Convert.ToInt16(Convert.ToInt16(damageCalculations.Item1 + damageCalculations.Item3) * Convert.ToDouble(1 + (damageCalculations.Item4 / 100) + increasedDamageDueToDebuffs));
+                maxDmg = Convert.ToInt16(Convert.ToInt16(damageCalculations.Item2 + damageCalculations.Item3) * Convert.ToDouble(1 + (damageCalculations.Item4 / 100) + increasedDamageDueToDebuffs));
+
+                increasedDamage = 1 + damageCalculations.Item4 / 100 + increasedDamageDueToDebuffs;
 
 
 
@@ -1096,39 +1365,46 @@ namespace BasicsOfGame
         {
             return player;
         }
-        
+        double waitBeforeUpdating = 0;
         public void gameTick(ScrollViewer Camera, bool UpKey, bool DownKey, bool RightKey, bool LeftKey, ref Grid map, double deltaTime, double Friction, ref List<TextBox> boxes, Action updateMiniMap)
         {
             if (Speed != 0) Speed = baseSpeed * deltaTime;
             ticksDone += baseSpeed / 2 * deltaTime;
-            demoSkill.updateState(deltaTime,map.rMon());
+            foreach(Skill skill in obtainedSkills)
+                skill.updateState(deltaTime, map.rMon());
+            waitBeforeUpdating -= deltaTime;
+            if (waitBeforeUpdating <= 0)
+            {
+                updateCd();
+                waitBeforeUpdating = 0.1;
+            }
             if (tryingInvoke)
             {
                 tryingInvoke = false;
                 checkAttackCollision(ref map, ref boxes, currentSkillBody, damageOfCurrentSkill, statusEffectsForSkill, canCurrentSkillCrit);
             }
-            timeUntilImmunityAvailable-=Convert.ToDouble(1000 * deltaTime);
-            if(timeUntilImmunityAvailable<0)timeUntilImmunityAvailable=0;
-            timeUntilShieldAvailable-=Convert.ToDouble(1000 * deltaTime);
-            if(timeUntilShieldAvailable<0)timeUntilShieldAvailable=0;
-            if(isShieldAdded)
+            timeUntilImmunityAvailable -= Convert.ToDouble(1000 * deltaTime);
+            if (timeUntilImmunityAvailable < 0) timeUntilImmunityAvailable = 0;
+            timeUntilShieldAvailable -= Convert.ToDouble(1000 * deltaTime);
+            if (timeUntilShieldAvailable < 0) timeUntilShieldAvailable = 0;
+            if (isShieldAdded)
             {
-                int cdOnShieldStackS=(int)Math.Floor(timeUntilShieldAvailable/1000);
-                int cdOnShieldStackMs=(int)Math.Floor(timeUntilShieldAvailable/100)-(cdOnShieldStackS*10);
-                
-                visualForShieldCooldown.Text=cdOnShieldStackS.ToString()+"."+cdOnShieldStackMs.ToString();
+                int cdOnShieldStackS = (int)Math.Floor(timeUntilShieldAvailable / 1000);
+                int cdOnShieldStackMs = (int)Math.Floor(timeUntilShieldAvailable / 100) - (cdOnShieldStackS * 10);
+
+                visualForShieldCooldown.Text = cdOnShieldStackS.ToString() + "." + cdOnShieldStackMs.ToString();
             }
-             if(isImmunityAdded)
-             {
-                 int cdOnImmunityStackS=(int)Math.Floor(timeUntilImmunityAvailable/1000);
-                
-                int cdOnImmunityStackMs=(int)Math.Floor(timeUntilImmunityAvailable/100)-(cdOnImmunityStackS*10);
-                visualForImmunityCooldown.Text=cdOnImmunityStackS.ToString()+"."+cdOnImmunityStackMs.ToString();
-             }
-            if(timeUntilImmunityAvailable>0)immunityPassiveVisual.Opacity=0.5;
-            else immunityPassiveVisual.Opacity=1;
-            if(timeUntilShieldAvailable>0)shieldPassiveVisual.Opacity=0.5;
-            else shieldPassiveVisual.Opacity=1;
+            if (isImmunityAdded)
+            {
+                int cdOnImmunityStackS = (int)Math.Floor(timeUntilImmunityAvailable / 1000);
+
+                int cdOnImmunityStackMs = (int)Math.Floor(timeUntilImmunityAvailable / 100) - (cdOnImmunityStackS * 10);
+                visualForImmunityCooldown.Text = cdOnImmunityStackS.ToString() + "." + cdOnImmunityStackMs.ToString();
+            }
+            if (timeUntilImmunityAvailable > 0) immunityPassiveVisual.Opacity = 0.5;
+            else immunityPassiveVisual.Opacity = 1;
+            if (timeUntilShieldAvailable > 0) shieldPassiveVisual.Opacity = 0.5;
+            else shieldPassiveVisual.Opacity = 1;
             if (blockAttack)
             {
 
@@ -1279,34 +1555,34 @@ namespace BasicsOfGame
             SpeedY = SpeedY * Friction;
             if (Speed != 0 && !stunned) Canvas.SetLeft(player, Canvas.GetLeft(player) + SpeedX);
             if (Speed != 0 && !stunned) Canvas.SetTop(player, Canvas.GetTop(player) + SpeedY);
-            if(Canvas.GetLeft(player)<400&& Canvas.GetTop(player)<60)
+            if (Canvas.GetLeft(player) < 400 && Canvas.GetTop(player) < 60)
             {
-                hpBar.Opacity=0.5;
-                hpBarWindow.Opacity=0.5;
-                hpVisualization.Opacity=0.5;
-                expBar.Opacity=0.5;
-                expBarWindow.Opacity=0.5;
-                expVisualization.Opacity=0.5;
-                DotBar.Opacity=0.5;
-                for(int i=0;i<howManyBuffsAndDebuffsImplemented;i++)
+                hpBar.Opacity = 0.5;
+                hpBarWindow.Opacity = 0.5;
+                hpVisualization.Opacity = 0.5;
+                expBar.Opacity = 0.5;
+                expBarWindow.Opacity = 0.5;
+                expVisualization.Opacity = 0.5;
+                DotBar.Opacity = 0.5;
+                for (int i = 0; i < howManyBuffsAndDebuffsImplemented; i++)
                 {
-                    if(Canvas.GetZIndex(buffsContainer[i])<950)buffsContainer[i].Visibility=Visibility.Hidden;
-                }               
+                    if (Canvas.GetZIndex(buffsContainer[i]) < 950) buffsContainer[i].Visibility = Visibility.Hidden;
+                }
             }
             else
             {
-                hpBar.Opacity=1;
-                hpBarWindow.Opacity=1;
-                hpVisualization.Opacity=1;
-                expBar.Opacity=1;
-                expBarWindow.Opacity=1;
-                expVisualization.Opacity=1;
-                DotBar.Opacity=1;
-                for(int i=0;i<howManyBuffsAndDebuffsImplemented;i++)
-                    buffsContainer[i].Visibility=Visibility.Visible;
-             
+                hpBar.Opacity = 1;
+                hpBarWindow.Opacity = 1;
+                hpVisualization.Opacity = 1;
+                expBar.Opacity = 1;
+                expBarWindow.Opacity = 1;
+                expVisualization.Opacity = 1;
+                DotBar.Opacity = 1;
+                for (int i = 0; i < howManyBuffsAndDebuffsImplemented; i++)
+                    buffsContainer[i].Visibility = Visibility.Visible;
+
             }
-            
+
             foreach (Monster monster in map.rMon())
                 monster.moveToTarget(player, deltaTime, Friction, dealDmgToPlayer);
             dotUpdate(deltaTime);
@@ -1315,14 +1591,15 @@ namespace BasicsOfGame
         public bool getBlock() { return blockAttack; }
         public void setBlock(bool block) { blockAttack = block; }
         public double getSpeed() { return Speed; }
-        public System.Windows.Point playerCoordinates(){return new System.Windows.Point(Canvas.GetLeft(player),Canvas.GetTop(player));}
-        public void  dealDmgToPlayer(int dealtDamage,string monsterName)
+        public System.Windows.Point playerCoordinates() { return new System.Windows.Point(Canvas.GetLeft(player), Canvas.GetTop(player)); }
+        public void dealDmgToPlayer(int dealtDamage, string monsterName)
         {
-            if(isShieldActive&&timeUntilShieldAvailable<=0){
-                timeUntilShieldAvailable=shieldCooldown;
+            if (isShieldActive && timeUntilShieldAvailable <= 0)
+            {
+                timeUntilShieldAvailable = shieldCooldown;
                 return;
             }
-            dealtDamage=Convert.ToInt16(dealtDamage*(1-damageTakenReduction));
+            dealtDamage = Convert.ToInt16(dealtDamage * (1 - damageTakenReduction));
             int obecnyDmg = Convert.ToInt32(playerDmg.Text);
             obecnyDmg += dealtDamage;
             playerDmg.Text = obecnyDmg.ToString();
@@ -1356,11 +1633,12 @@ namespace BasicsOfGame
             else return false;
         }
 
-        public void deleteDeadToDot(ref Grid map,ref List<TextBox> boxes){
+        public void deleteDeadToDot(ref Grid map, ref List<TextBox> boxes)
+        {
 
             List<Monster> updateState = map.rMon();
-                for(int j=map.rMon().Count-1;j>=0;j--)
-                {
+            for (int j = map.rMon().Count - 1; j >= 0; j--)
+            {
                 if (map.grid[map.getX(), map.getY()].checkIfDead(updateState[j], ref exp))
                 {
 
@@ -1368,7 +1646,7 @@ namespace BasicsOfGame
                     boxes.RemoveAt(j);
                     updateExp();
                 }
-                }
+            }
         }
         const int BLEED_CHANCE = 0;
         const int IGNITE_CHANCE = 1;
@@ -1376,34 +1654,34 @@ namespace BasicsOfGame
         const int SHOCK_CHANCE = 3;
         const int POISON_CHANCE = 4;
         const int STUN_CHANCE = 5;
-     
-        private void checkAttackCollision(ref Grid map, ref List<TextBox> boxes,System.Windows.Shapes.Rectangle skillBody,int damage,int[] statusEffects,bool canCrit)
+
+        private void checkAttackCollision(ref Grid map, ref List<TextBox> boxes, System.Windows.Shapes.Rectangle skillBody, int damage, int[] statusEffects, bool canCrit)
         {
-            if (Skill.hitsToDisappear <= 0) return;
-            int i = 0;
             
+            int i = 0;
+
             if (ignited)
             {
                 double igniteEffect = 1 - (0.2 * igniteResistance);
                 damage = Convert.ToInt32(damage * igniteEffect);
-                
+
             }
             List<Monster> updateState = map.rMon();
             foreach (Monster x in updateState)
             {
-                
+
 
                 int rand = getRand.Next(0, 100); // ONLY 1 check for better optimization
-                Rect hitbox = new Rect(Canvas.GetLeft(skillBody), Canvas.GetTop(skillBody), skillBody.ActualWidth, skillBody.ActualHeight);  ;
+                Rect hitbox = new Rect(Canvas.GetLeft(skillBody), Canvas.GetTop(skillBody), skillBody.ActualWidth, skillBody.ActualHeight); ;
                 Rect collisionChecker = new Rect(Canvas.GetLeft(x.getBody()), Canvas.GetTop(x.getBody()), x.getBody().ActualWidth, x.getBody().ActualHeight);
-                if (determinateCollision(hitbox, collisionChecker)&&Skill.hitsToDisappear>0)
+                if (determinateCollision(hitbox, collisionChecker) )
                 {
-                    
+                    if (!Skill.Fireball1hit && skillBody.Width == 50 && skillBody.Height == 50) return;
                     if (rand < statusEffects[BLEED_CHANCE])
                     {
                         double dmg = damage * 1.2 * (increasedDamage + increasedNonElementalDotDamage);
-                        x.addDot(dmg, 4000, "Bleed");
-                        
+                        x.addDot(dmg, 3000, "Bleed");
+
                     }
                     if (rand < statusEffects[IGNITE_CHANCE])
                     {
@@ -1419,14 +1697,14 @@ namespace BasicsOfGame
                     }
                     if (rand < statusEffects[SHOCK_CHANCE])
                     {
-                        double dmg =0;
+                        double dmg = 0;
                         x.addDot(dmg, 4000, "Shock");
 
                     }
                     if (rand < statusEffects[POISON_CHANCE])
                     {
                         double dmg = damage * 1.8 * (increasedDamage + increasedNonElementalDotDamage);
-                        x.addDot(dmg, 3000, "Bleed");
+                        x.addDot(dmg, 4000, "Poison");
 
                     }
                     if (rand < statusEffects[STUN_CHANCE])
@@ -1435,19 +1713,21 @@ namespace BasicsOfGame
                         x.addDot(dmg, 2400, "Stun");
 
                     }
-                    if (canCrit&& rand < criticalHitChance)
-                    { // 0 - 99 < 1 - 100
+                    if (canCrit && rand < criticalHitChance)
+                    {
                         damage = Convert.ToInt16(damage * criticalHitDamage);
+                        x.damageTaken(ref damage);
                         boxes[i].Text = damage.ToString() + "!";
                     }
                     else
                     {
+                        x.damageTaken(ref damage);
                         boxes[i].Text = damage.ToString();
                     }
 
 
 
-                    x.damageTaken(damage);
+
                     boxes[i].Foreground = Brushes.BlanchedAlmond;
                     boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 14;
                     boxes[i].Opacity = 1;
@@ -1456,7 +1736,7 @@ namespace BasicsOfGame
 
 
                     healPlayerBy(lifeGainOnHit);
-                    Skill.hitsToDisappear--;
+                    if (Skill.Fireball1hit&&skillBody.Width==50&&skillBody.Height==50) Skill.Fireball1hit = false;
                 }
 
 
@@ -1475,15 +1755,15 @@ namespace BasicsOfGame
                 }
             }
         }
-        private void checkAttackCollision(ref Grid map,ref List<TextBox> boxes)
+        private void checkAttackCollision(ref Grid map, ref List<TextBox> boxes)
         {
-            
+
             int i = 0;
-            int minDmgAfterCalc=minDmg;
-            int maxDmgAfterCalc=maxDmg;
+            int minDmgAfterCalc = minDmg;
+            int maxDmgAfterCalc = maxDmg;
             if (ignited)
             {
-                double igniteEffect=1-(0.2*igniteResistance);
+                double igniteEffect = 1 - (0.2 * igniteResistance);
                 minDmgAfterCalc = Convert.ToInt32(minDmg * igniteEffect);
                 maxDmgAfterCalc = Convert.ToInt32(maxDmg * igniteEffect);
             }
@@ -1498,32 +1778,38 @@ namespace BasicsOfGame
                 if (determinateCollision(hitbox, collisionChecker))
                 {
                     int dealtDmg = getRand.Next(minDmgAfterCalc, maxDmgAfterCalc + 1);
-                    if(getRand.Next(0,100)<chanceToInflictBleed){
-                        double dmg=dealtDmg*1.2*(increasedDamage+increasedNonElementalDotDamage);
-                        x.addDot(dmg,4000,"Bleed");
-                        boxes[i].Foreground=Brushes.PaleVioletRed;
+                    if (getRand.Next(0, 100) < chanceToInflictBleed)
+                    {
+                        double dmg = dealtDmg * 1.2 * (increasedDamage + increasedNonElementalDotDamage);
+                        x.addDot(dmg, 4000, "Bleed");
+                        boxes[i].Foreground = Brushes.PaleVioletRed;
                     }
-                    else{
-                        boxes[i].Foreground=Brushes.BlanchedAlmond;
+                    else
+                    {
+                        boxes[i].Foreground = Brushes.BlanchedAlmond;
                     }
-                    if(getRand.Next(0,100)<criticalHitChance){ // 0 - 99 < 1 - 100
-                        dealtDmg=Convert.ToInt16(dealtDmg*criticalHitDamage);
-                        boxes[i].Text = dealtDmg.ToString()+"!";
+                    if (getRand.Next(0, 100) < criticalHitChance)
+                    { // 0 - 99 < 1 - 100
+                        dealtDmg = Convert.ToInt16(dealtDmg * criticalHitDamage);
+                        x.damageTaken(ref dealtDmg);
+                        boxes[i].Text = dealtDmg.ToString() + "!";
                     }
-                     else{
+                    else
+                    {
+                        x.damageTaken(ref dealtDmg);
                         boxes[i].Text = dealtDmg.ToString();
                     }
-                    
-                   
-                        
-                        x.damageTaken(dealtDmg);
-                        
-                        boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 14;
-                        boxes[i].Opacity = 1;
-                        Canvas.SetLeft(boxes[i], Canvas.GetLeft(x.getBody()) + (x.getBody().ActualWidth / 2) - (boxes[i].Width / 2));
-                        Canvas.SetTop(boxes[i], (Canvas.GetTop(x.getBody()) - (x.getBody().Height - x.getBody().ActualHeight)) - (boxes[i].Height) - 15 );
 
-                    
+
+
+
+
+                    boxes[i].Width = Convert.ToInt16(boxes[i].Text.Length) * 14;
+                    boxes[i].Opacity = 1;
+                    Canvas.SetLeft(boxes[i], Canvas.GetLeft(x.getBody()) + (x.getBody().ActualWidth / 2) - (boxes[i].Width / 2));
+                    Canvas.SetTop(boxes[i], (Canvas.GetTop(x.getBody()) - (x.getBody().Height - x.getBody().ActualHeight)) - (boxes[i].Height) - 15);
+
+
                     healPlayerBy(lifeGainOnHit);
                 }
 
@@ -1551,18 +1837,20 @@ namespace BasicsOfGame
         {
             playerPassives.showSkillTree();
         }
-        private void healPlayerBy(double healAmount){
-            double expectedHealing=healAmount*healthRecoveryRate;
-            int healingGiven=Convert.ToInt16(healAmount*healthRecoveryRate);
-            overflowingHealing+=(expectedHealing-healingGiven);
-            if(overflowingHealing>1){
-                int additionalHealingDueToAccumulationOfOverlowingHealing=Convert.ToInt16(overflowingHealing);
-                healingGiven+=additionalHealingDueToAccumulationOfOverlowingHealing;
-                overflowingHealing-=additionalHealingDueToAccumulationOfOverlowingHealing;
+        private void healPlayerBy(double healAmount)
+        {
+            double expectedHealing = healAmount * healthRecoveryRate;
+            int healingGiven = Convert.ToInt16(healAmount * healthRecoveryRate);
+            overflowingHealing += (expectedHealing - healingGiven);
+            if (overflowingHealing > 1)
+            {
+                int additionalHealingDueToAccumulationOfOverlowingHealing = Convert.ToInt16(overflowingHealing);
+                healingGiven += additionalHealingDueToAccumulationOfOverlowingHealing;
+                overflowingHealing -= additionalHealingDueToAccumulationOfOverlowingHealing;
             }
             healthPoints += healingGiven;
-                if (healthPoints > maxHealthPoints) healthPoints = maxHealthPoints;
-                updateHpBar();
+            if (healthPoints > maxHealthPoints) healthPoints = maxHealthPoints;
+            updateHpBar();
         }
         private void updateExp()
         {
@@ -1570,19 +1858,22 @@ namespace BasicsOfGame
             {
                 exp -= 1000;
                 level++;
-                double lifeRestoredDueToLevelUp=maxHealthPoints*0.1;
+                double lifeRestoredDueToLevelUp = maxHealthPoints * 0.1;
                 healPlayerBy(lifeRestoredDueToLevelUp);
                 unassignedSkillPoints++;
-                
-                
+                if (level % 5 == 0 && skillsToPick < 5)
+                {
+                    skillsToPick ++;
+                }
+
             }
-            
-            expVisualization.Text = "lvl. "+level.ToString();
-            expBar.Width = Convert.ToInt32(Convert.ToDouble(exp)*0.2 );
-            
+
+            expVisualization.Text = "lvl. " + level.ToString();
+            expBar.Width = Convert.ToInt32(Convert.ToDouble(exp) * 0.2);
+
         }
 
-        private void attackOmni(double deltaTime,ref Grid map, ref List<TextBox> boxes)
+        private void attackOmni(double deltaTime, ref Grid map, ref List<TextBox> boxes)
         {
             if (stunned)
             {
@@ -1593,7 +1884,7 @@ namespace BasicsOfGame
             }
             if (ticksRemaining == 1)
             {
-                checkAttackCollision(ref map,ref boxes);
+                checkAttackCollision(ref map, ref boxes);
                 ticksRemaining--;
                 weapon.Fill = new SolidColorBrush(Colors.Transparent);
                 Speed = baseSpeed * deltaTime;
@@ -1625,6 +1916,6 @@ namespace BasicsOfGame
             }
         }
 
-       
+
     }
 }

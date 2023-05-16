@@ -192,6 +192,8 @@
    
     <None Remove="images\UI\Paint Layer 1.PNG" />
    
+    <None Remove="images\UI\SkillPicker.png" />
+   
     <None Remove="images\UI\Start.PNG" />
     <None Remove="images\UI\levelUpSprite.png" />
     <None Remove="images\UI\StartH.PNG" />
@@ -368,6 +370,7 @@
     <Resource Include="images\UI\Exit.PNG" />
     <Resource Include="images\UI\ExitH.PNG" />
     <Resource Include="images\UI\MenuBG.PNG" />
+    <Resource Include="images\UI\SkillPicker.png" />
     <Resource Include="images\UI\Start.PNG" />
     <Resource Include="images\UI\StartH.PNG" />
   
