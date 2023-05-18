@@ -103,6 +103,8 @@ namespace BasicsOfGame
             }
             if(e.Key == Key.D1)
             {
+                
+                Weapon c = new Weapon(new Random().Next(0,4));
                 System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
                 
                 mainCharacter.useFirstSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
