@@ -135,9 +135,9 @@ namespace BasicsOfGame
         }
     };
     
-    internal class BodyArmour // BASE ARMOUR
+    internal class BodyArmour // BASE ARMOUR 
     {
-        
+        const int NORMAL = 0;
         const int MAGIC = 1;
         const int RARE = 2;
         const int EPIC = 3;
