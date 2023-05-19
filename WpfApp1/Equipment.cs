@@ -189,9 +189,9 @@ namespace BasicsOfGame
         const int HEALTHRECOVERY = 1;
         const int LIFEGAINONHIT = 2;
         const int DECREASEDAMAGETAKEN = 3;
-        const int ICERESISTANCECHANCE = 4;
-        const int LIGHTNIGRESISTANCECHANCE = 5;
-        const int FIRERESISTANCECHANCE = 6;
+        const int STUNRESISTANCECHANCE = 4;
+        const int SHOCKRESISTANCECHANCE = 5;
+        const int IGNITERESISTANCECHANCE = 6;
         const int ELEMENTALRESISTANCECHANCE = 7;
         private Tuple<string, string, double> generateRandomStats()
         {
@@ -208,7 +208,7 @@ namespace BasicsOfGame
             else if (x == HEALTHRECOVERY)
             {
                 range = rnd.Next(3, 15);
-                returnMe = new Tuple<string, string, double>("healthRecoveryRate", "percent", range);
+                returnMe = new Tuple<string, string, double>("healthRecovery", "percent", range);
                 desc += "Increases your health recovery by " + range + " per second\n";
             }
             else if (x == LIFEGAINONHIT)
@@ -220,31 +220,31 @@ namespace BasicsOfGame
             else if (x == DECREASEDAMAGETAKEN)
             {
                 range = rnd.Next(3, 10);
-                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("DecreaseDamageTaken", "percent", range);
                 desc += "Decrease damage taken from hits by " + range + "%\n";
             }
-            else if (x == ICERESISTANCECHANCE)
+            else if (x == STUNRESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("StunResistance", "percent", range);
                 desc += "Duration of stun inflicted on you is decreased by " + range + "%\n";
             }
-            else if (x == LIGHTNIGRESISTANCECHANCE)
+            else if (x == SHOCKRESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("ShockResistance", "percent", range);
                 desc += "Reduces effect of shock inflicted on you by " + range + "%\n";
             }
-            else if (x == FIRERESISTANCECHANCE)
+            else if (x == IGNITERESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("IgniteResistance", "percent", range);
                 desc += "Reduces effect of ignite inflicted on you by" + range + "%\n";
             }
             else// (x == ELEMENTALRESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("ElementalResistance", "percent", range);
                 desc += "Reduces damage dealt by bleed and poison inflicted on you by " + range + "%\n";
             }
             return returnMe;
@@ -326,7 +326,7 @@ namespace BasicsOfGame
             else if (x == HEALTHRECOVERY)
             {
                 range = rnd.Next(3, 15);
-                returnMe = new Tuple<string, string, double>("healthRecoveryRate", "percent", range);
+                returnMe = new Tuple<string, string, double>("healthRecovery", "percent", range);
                 desc += "Increases your health recovery by " + range + " per second\n";
             }
             else if (x == COOLDOWNREDUCED)
@@ -344,7 +344,7 @@ namespace BasicsOfGame
             else// (x == DECREASEDAMAGETAKEN)
             {
                 range = rnd.Next(3, 10);
-                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("DecreaseDamageTaken", "percent", range);
                 desc += "Decrease damage taken from hits by " + range + "%\n";
             }
             return returnMe;
