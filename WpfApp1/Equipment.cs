@@ -29,8 +29,9 @@ namespace BasicsOfGame
             generateName(rarity); 
             minDamage =rnd.Next(minDamageMinimum,minDamageMaximum);
             maxDamage = rnd.Next(maxDamageMinimum, maxDamageMaximum);
-            desc += "Base damage: " + minDamage + " to " + maxDamage+"\nAdditional stats:\n";
-            for(int i=0;i<rarity;i++){ AdditionalStats.Add(generateRandomStats()); }
+            desc += "Base damage: " + minDamage + " to " + maxDamage+"\n";
+            if (rarity != NORMAL) desc += "Additional stats:\n";
+            for (int i=0;i<rarity;i++){ AdditionalStats.Add(generateRandomStats()); }
 
            
             MessageBox.Show(desc);
@@ -162,6 +163,121 @@ namespace BasicsOfGame
         const int MAGIC = 1;
         const int RARE = 2;
         const int EPIC = 3;
+        Random rnd = new Random();
+        int BaseCd; // 12-20
+        string desc = "";
+     
+        List<Tuple<string, string, double>> AdditionalStats;
+        public Jewellery(int rarity)
+        {
+
+            AdditionalStats = new List<Tuple<string, string, double>>();
+            generateName(rarity);
+            BaseCd = rnd.Next(12, 21);
+            
+            desc += "Cooldown Reduction: " + BaseCd + "%\n";
+            if(rarity!=NORMAL) desc += "Additional stats:\n";
+                
+            AdditionalStats.Add(new Tuple<string, string, double>("cooldownReduced","percent", BaseCd));
+            for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
+
+
+            MessageBox.Show(desc);
+
+
+        }
+       
+        private void generateName(int rarity)
+        {
+            string[] prefix = new string[] { "Golden", "Shining", "Rune", "Glutonous","Prismatic" };
+            string[] name = new string[] { "Ring", "Bracelet", "Necklace" };
+            string[] suffix = new string[] { "Hope", "Darkness", "White Moon", "Black Sun", "Foreseeing","Devil" };
+            if (rarity == NORMAL)
+            {
+                desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
+            }
+            if (rarity == MAGIC)
+            {
+                desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
+
+            }
+            if (rarity == RARE)
+            {
+                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+            }
+            if (rarity == EPIC)
+            {
+                desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+            }
+            desc += '\n';
+        }
+        const int MAXHEALTH = 0;
+        const int LIFEGAINONHIT = 1;
+        const int CRITDMG = 2;
+        const int CRITCHANCE = 3;
+        const int ITEMQUANTITY = 4;
+        const int ITEMRARITY = 5;
+        //const int BLEEDINGCHANCE = 6;
+        private Tuple<string, string, double> generateRandomStats()
+        {
+
+            int x = rnd.Next(0, 8);
+            int range;
+            Tuple<string, string, double> returnMe;
+            if (x == MAXHEALTH)
+            {
+                range = rnd.Next(20, 41);
+                returnMe = new Tuple<string, string, double>("maximumHealth", "flat", range);
+
+                desc += "Increases your max health by " + range + "\n";
+            }
+            else if (x == LIFEGAINONHIT)
+            {
+                range = rnd.Next(50, 101);
+                double afterConversion = Convert.ToDouble(range) / 100;
+                
+                returnMe = new Tuple<string, string, double>("lifeGainOnHit", "flat", afterConversion);
+                desc += "Gain " + afterConversion + " life for each enemy hit.\n";
+            }
+            else if (x == CRITDMG)
+            {
+                range = rnd.Next(15, 31);
+                returnMe = new Tuple<string, string, double>("criticalDamage", "percent", range);
+                desc += "Increases your critical damage by " + range + "%\n";
+            }
+            else if (x == CRITCHANCE)
+            {
+                range = rnd.Next(5, 10);
+                returnMe = new Tuple<string, string, double>("absoluteCriticalHitChance", "percent", range);
+                desc += "Increases your critical strike chance by " + range + "%\n";
+            }
+            else if (x == ITEMQUANTITY)
+            {
+                range = rnd.Next(10, 21);
+                returnMe = new Tuple<string, string, double>("itemQuantity", "percent", range);
+                desc += "Increases your chance to drop items " + range + "%\n";
+            }
+            else if (x == ITEMRARITY)
+            {
+                range = rnd.Next(20, 41);
+                returnMe = new Tuple<string, string, double>("itemQuality", "percent", range);
+                desc += "Increases quality of items dropped by " + range + "%\n";
+            }
+            else
+            {
+                range = rnd.Next(8, 17);
+                returnMe = new Tuple<string, string, double>("bleedingChance", "percent", range);
+                desc += "+ " + range + "% chance to inflict bleeding on hit.\n";
+            }
+            return returnMe;
+        }
+      
+        public List<Tuple<string, string, double>> getStats() { return AdditionalStats; }
+        public string description()
+        {
+
+            return desc;
+        }
     };
 
 
