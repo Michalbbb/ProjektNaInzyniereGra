@@ -143,7 +143,7 @@ namespace BasicsOfGame
         const int RARE = 2;
         const int EPIC = 3;
         Random rnd = new Random();
-        int minArmour; // 5-25
+        int BaseArmour; // 5-25
         string desc = "";
         const int minArmourMinimum = 3;
         const int minArmourMaximum = 12;
@@ -153,8 +153,9 @@ namespace BasicsOfGame
 
             AdditionalStats = new List<Tuple<string, string, double>>();
             generateName(rarity);
-            minArmour = rnd.Next(minArmourMinimum, minArmourMaximum);
-            desc += "Base Armour: " + minArmour + "\nAdditional stats:\n";
+            BaseArmour = rnd.Next(minArmourMinimum, minArmourMaximum);
+            desc += "Base Armour: " + BaseArmour + "\nAdditional stats:\n";
+            AdditionalStats.Add(new Tuple<string, string, double>("cooldownReduced", "percent", BaseArmour));
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
             MessageBox.Show(desc);
@@ -187,8 +188,11 @@ namespace BasicsOfGame
         const int MAXHEALTH = 0;
         const int HEALTHRECOVERY = 1;
         const int LIFEGAINONHIT = 2;
-        const int RESISTANCECHANCE = 3;
-
+        const int DECREASEDAMAGETAKEN = 3;
+        const int ICERESISTANCECHANCE = 4;
+        const int LIGHTNIGRESISTANCECHANCE = 5;
+        const int FIRERESISTANCECHANCE = 6;
+        const int ELEMENTALRESISTANCECHANCE = 7;
         private Tuple<string, string, double> generateRandomStats()
         {
 
@@ -211,18 +215,40 @@ namespace BasicsOfGame
             {
                 range = rnd.Next(5, 25);
                 returnMe = new Tuple<string, string, double>("lifeGainOnHit", "percent", range);
-                desc += "Increases how much life you gain when you hit an enemy by " + range + "%\n";
+                desc += "Every time you hit enemy, recover life by" + range + "%\n";
             }
-            else// (x == RESISTANCECHANCE)
+            else if (x == DECREASEDAMAGETAKEN)
             {
-                range = rnd.Next(5, 15);
+                range = rnd.Next(3, 10);
                 returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
-                desc += "Increases your resistance to all debuffs by " + range + "%\n";
+                desc += "Decrease damage taken from hits by " + range + "%\n";
+            }
+            else if (x == ICERESISTANCECHANCE)
+            {
+                range = rnd.Next(10, 26);
+                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                desc += "Duration of stun inflicted on you is decreased by " + range + "%\n";
+            }
+            else if (x == LIGHTNIGRESISTANCECHANCE)
+            {
+                range = rnd.Next(10, 26);
+                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                desc += "Reduces effect of shock inflicted on you by " + range + "%\n";
+            }
+            else if (x == FIRERESISTANCECHANCE)
+            {
+                range = rnd.Next(10, 26);
+                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                desc += "Reduces effect of ignite inflicted on you by" + range + "%\n";
+            }
+            else// (x == ELEMENTALRESISTANCECHANCE)
+            {
+                range = rnd.Next(10, 26);
+                returnMe = new Tuple<string, string, double>("debuffResistance", "percent", range);
+                desc += "Reduces damage dealt by bleed and poison inflicted on you by " + range + "%\n";
             }
             return returnMe;
         }
-
-        public int getMinArmour() { return minArmour; }
         public List<Tuple<string, string, double>> getStats() { return AdditionalStats; }
         public string description()
         {
@@ -237,7 +263,7 @@ namespace BasicsOfGame
         const int RARE = 2;
         const int EPIC = 3;
         Random rnd = new Random();
-        double minStunResistance; // 5-25
+        double BaseStunResistance; // 5-25
         string desc = "";
         const int minStunResistanceMinimum = 5;
         const int minStunResistanceMaximum = 26;
@@ -247,8 +273,9 @@ namespace BasicsOfGame
 
             AdditionalStats = new List<Tuple<string, string, double>>();
             generateName(rarity);
-            minStunResistance = rnd.Next(minStunResistanceMinimum, minStunResistanceMaximum);
-            desc += "Base Armour: " + minStunResistance + "\nAdditional stats:\n";
+            BaseStunResistance = rnd.Next(minStunResistanceMinimum, minStunResistanceMaximum);
+            desc += "Base Armour: " + BaseStunResistance + "\nAdditional stats:\n";
+            AdditionalStats.Add(new Tuple<string, string, double>("cooldownReduced", "percent", BaseStunResistance));
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
             MessageBox.Show(desc);
@@ -323,7 +350,6 @@ namespace BasicsOfGame
             return returnMe;
         }
 
-        public double getMinStunResistance() { return minStunResistance; }
         public List<Tuple<string, string, double>> getStats() { return AdditionalStats; }
         public string description()
         {
