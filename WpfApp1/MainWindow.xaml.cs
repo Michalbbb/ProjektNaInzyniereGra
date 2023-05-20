@@ -54,6 +54,17 @@ namespace BasicsOfGame
 
         private void KeyboardDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape)
+            {
+                if (tryingAssign)
+                {
+                    mainCharacter.hideSkillTree();
+                    tryingAssign = false;
+                }
+                else SwitchState();
+
+            }
+            if (!isGameRunning) {e.Handled=true; return; }
             if (e.Key == Key.W && e.Key != Key.S)
             {
                 UpKey = true;
@@ -92,20 +103,16 @@ namespace BasicsOfGame
                     mainCharacter.showSkillTree();
                 }
             }
-            if (e.Key == Key.Escape)
-            {
-                if(tryingAssign){
-                    mainCharacter.hideSkillTree();
-                tryingAssign = false;
-                }
-                else SwitchState();
-                
-            }
+            
             if(e.Key == Key.D1)
             {
-                //Helmet c = new Helmet(new Random().Next(0, 4));
-                BodyArmour c = new BodyArmour(new Random().Next(0, 4));
-                //Jewellery c = new Jewellery(new Random().Next(0,4));
+                Inventory inv = new Inventory();
+                for(int i = 0; i < 5; i++)
+                {
+                    inv.addEquipment(new Equipment(new Random().Next(0, 5), new Random().Next(0, 4)));
+
+                }
+                MessageBox.Show(inv.sum());
                 System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
                 
                 mainCharacter.useFirstSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
@@ -177,7 +184,7 @@ namespace BasicsOfGame
             {
                 LeftKey = false;
             }
-            if (e.Key == Key.Tab)
+            if (e.Key == Key.Tab&&isGameRunning)
             {
                 miniMapHolder.Opacity = 0;
                 map.miniMapClear();
@@ -348,7 +355,7 @@ namespace BasicsOfGame
         }
           void MainWindowPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Tab)
+            if(e.Key == Key.Tab&&isGameRunning)
             {
                map.showMiniMap(miniMapHolder);
                 miniMapHolder.Opacity = 0.3;

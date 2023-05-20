@@ -17,6 +17,7 @@ namespace BasicsOfGame
         int minDamage; // 10-14
         int maxDamage; // 15-18
         string desc="";
+        string rarityOfItem;
         const int minDamageMinimum = 10;
         const int minDamageMaximum = 15;
         const int maxDamageMinimum = 15;
@@ -34,7 +35,6 @@ namespace BasicsOfGame
             for (int i=0;i<rarity;i++){ AdditionalStats.Add(generateRandomStats()); }
 
            
-            MessageBox.Show(desc);
            
             
         }
@@ -53,19 +53,22 @@ namespace BasicsOfGame
             if(rarity == NORMAL)
             {
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
+                rarityOfItem = "Normal";
             }
             if (rarity == MAGIC)
             {
                 desc += "(MAGIC)\n" + prefix[rnd.Next(0,prefix.Length-1)] +" "+ name[rnd.Next(0, name.Length - 1)];
-
+                rarityOfItem = "Magic";
             }
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)]+" of "+suffix[rnd.Next(0,suffix.Length-1)];
+                rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Epic";
             }
             desc += '\n';
         }
@@ -134,6 +137,10 @@ namespace BasicsOfGame
 
             return desc;
         }
+        public string returnRarity()
+        {
+            return rarityOfItem;
+        }
     };
 
     internal class BodyArmour // BASE ARMOUR 
@@ -142,6 +149,7 @@ namespace BasicsOfGame
         const int MAGIC = 1;
         const int RARE = 2;
         const int EPIC = 3;
+        string rarityOfItem;
         Random rnd = new Random();
         int BaseArmour; // 5-25
         string desc = "";
@@ -155,10 +163,9 @@ namespace BasicsOfGame
             generateName(rarity);
             BaseArmour = rnd.Next(minArmourMinimum, minArmourMaximum);
             desc += "Base Armour: " + BaseArmour + "\nAdditional stats:\n";
-            AdditionalStats.Add(new Tuple<string, string, double>("cooldownReduced", "percent", BaseArmour));
+            AdditionalStats.Add(new Tuple<string, string, double>("armour", "flat", BaseArmour));
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
-            MessageBox.Show(desc);
         }
         private void generateName(int rarity)
         {
@@ -168,19 +175,22 @@ namespace BasicsOfGame
             if (rarity == NORMAL)
             {
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
+                rarityOfItem = "Normal";
             }
             if (rarity == MAGIC)
             {
                 desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-
+                rarityOfItem = "Magic";
             }
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Epic";
             }
             desc += '\n';
         }
@@ -208,43 +218,45 @@ namespace BasicsOfGame
             else if (x == HEALTHRECOVERY)
             {
                 range = rnd.Next(3, 15);
-                returnMe = new Tuple<string, string, double>("healthRecovery", "percent", range);
-                desc += "Increases your health recovery by " + range + " per second\n";
+                returnMe = new Tuple<string, string, double>("healthRecoveryRate", "percent", range);
+                desc += "Increases amount of healing you are getting by " + range + "%\n";
             }
             else if (x == LIFEGAINONHIT)
             {
-                range = rnd.Next(5, 25);
-                returnMe = new Tuple<string, string, double>("lifeGainOnHit", "percent", range);
-                desc += "Every time you hit enemy, recover life by" + range + "%\n";
+                range = rnd.Next(75, 126);
+                double afterConversion = Convert.ToDouble(range) / 100;
+
+                returnMe = new Tuple<string, string, double>("lifeGainOnHit", "flat", afterConversion);
+                desc += "Gain " + afterConversion + " life for each enemy hit.\n";
             }
             else if (x == DECREASEDAMAGETAKEN)
             {
                 range = rnd.Next(3, 10);
-                returnMe = new Tuple<string, string, double>("DecreaseDamageTaken", "percent", range);
+                returnMe = new Tuple<string, string, double>("decreaseDamageTaken", "percent", range);
                 desc += "Decrease damage taken from hits by " + range + "%\n";
             }
             else if (x == STUNRESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("StunResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("selfStunEffect", "percent", range);
                 desc += "Duration of stun inflicted on you is decreased by " + range + "%\n";
             }
             else if (x == SHOCKRESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("ShockResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("selfShockEffect", "percent", range);
                 desc += "Reduces effect of shock inflicted on you by " + range + "%\n";
             }
             else if (x == IGNITERESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("IgniteResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("selfIgniteEffect", "percent", range);
                 desc += "Reduces effect of ignite inflicted on you by" + range + "%\n";
             }
             else// (x == ELEMENTALRESISTANCECHANCE)
             {
                 range = rnd.Next(10, 26);
-                returnMe = new Tuple<string, string, double>("ElementalResistance", "percent", range);
+                returnMe = new Tuple<string, string, double>("selfNonElementalDotDamageEffect", "percent", range);
                 desc += "Reduces damage dealt by bleed and poison inflicted on you by " + range + "%\n";
             }
             return returnMe;
@@ -255,6 +267,10 @@ namespace BasicsOfGame
 
             return desc;
         }
+        public string returnRarity()
+        {
+            return rarityOfItem;
+        }
     };
     internal class Helmet // BASE STUN RESISTANCE 
     {
@@ -262,11 +278,12 @@ namespace BasicsOfGame
         const int MAGIC = 1;
         const int RARE = 2;
         const int EPIC = 3;
+        string rarityOfItem;
         Random rnd = new Random();
         double BaseStunResistance; // 5-25
         string desc = "";
-        const int minStunResistanceMinimum = 5;
-        const int minStunResistanceMaximum = 26;
+        const int minStunResistanceMinimum = 15;
+        const int minStunResistanceMaximum = 31;
         List<Tuple<string, string, double>> AdditionalStats;
         public Helmet(int rarity)
         {
@@ -274,11 +291,10 @@ namespace BasicsOfGame
             AdditionalStats = new List<Tuple<string, string, double>>();
             generateName(rarity);
             BaseStunResistance = rnd.Next(minStunResistanceMinimum, minStunResistanceMaximum);
-            desc += "Base Armour: " + BaseStunResistance + "\nAdditional stats:\n";
-            AdditionalStats.Add(new Tuple<string, string, double>("cooldownReduced", "percent", BaseStunResistance));
+            desc += "Stun resistance: " + BaseStunResistance + "\nAdditional stats:\n";
+            AdditionalStats.Add(new Tuple<string, string, double>("selfStunEffect", "percent", BaseStunResistance));
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
-            MessageBox.Show(desc);
         }
         private void generateName(int rarity)
         {
@@ -288,19 +304,22 @@ namespace BasicsOfGame
             if (rarity == NORMAL)
             {
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
+                rarityOfItem = "Normal";
             }
             if (rarity == MAGIC)
             {
                 desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-
+                rarityOfItem = "Magic";
             }
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Epic";
             }
             desc += '\n';
         }
@@ -319,32 +338,32 @@ namespace BasicsOfGame
             Tuple<string, string, double> returnMe;
             if (x == MAXHEALTH)
             {
-                range = rnd.Next(10, 40);
+                range = rnd.Next(10, 41);
                 returnMe = new Tuple<string, string, double>("maximumHealth", "percent", range);
                 desc += "Increases your maximum health by " + range + " health points\n";
             }
             else if (x == HEALTHRECOVERY)
             {
-                range = rnd.Next(3, 15);
-                returnMe = new Tuple<string, string, double>("healthRecovery", "percent", range);
-                desc += "Increases your health recovery by " + range + " per second\n";
+                range = rnd.Next(15, 26);
+                returnMe = new Tuple<string, string, double>("healthRecoveryRate", "percent", range);
+                desc += "Increases amount of healing you are getting by " + range + "%\n";
             }
             else if (x == COOLDOWNREDUCED)
             {
-                range = rnd.Next(5, 20);
-                returnMe = new Tuple<string, string, double>("lifeGainOnHit", "percent", range);
+                range = rnd.Next(5, 21);
+                returnMe = new Tuple<string, string, double>("cooldownReduced", "percent", range);
                 desc += "Decreases your active skills cooldown time by " + range + "%\n";
             }
             else if (x == DAMAGEPERDEBUFF)
             {
-                range = rnd.Next(10, 25);
-                returnMe = new Tuple<string, string, double>("lifeGainOnHit", "percent", range);
+                range = rnd.Next(10, 26);
+                returnMe = new Tuple<string, string, double>("damagePerDebuff", "percent", range);
                 desc += "For every type of debuff on you, increase your dmg by " + range + "%\n";
             }
             else// (x == DECREASEDAMAGETAKEN)
             {
-                range = rnd.Next(3, 10);
-                returnMe = new Tuple<string, string, double>("DecreaseDamageTaken", "percent", range);
+                range = rnd.Next(3, 11);
+                returnMe = new Tuple<string, string, double>("decreaseDamageTaken", "percent", range);
                 desc += "Decrease damage taken from hits by " + range + "%\n";
             }
             return returnMe;
@@ -355,6 +374,10 @@ namespace BasicsOfGame
         {
 
             return desc;
+        }
+        public string returnRarity()
+        {
+            return rarityOfItem;
         }
     };
     internal class Boots // BASE MOVEMENT SPEED
@@ -370,6 +393,7 @@ namespace BasicsOfGame
         const int MAGIC = 1;
         const int RARE = 2;
         const int EPIC = 3;
+        string rarityOfItem;
         Random rnd = new Random();
         int BaseCd; // 12-20
         string desc = "";
@@ -389,7 +413,6 @@ namespace BasicsOfGame
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
 
-            MessageBox.Show(desc);
 
 
         }
@@ -402,19 +425,22 @@ namespace BasicsOfGame
             if (rarity == NORMAL)
             {
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
+                rarityOfItem = "Normal";
             }
             if (rarity == MAGIC)
             {
                 desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-
+                rarityOfItem = "Normal";
             }
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Epic";
             }
             desc += '\n';
         }
@@ -484,6 +510,10 @@ namespace BasicsOfGame
         {
 
             return desc;
+        }
+        public string returnRarity()
+        {
+            return rarityOfItem;
         }
     };
 

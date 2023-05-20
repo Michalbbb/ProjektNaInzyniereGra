@@ -482,6 +482,8 @@ namespace BasicsOfGame
             currX = gridMid;
             currY = gridMid;
             int type=1; // from now onwards we generate type of room in generateDoors
+            
+
             while (roomCount > 0)
             {
                 direction = rnd.Next(0, 4);
@@ -544,6 +546,7 @@ namespace BasicsOfGame
                 }
 
             }
+            
             generateDoors(canv);
         }
         public void updateMiniMap(GroupBox c)  //minimapa
@@ -746,6 +749,7 @@ namespace BasicsOfGame
             grid[currX, currY].setVisited(true);
             grid[currX, currY].makeMap(GameScreen, ref leftDoorExist, ref rightDoorExist, ref upDoorExist, ref downDoorExist, doorDirection);
         }
+       
         private void generateDoors(Canvas canv)
         {
             Random generateType=new Random();
@@ -789,10 +793,14 @@ namespace BasicsOfGame
                 }
                 if(unlock)diff += 0.05;
             }
+            
             grid[lastDoor/10,lastDoor%10].setType(2);
             grid[lastDoor/10,lastDoor%10].changeRoomUsage("bossRoom");
             grid[lastDoor / 10, lastDoor % 10].setDiff(0.20);
+            
         }
+       
+
         private bool CheckRoom(int x, int y)
         {
             if (grid[x, y].getType() != 0)

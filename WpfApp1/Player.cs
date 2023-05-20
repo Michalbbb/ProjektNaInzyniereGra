@@ -643,6 +643,7 @@ namespace BasicsOfGame
             {
                 if (skills.Item1 == "absoluteCriticalHitChance") { criticalHitChanceCalculations = new Tuple<int, double, double>(criticalHitChanceCalculations.Item1, criticalHitChanceCalculations.Item2 + skills.Item3, criticalHitChanceCalculations.Item3); }
                 if (skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2 + equippedPieces * skills.Item3, armourCalculations.Item3); }
+                if (skills.Item1 == "armour") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2 + skills.Item3, armourCalculations.Item3); }
                 if (skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2 + skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2 + skills.Item3); }
                 if (skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2 + skills.Item3); }
                 if (skills.Item1 == "cooldownReduced") { cooldownTimeForActiveSkillsCalculations = new Tuple<double, double>(cooldownTimeForActiveSkillsCalculations.Item1, cooldownTimeForActiveSkillsCalculations.Item2 + (skills.Item3 / 100)); }
