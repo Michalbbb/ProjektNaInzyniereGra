@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -386,7 +387,126 @@ namespace BasicsOfGame
         const int MAGIC = 1;
         const int RARE = 2;
         const int EPIC = 3;
+        string rarityOfItem;
+        Random rnd = new Random();
+        double MovementSpeed;
+        string desc="";
+        const int minMovementSpeed = 10;
+        const int maxMovementSpeed = 30;
+        List<Tuple<string, string, double>> AdditionalStats;
+        double BaseMovementSpeed;
+        public Boots(int rarity)
+        {
+
+            AdditionalStats = new List<Tuple<string, string, double>>();
+            generateName(rarity);
+            BaseMovementSpeed = rnd.Next(minMovementSpeed, maxMovementSpeed);
+            desc += "Increases movement speed by  " + BaseMovementSpeed + "% \n Additional stats:\n";
+            AdditionalStats.Add(new Tuple<string, string, double>("selfSpeedEffect", "percent", BaseMovementSpeed));
+            for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
+
+        }
+        private void generateName(int rarity)
+        {
+            string[] prefix = new string[] { "Leather", "Mail", "Black", "Iron", "Bronze",  };
+            string[] name = new string[] { "Greaves", "Boots", "Sandals", "Clogs" };
+            string[] suffix = new string[] {  "Black Lord", "Warrior", "Lightness", "Black Lord", "Citizen General" };
+            if (rarity == NORMAL)
+            {
+                desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
+                rarityOfItem = "Normal";
+            }
+            if (rarity == MAGIC)
+            {
+                desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
+                rarityOfItem = "Magic";
+            }
+            if (rarity == RARE)
+            {
+                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Rare";
+            }
+            if (rarity == EPIC)
+            {
+                desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Epic";
+            }
+            desc += '\n';
+        }
+
+        const int MAXHEALTH = 0; 
+        const int ATTACKSPEED = 1; //nie Fast hand;Increases your attack speed by;passive4;attackSpeed;percent;3;attackSpeed;percent;7;attackSpeed;percent;15;
+        const int COOLDOWNREDUCED = 2;
+        const int CRITICALHITCHANCE = 3; //nie Precison;Increases your critical hit chance by +|(Default critical hit chance is equal to 0% );passive3;absoluteCriticalHitChance;percent;5;absoluteCriticalHitChance;percent;15;absoluteCriticalHitChance;percent;30;
+
+        const int DECREASEDAMAGETAKEN = 4;
+        private Tuple<string, string, double> generateRandomStats()
+        {
+
+            int x = rnd.Next(0, 4);
+            int range;
+            Tuple<string, string, double> returnMe;
+            if (x == MAXHEALTH)
+            {
+                range = rnd.Next(10, 20);
+                returnMe = new Tuple<string, string, double>("maximumHealth", "percent", range);
+                desc += "Increases your maximum health by " + range + " health points\n";
+            }
+            else if (x == ATTACKSPEED)
+            {
+                range = rnd.Next(5, 20);
+                returnMe = new Tuple<string, string, double>("attackSpeed", "percent", range);
+                desc += "Increases your attack speed by  " + range + "%\n";
+            }
+            else if (x == COOLDOWNREDUCED)
+            {
+                range = rnd.Next(5, 15);
+                returnMe = new Tuple<string, string, double>("cooldownReduced", "percent", range);
+                desc += "Decreases your active skills cooldown time by " + range + "%\n";
+            }
+            else if (x == CRITICALHITCHANCE)
+            {
+                range = rnd.Next(2, 10);
+                returnMe = new Tuple<string, string, double>("absoluteCriticalHitChance", "percent", range);
+                desc += "Increases your critical hit chance by " + range + "%\n";
+            }
+            else// (x == DECREASEDAMAGETAKEN)
+            {
+                range = rnd.Next(3, 11);
+                returnMe = new Tuple<string, string, double>("decreaseDamageTaken", "percent", range);
+                desc += "Decrease damage taken from hits by " + range + "%\n";
+            }
+            return returnMe;
+        }
+        public List<Tuple<string, string, double>> getStats() { return AdditionalStats; }
+        public string description()
+        {
+
+            return desc;
+        }
+        public string returnRarity()
+        {
+            return rarityOfItem;
+        }
     };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     internal class Jewellery // BASE COOLDOWN
     {
         const int NORMAL = 0;

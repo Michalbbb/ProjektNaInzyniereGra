@@ -82,15 +82,17 @@ namespace BasicsOfGame
             }
             if (type == BOOTS) 
             {
-                slot = "Inwork";
-                addedSkills = new List<Tuple<string, string, double>>();
-                desc = "Still in work";
+                slot = "Boots";
+                Boots temp = new Boots(rarity);
+                addedSkills = temp.getStats();
+                desc = temp.description();
                 sprite = new ImageBrush(); // here should be absolute path for sprite
+                itemRarity = temp.returnRarity();
             }
             else // JEWELLERY 
             {
-                slot = "Boots";
-                Helmet temp = new Helmet(rarity);
+                slot = "JewelleryJewellery";
+                Jewellery temp = new Jewellery(rarity);
                 addedSkills = temp.getStats();
                 desc = temp.description();
                 sprite = new ImageBrush(); // here should be absolute path for sprite
