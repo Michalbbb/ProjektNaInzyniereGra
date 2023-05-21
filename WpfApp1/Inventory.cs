@@ -300,7 +300,7 @@ namespace BasicsOfGame
                 desc = temp.description();
                 clickToEquipItem.Style = (Style)Application.Current.MainWindow.FindResource("IButton");
                 sprite = new ImageBrush(); // here should be absolute path for sprite
-                sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/items/Pierscien.png", UriKind.Absolute));
+                sprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/items/Zbroja.png", UriKind.Absolute));
                 clickToEquipItem.Background = sprite;
                 itemRarity = temp.returnRarity();
             }
