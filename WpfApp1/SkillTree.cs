@@ -326,7 +326,7 @@ namespace BasicsOfGame
         static TextBox assignedCurrently;
         private int skillPointsAtTimeOfClick;
         private int assignedSkillPointsAtTimeOfClick;
-        public event Action<List<Tuple<string,string,double>>> updateStats; 
+        public  Action requestStatsRecalculation; 
         public SkillTree(Canvas canvas)
         {
             currentCanvas = canvas;
@@ -445,12 +445,23 @@ namespace BasicsOfGame
                 if(pas.isAnyStageAllocated())listOfSkills.Add(pas.getPropertiesOfPassive());
                 
             }
-           
-            updateStats.Invoke(listOfSkills);
+
+            requestStatsRecalculation.Invoke();
             hideSkillTree();
            
         }
+        public List<Tuple<string, string, double>> getStats()
+        {
+            List<Tuple<string, string, double>> listOfSkills = new List<Tuple<string, string, double>>();
+            foreach (Passive pas in skills)
+            {
+                pas.saveChanges();
+                if (pas.isAnyStageAllocated()) listOfSkills.Add(pas.getPropertiesOfPassive());
 
+            }
+            return listOfSkills;
+
+        }
         private void hideST(object sender, RoutedEventArgs e)
         {
             foreach (Passive pas in skills) pas.discardChanges();

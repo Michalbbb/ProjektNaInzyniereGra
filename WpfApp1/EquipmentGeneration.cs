@@ -156,6 +156,7 @@ namespace BasicsOfGame
         string desc = "";
         const int minArmourMinimum = 3;
         const int minArmourMaximum = 12;
+        
         List<Tuple<string, string, double>> AdditionalStats;
         public BodyArmour(int rarity)
         {
@@ -163,8 +164,9 @@ namespace BasicsOfGame
             AdditionalStats = new List<Tuple<string, string, double>>();
             generateName(rarity);
             BaseArmour = rnd.Next(minArmourMinimum, minArmourMaximum);
-            desc += "Base Armour: " + BaseArmour + "\nAdditional stats:\n";
+            desc += "Base Armour: " + BaseArmour + "\n";
             AdditionalStats.Add(new Tuple<string, string, double>("armour", "flat", BaseArmour));
+            if (rarity != NORMAL) desc += "Additional stats:\n";
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
         }
@@ -178,6 +180,7 @@ namespace BasicsOfGame
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
+          
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
@@ -292,8 +295,9 @@ namespace BasicsOfGame
             AdditionalStats = new List<Tuple<string, string, double>>();
             generateName(rarity);
             BaseStunResistance = rnd.Next(minStunResistanceMinimum, minStunResistanceMaximum);
-            desc += "Stun resistance: " + BaseStunResistance + "\nAdditional stats:\n";
+            desc += "Reduces stun duration on you by additonal " + BaseStunResistance + "%\n";
             AdditionalStats.Add(new Tuple<string, string, double>("selfStunEffect", "percent", BaseStunResistance));
+            if(rarity!=NORMAL)desc += "Additional stats:\n";
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
         }
@@ -307,6 +311,7 @@ namespace BasicsOfGame
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
+            
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
@@ -401,8 +406,9 @@ namespace BasicsOfGame
             AdditionalStats = new List<Tuple<string, string, double>>();
             generateName(rarity);
             BaseMovementSpeed = rnd.Next(minMovementSpeed, maxMovementSpeed);
-            desc += "Increases movement speed by  " + BaseMovementSpeed + "% \n Additional stats:\n";
+            desc += "Increases movement speed by  " + BaseMovementSpeed + "% \n";
             AdditionalStats.Add(new Tuple<string, string, double>("movementSpeed", "percent", BaseMovementSpeed));
+            if (rarity != NORMAL) desc += "Additional stats:\n";
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
         }
@@ -416,6 +422,7 @@ namespace BasicsOfGame
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
+           
             if (rarity == RARE)
             {
                 desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];

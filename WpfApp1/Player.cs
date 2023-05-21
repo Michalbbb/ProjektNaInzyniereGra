@@ -83,7 +83,7 @@ namespace BasicsOfGame
         const int RIGHTDOOR = 1;
         const int DOWNDOOR = 2;
         const int LEFTDOOR = 3;
-        int equippedPieces;
+        
         double damageIncreasedPerDebuff;
         double itemQuantity;
         double itemQuality;
@@ -166,7 +166,7 @@ namespace BasicsOfGame
 
         public Player(Canvas GS)
         {
-            playerInventory = new Inventory(GS);
+            
             descActiveSkills=new TextBox();
             descActiveSkills.Text = "PICK ONE SKILL";
             descActiveSkills.FontFamily = new FontFamily("Algerian");
@@ -296,7 +296,7 @@ namespace BasicsOfGame
             shockResistance = 1;
             stunResistance = 1;
             nonElementalDotResistance = 1;
-            equippedPieces = 0;
+            
             itemQuantity = 1;
             itemQuality = 1;
             healthRecoveryRate = 1.0;
@@ -335,8 +335,10 @@ namespace BasicsOfGame
             unassignedSkillPoints = 0;
             assignedSkillPoints = 0;
             killedBy = "Damage over time";
+            playerInventory = new Inventory(GS);
             playerPassives = new SkillTree(GS);
-            playerPassives.updateStats += updateStats;
+            playerPassives.requestStatsRecalculation += updateStats;
+            playerInventory.requestStatRecalculation += updateStats;
             isDead = false;
             lastDamage = 1;
             level = 1;
@@ -396,6 +398,9 @@ namespace BasicsOfGame
             }
 
         }
+
+        
+
         public void generateRandomItems()
         {
 
@@ -412,6 +417,7 @@ namespace BasicsOfGame
         private void CloseEquipment_Click(object sender, RoutedEventArgs e)
         {
             closeEquipment();
+            GameScreen.Focus();
             e.Handled = true;
         }
 
@@ -621,19 +627,19 @@ namespace BasicsOfGame
             playerStatsHolder.Text += "\nIncreased ice damage: " + Math.Round((increasedIceDamage) * 100, 0).ToString() + "%";
             playerStatsHolder.Text += "\nIncreased bleeding and poison damage: " + Math.Round((increasedNonElementalDotDamage) * 100).ToString() + "%";
             playerStatsHolder.Text += "\nChance to inflict bleed on hit: " + (chanceToInflictBleed).ToString() + "%";
-            playerStatsHolder.Text += "\nAttack speed: " + (100 + attackSpeedCalculations.Item2).ToString() + "% of base";
+            playerStatsHolder.Text += "\nAttack speed: " + Math.Round((100 + attackSpeedCalculations.Item2),0).ToString() + "% of base";
             playerStatsHolder.Text += "\nCritical hit chance: " + criticalHitChance.ToString() + "%";
-            playerStatsHolder.Text += "\nCritical hit damage: " + (criticalHitDamage * 100).ToString() + "% of non critical damage";
+            playerStatsHolder.Text += "\nCritical hit damage: " + Math.Round((criticalHitDamage * 100),0).ToString() + "% of non critical damage";
             playerStatsHolder.Text += "\nArmour:" + armour.ToString();
             playerStatsHolder.Text += "\nMax life: " + maxHealthPoints.ToString();
-            playerStatsHolder.Text += "\nDamage Reduction from hits: " + (damageTakenReduction * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nDamage Reduction from hits: " + Math.Round((damageTakenReduction * 100),0).ToString() + "%";
             playerStatsHolder.Text += "\nLife recovery rate: " + Math.Round(healthRecoveryRate * 100, 0).ToString() + "%";
-            playerStatsHolder.Text += "\nIgnite effect reduction: " + ((1 - igniteResistance) * 100).ToString() + "%";
-            playerStatsHolder.Text += "\nShock effect reduction: " + ((1 - shockResistance) * 100).ToString() + "%";
-            playerStatsHolder.Text += "\nStun duration reduction: " + ((1 - stunResistance) * 100).ToString() + "%";
-            playerStatsHolder.Text += "\nBleed and poison effect reduction: " + ((1 - nonElementalDotResistance) * 100).ToString() + "%";
-            playerStatsHolder.Text += "\nMovement speed: " + baseSpeed.ToString() + "%";
-            playerStatsHolder.Text += "\nCooldown Reduction: " + (cooldownTimeForActiveSkillsCalculations.Item2 * 100).ToString() + "%";
+            playerStatsHolder.Text += "\nIgnite effect reduction: " + Math.Round(((1 - igniteResistance) * 100),0).ToString() + "%";
+            playerStatsHolder.Text += "\nShock effect reduction: " + Math.Round(((1 - shockResistance) * 100),0).ToString() + "%";
+            playerStatsHolder.Text += "\nStun duration reduction: " + Math.Round(((1 - stunResistance) * 100),0).ToString() + "%";
+            playerStatsHolder.Text += "\nBleed and poison effect reduction: " + Math.Round(((1 - nonElementalDotResistance) * 100),0).ToString() + "%";
+            playerStatsHolder.Text += "\nMovement speed: " + Math.Round(baseSpeed,0).ToString() + "%";
+            playerStatsHolder.Text += "\nCooldown Reduction: " + Math.Round((cooldownTimeForActiveSkillsCalculations.Item2 * 100),1).ToString() + "%";
             playerStatsHolder.Text += "\nIncrease of item quality dropped: " + Math.Round((itemQuality - 1) * 100, 0).ToString() + "%";
             playerStatsHolder.Text += "\nIncrease of amount of items dropped: " + Math.Round((itemQuantity - 1) * 100, 0).ToString() + "%";
             playerStatsHolder.Text += "\nLife gain per hit(including life recovery rate): " + Math.Round(lifeGainOnHit * healthRecoveryRate, 1).ToString();
@@ -664,7 +670,7 @@ namespace BasicsOfGame
 
             healthPointsCalculations = new Tuple<int, double, double>(200, 0, 0);
             healthRecoveryRateCalculations = new Tuple<double, double, double>(1, 0, 0);
-            damageCalculations = new Tuple<int, int, double, double>(10, 15, 0, 0);
+            damageCalculations = new Tuple<int, int, double, double>(minDmg, maxDmg, 0, 0);
             iceDamageCalculations = new Tuple<double, double>(0, 0);
             fireDamageCalculations = new Tuple<double, double>(0, 0);
             lightningDamageCalculations = new Tuple<double, double>(0, 0);
@@ -691,7 +697,7 @@ namespace BasicsOfGame
             foreach (var skills in listOfSkills)
             {
                 if (skills.Item1 == "absoluteCriticalHitChance") { criticalHitChanceCalculations = new Tuple<int, double, double>(criticalHitChanceCalculations.Item1, criticalHitChanceCalculations.Item2 + skills.Item3, criticalHitChanceCalculations.Item3); }
-                if (skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2 + equippedPieces * skills.Item3, armourCalculations.Item3); }
+                if (skills.Item1 == "armourPerEq") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2 + playerInventory.howManyEquipped() * skills.Item3, armourCalculations.Item3); }
                 if (skills.Item1 == "armour") { armourCalculations = new Tuple<int, double, double>(armourCalculations.Item1, armourCalculations.Item2 + skills.Item3, armourCalculations.Item3); }
                 if (skills.Item1 == "attackSpeed") { attackSpeedCalculations = new Tuple<double, double>(attackSpeedCalculations.Item1, attackSpeedCalculations.Item2 + skills.Item3); attackCooldownCalculations = new Tuple<double, double>(attackCooldownCalculations.Item1, attackCooldownCalculations.Item2 + skills.Item3); }
                 if (skills.Item1 == "bleedingChance") { chanceToBleedCalculations = new Tuple<int, double>(chanceToBleedCalculations.Item1, chanceToBleedCalculations.Item2 + skills.Item3); }
@@ -847,9 +853,14 @@ namespace BasicsOfGame
             if (w < 0) w = 0;
             hpBar.Width = Convert.ToInt32(w);
         }
-        private void updateStats(List<Tuple<string, string, double>> listOfSkills)
+        private void updateStats()
         {
-            recalculateStats(listOfSkills);
+            List<Tuple<string,string,double>> temp=playerInventory.getStats();
+            List<Tuple<string,string,double>> addMe=playerPassives.getStats();
+            temp.AddRange(addMe);
+            minDmg = playerInventory.getMinDmg();
+            maxDmg = playerInventory.getMaxDmg();
+            recalculateStats(temp);
         }
         private void initializeAnimationsForAttack()
         {

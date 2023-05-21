@@ -15,7 +15,24 @@ namespace BasicsOfGame
 {
     internal class Inventory
     {
+        
        List<Equipment> equipment;
+       private Tuple<int, int> helmetCoord=new Tuple<int,int>(128,19);
+        private Tuple<int, int> armourCoord = new Tuple<int, int>(128, 89);
+        private Tuple<int, int> bootsCoord = new Tuple<int, int>(128, 159);
+        private Tuple<int, int> weaponCoord = new Tuple<int, int>(58, 89);
+        private Tuple<int, int> jewelleryCoord = new Tuple<int, int>(198, 89);
+        bool isHelmetEquipped;
+        bool isArmourEquipped;
+        bool isBootsEquipped;
+        bool isWeaponEquipped;
+        bool isJewelleryEquipped;
+        int helmetIndex;
+        int armourIndex;
+        int bootsIndex;
+        int jewelleryIndex;
+        int weaponIndex;
+        public Action requestStatRecalculation;
         Canvas canv;
         public Inventory(Canvas gs) {
             canv = gs;
@@ -36,7 +53,163 @@ namespace BasicsOfGame
         }
         public void addEquipment(Equipment itemToAdd)
         {
+
             equipment.Add(itemToAdd);
+            equipment[equipment.Count - 1].requestEquipping += equipItem;
+        }
+        public int getMinDmg()
+        {
+            if (isWeaponEquipped)
+            {
+                return equipment[weaponIndex].getMinDmg();
+            }
+            return 10;
+        }
+        public int howManyEquipped()
+        {
+            int equippedPieces = 0;
+            if (isArmourEquipped) equippedPieces++;
+            if (isHelmetEquipped) equippedPieces++;
+            if (isWeaponEquipped) equippedPieces++;
+            if (isJewelleryEquipped) equippedPieces++;
+            if (isBootsEquipped) equippedPieces++;
+
+
+            return equippedPieces;
+        }
+        public int getMaxDmg()
+        {
+            if (isWeaponEquipped)
+            {
+                return equipment[weaponIndex].getMaxDmg();
+            }
+            return 15;
+        }
+        private void equipItem(string slot,Equipment choosen)
+        {
+            
+            if (slot == "Weapon")
+            {
+                if (isWeaponEquipped)
+                {
+                    equipment[weaponIndex].takeOff();
+                    
+                }
+                for (int i = 0; i < equipment.Count; i++)
+                {
+                    if (equipment[i] == choosen)
+                    {
+
+                        equipment[i].Equip();
+                        equipment[i].setButtonPosition(weaponCoord.Item1, weaponCoord.Item2);
+                        isWeaponEquipped = true;
+                        weaponIndex = i;
+                        break;
+                    }
+                }
+                showItems();
+            }
+            if (slot == "BodyArmour")
+            {
+                if (isArmourEquipped)
+                {
+                    equipment[armourIndex].takeOff();
+
+                }
+                for (int i = 0; i < equipment.Count; i++)
+                {
+                    if (equipment[i] == choosen)
+                    {
+
+                        equipment[i].Equip();
+                        isArmourEquipped = true;
+                        equipment[i].setButtonPosition(armourCoord.Item1, armourCoord.Item2);
+                        armourIndex = i;
+                        break;
+                    }
+                }
+                showItems();
+            }
+            if (slot == "Helmet")
+            {
+                if (isHelmetEquipped)
+                {
+                    equipment[helmetIndex].takeOff();
+
+                }
+                for (int i = 0; i < equipment.Count; i++)
+                {
+                    if (equipment[i] == choosen)
+                    {
+
+                        equipment[i].Equip();
+                        isHelmetEquipped = true;
+                        equipment[i].setButtonPosition(helmetCoord.Item1, helmetCoord.Item2);
+                        helmetIndex = i;
+                        break;
+                    }
+                }
+                showItems();
+            }
+            if (slot == "Boots")
+            {
+                if (isBootsEquipped)
+                {
+                    equipment[bootsIndex].takeOff();
+
+                }
+                for (int i = 0; i < equipment.Count; i++)
+                {
+                    if (equipment[i] == choosen)
+                    {
+
+                        equipment[i].Equip();
+                        isBootsEquipped = true;
+                        equipment[i].setButtonPosition(bootsCoord.Item1, bootsCoord.Item2);
+                        bootsIndex = i;
+                        break;
+                    }
+                }
+                showItems();
+            }
+            if (slot == "Jewellery")
+            {
+                if (isJewelleryEquipped)
+                {
+                    equipment[jewelleryIndex].takeOff();
+
+                }
+                for (int i = 0; i < equipment.Count; i++)
+                {
+                    if (equipment[i] == choosen)
+                    {
+
+                        equipment[i].Equip();
+                        isJewelleryEquipped = true;
+                        equipment[i].setButtonPosition(jewelleryCoord.Item1, jewelleryCoord.Item2);
+                        jewelleryIndex = i;
+                        break;
+                    }
+                }
+                showItems();
+            }
+            
+            requestStatRecalculation?.Invoke();
+        }
+        public List<Tuple<string, string, double>> getStats()
+        {
+            List<Tuple<string, string, double>> statsFromItems = new List<Tuple<string, string, double>>();
+            foreach (Equipment item in equipment)
+            {
+                if (item.isEquipped())
+                {
+                    foreach (Tuple<string, string, double> tuple in item.getStats())
+                    {
+                        statsFromItems.Add(tuple);
+                    }
+                }
+            }
+            return statsFromItems;
 
         }
         public void showItems()
@@ -46,6 +219,10 @@ namespace BasicsOfGame
 
             for(int i = 0; i < equipment.Count; i++)
             {
+                if (equipment[i].isEquipped())
+                {
+                    equipment[i].addButton(); continue;
+                }
                 equipment[i].setButtonPosition(x, y);
                 equipment[i].addButton();
                 x += 50;
@@ -72,20 +249,21 @@ namespace BasicsOfGame
         System.Windows.Shapes.Rectangle backgroundOfButton;
         TextBlock toolTip;
         string desc;
-        int minDamage=0;
-        int maxDamage=0;
+        int minDamage = 0;
+        int maxDamage = 0;
         ImageBrush sprite;
         const int WEAPON = 0;
         const int BODYARMOUR = 1;
         const int HELMET = 2;
         const int BOOTS = 3;
         const int JEWELLERY = 4;
-
+        bool equipped;
         Canvas canv;
+        public Action<string, Equipment> requestEquipping;
 
         public Equipment(int type,int rarity,Canvas gs)
         {
-            
+            equipped = false;
             clickToEquipItem = new Button();
              toolTip = new TextBlock();
             backgroundOfButton = new System.Windows.Shapes.Rectangle();
@@ -153,7 +331,7 @@ namespace BasicsOfGame
             }
             else // JEWELLERY 
             {
-                slot = "JewelleryJewellery";
+                slot = "Jewellery";
                 Jewellery temp = new Jewellery(rarity);
                 addedSkills = temp.getStats();
                 desc = temp.description();
@@ -197,7 +375,16 @@ namespace BasicsOfGame
             Canvas.SetZIndex(clickToEquipItem, 1001);
             clickToEquipItem.MouseMove += showToolTip;
             clickToEquipItem.MouseLeave += hideToolTip;
+
+            clickToEquipItem.MouseRightButtonDown += invokeEquipping;
         }
+        public List<Tuple<string, string, double>> getStats(){ return addedSkills;}
+
+        private void invokeEquipping(object sender, MouseButtonEventArgs e)
+        {
+           if(!equipped) requestEquipping?.Invoke(slot,this);
+        }
+
         bool isBeingShown = false;
         public void setButtonPosition(int x, int y)
         {
@@ -252,6 +439,18 @@ namespace BasicsOfGame
         public string getDesc()
         {
             return desc;
+        }
+        public bool isEquipped()
+        {
+            return equipped;
+        }
+        public void Equip()
+        {
+            equipped = true;
+        }
+        public void takeOff()
+        {
+            equipped = false;
         }
         public int getMinDmg() { return minDamage; }
         public int getMaxDmg() { return maxDamage; }
