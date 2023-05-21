@@ -11,9 +11,9 @@ namespace BasicsOfGame
     internal class Weapon 
     {
         const int NORMAL = 0;
-        const int MAGIC = 1;
-        const int RARE = 2;
-        const int EPIC = 3;
+        const int RARE = 1;
+        const int EPIC = 2;
+        const int LEGENDARY = 3;
         Random rnd = new Random();
         int minDamage; // 10-14
         int maxDamage; // 15-18
@@ -48,28 +48,28 @@ namespace BasicsOfGame
         const int FIREDAMAGE = 6;
         private void generateName(int rarity)
         {
-            string[] prefix = new string[] { "Malicious", "Weeping", "Rune", "Splendid", "Heroic","Legendary","Stalwart"};
-            string[] name = new string[] { "Sword", "Blade", "Axe", "Dagger" };
+            string[] prefix = new string[] { "Malicious", "Weeping", "Rune", "Splendid", "Heroic","Mythical","Stalwart"};
+            string[] name = new string[] { "Sword", "Blade", "Knife", "Dagger" };
             string[] suffix = new string[] { "Destruction", "Darkness","Godslayer","Eagle Tribe","Starbreaking"};
             if(rarity == NORMAL)
             {
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
-            if (rarity == MAGIC)
-            {
-                desc += "(MAGIC)\n" + prefix[rnd.Next(0,prefix.Length-1)] +" "+ name[rnd.Next(0, name.Length - 1)];
-                rarityOfItem = "Magic";
-            }
             if (rarity == RARE)
             {
-                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)]+" of "+suffix[rnd.Next(0,suffix.Length-1)];
+                desc += "(RARE)\n" + prefix[rnd.Next(0,prefix.Length-1)] +" "+ name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
-                desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)]+" of "+suffix[rnd.Next(0,suffix.Length-1)];
                 rarityOfItem = "Epic";
+            }
+            if (rarity == LEGENDARY)
+            {
+                desc += "(LEGENDARY)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Legendary";
             }
             desc += '\n';
         }
@@ -147,9 +147,9 @@ namespace BasicsOfGame
     internal class BodyArmour // BASE ARMOUR 
     {
         const int NORMAL = 0;
-        const int MAGIC = 1;
-        const int RARE = 2;
-        const int EPIC = 3;
+        const int RARE = 1;
+        const int EPIC = 2;
+        const int LEGENDARY = 3;
         string rarityOfItem;
         Random rnd = new Random();
         int BaseArmour; // 5-25
@@ -178,20 +178,20 @@ namespace BasicsOfGame
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
-            if (rarity == MAGIC)
-            {
-                desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-                rarityOfItem = "Magic";
-            }
             if (rarity == RARE)
             {
-                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
                 rarityOfItem = "Epic";
+            }
+            if (rarity == LEGENDARY)
+            {
+                desc += "(LEGENDARY)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Legendary";
             }
             desc += '\n';
         }
@@ -276,9 +276,9 @@ namespace BasicsOfGame
     internal class Helmet // BASE STUN RESISTANCE 
     {
         const int NORMAL = 0;
-        const int MAGIC = 1;
-        const int RARE = 2;
-        const int EPIC = 3;
+        const int RARE = 1;
+        const int EPIC = 2;
+        const int LEGENDARY = 3;
         string rarityOfItem;
         Random rnd = new Random();
         double BaseStunResistance; // 5-25
@@ -300,27 +300,27 @@ namespace BasicsOfGame
         private void generateName(int rarity)
         {
             string[] prefix = new string[] { "Obsidian", "Platinum", "Golden", "Iron", "Bronze", "Horned" };
-            string[] name = new string[] { "Helmet", "Basinet", "Kabuto", "Turban" };
+            string[] name = new string[] { "Helmet", "Bascinet", "Kabuto", "Turban" };
             string[] suffix = new string[] { "Wisdom", "Protection", "Conquest", "Divinity" };
             if (rarity == NORMAL)
             {
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
-            if (rarity == MAGIC)
-            {
-                desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-                rarityOfItem = "Magic";
-            }
             if (rarity == RARE)
             {
-                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
                 rarityOfItem = "Epic";
+            }
+            if (rarity == LEGENDARY)
+            {
+                desc += "(LEGENDARY)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Legendary";
             }
             desc += '\n';
         }
@@ -384,12 +384,12 @@ namespace BasicsOfGame
     internal class Boots // BASE MOVEMENT SPEED
     {
         const int NORMAL = 0;
-        const int MAGIC = 1;
-        const int RARE = 2;
-        const int EPIC = 3;
+        const int RARE = 1;
+        const int EPIC = 2;
+        const int LEGENDARY = 3;
         string rarityOfItem;
         Random rnd = new Random();
-        double MovementSpeed;
+        
         string desc="";
         const int minMovementSpeed = 10;
         const int maxMovementSpeed = 30;
@@ -402,7 +402,7 @@ namespace BasicsOfGame
             generateName(rarity);
             BaseMovementSpeed = rnd.Next(minMovementSpeed, maxMovementSpeed);
             desc += "Increases movement speed by  " + BaseMovementSpeed + "% \n Additional stats:\n";
-            AdditionalStats.Add(new Tuple<string, string, double>("selfSpeedEffect", "percent", BaseMovementSpeed));
+            AdditionalStats.Add(new Tuple<string, string, double>("movementSpeed", "percent", BaseMovementSpeed));
             for (int i = 0; i < rarity; i++) { AdditionalStats.Add(generateRandomStats()); }
 
         }
@@ -416,20 +416,20 @@ namespace BasicsOfGame
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
-            if (rarity == MAGIC)
-            {
-                desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-                rarityOfItem = "Magic";
-            }
             if (rarity == RARE)
             {
-                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
                 rarityOfItem = "Epic";
+            }
+            if (rarity == LEGENDARY)
+            {
+                desc += "(LEGENDARY)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Legendary";
             }
             desc += '\n';
         }
@@ -510,9 +510,9 @@ namespace BasicsOfGame
     internal class Jewellery // BASE COOLDOWN
     {
         const int NORMAL = 0;
-        const int MAGIC = 1;
-        const int RARE = 2;
-        const int EPIC = 3;
+        const int RARE = 1;
+        const int EPIC = 2;
+        const int LEGENDARY = 3;
         string rarityOfItem;
         Random rnd = new Random();
         int BaseCd; // 12-20
@@ -547,20 +547,20 @@ namespace BasicsOfGame
                 desc += "(NORMAL)\n" + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Normal";
             }
-            if (rarity == MAGIC)
-            {
-                desc += "(MAGIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
-                rarityOfItem = "Normal";
-            }
             if (rarity == RARE)
             {
-                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                desc += "(RARE)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)];
                 rarityOfItem = "Rare";
             }
             if (rarity == EPIC)
             {
                 desc += "(EPIC)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
                 rarityOfItem = "Epic";
+            }
+            if (rarity == LEGENDARY)
+            {
+                desc += "(LEGENDARY)\n" + prefix[rnd.Next(0, prefix.Length - 1)] + " " + name[rnd.Next(0, name.Length - 1)] + " of " + suffix[rnd.Next(0, suffix.Length - 1)];
+                rarityOfItem = "Legendary";
             }
             desc += '\n';
         }
@@ -608,7 +608,7 @@ namespace BasicsOfGame
             {
                 range = rnd.Next(10, 21);
                 returnMe = new Tuple<string, string, double>("itemQuantity", "percent", range);
-                desc += "Increases your chance to drop items " + range + "%\n";
+                desc += "Increases your chance to drop items by " + range + "%\n";
             }
             else if (x == ITEMRARITY)
             {

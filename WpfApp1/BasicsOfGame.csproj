@@ -116,6 +116,10 @@
     <None Remove="images\goblinsword.png" />
     <None Remove="images\icon.ico" />
     <None Remove="images\icon2.ico" />
+    <None Remove="images\items\Buty.png" />
+    <None Remove="images\items\Helm.png" />
+    <None Remove="images\items\Pierscien.png" />
+    <None Remove="images\items\sword.png" />
     <None Remove="images\mainCharacter01.png" />
     <None Remove="images\mainCharacter01l.png" />
     <None Remove="images\mainCharacter02.png" />
@@ -180,6 +184,8 @@
    
     <None Remove="images\UI\Death.png" />
    
+    <None Remove="images\UI\equipmentUI.png" />
+   
     <None Remove="images\UI\Exit.PNG" />
    
     <None Remove="images\UI\ExitH.PNG" />
@@ -200,6 +206,12 @@
 
     <None Remove="images\UI\equipmentClosedSprite.png" />
     <None Remove="images\UI\equipmentOpenSprite.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\items\Buty.png" />
+    <Resource Include="images\items\Helm.png" />
+    <Resource Include="images\items\Pierscien.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -229,6 +241,8 @@
     <Resource Include="images\ActiveSkills\iceBurst4.PNG" />
     <Resource Include="images\ActiveSkills\iceBurst4l.PNG" />
     <Resource Include="images\Buffs_Debuffs\buff2.png" />
+    <Resource Include="images\items\sword.png" />
+    <Resource Include="images\UI\equipmentUI.png" />
     <Resource Include="images\UI\levelUpSprite.png" />
      <Resource Include="images\UI\equipmentClosedSprite.png" />
     <Resource Include="images\UI\equipmentOpenSprite.png" />

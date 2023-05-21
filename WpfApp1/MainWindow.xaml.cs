@@ -106,13 +106,9 @@ namespace BasicsOfGame
             
             if(e.Key == Key.D1)
             {
-                Inventory inv = new Inventory();
-                for(int i = 0; i < 5; i++)
-                {
-                    inv.addEquipment(new Equipment(new Random().Next(0, 5), new Random().Next(0, 4)));
 
-                }
-                MessageBox.Show(inv.sum());
+                mainCharacter.generateRandomItems();
+                
                 System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
                 
                 mainCharacter.useFirstSkill(mousePosition,new System.Windows.Point(Canvas.GetLeft(mainCharacter.getBody()) + mainCharacter.getBody().Width/2, Canvas.GetTop(mainCharacter.getBody()) + mainCharacter.getBody().Height / 2));
@@ -318,11 +314,11 @@ namespace BasicsOfGame
         private void showScuffedEquipment(object sender, RoutedEventArgs e)
         {
            if(!statsAreShown){
-            mainCharacter.showStats();
+            mainCharacter.showEquipment();
             statsAreShown=true;
            }
            else{
-            mainCharacter.hideStats();
+            mainCharacter.closeEquipment();
             statsAreShown=false;
            }
         }

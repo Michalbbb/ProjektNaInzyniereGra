@@ -23,11 +23,13 @@ namespace BasicsOfGame
 {
     internal class Player
     {
+        System.Windows.Shapes.Rectangle equipmentBackground;
         TextBox playerStatsHolder;
         bool allocateMode = true;
         TextBox visualForShieldCooldown;
         TextBox visualForImmunityCooldown;
         System.Windows.Shapes.Rectangle immunityPassiveVisual;
+        Button closeEquipmentButton;
         System.Windows.Shapes.Rectangle shieldPassiveVisual;
         bool isShieldAdded;
         bool isImmunityAdded;
@@ -159,11 +161,12 @@ namespace BasicsOfGame
         TextBox[] cdSkills=new TextBox[5];
         
         System.Windows.Shapes.Rectangle[] visualsSkills=new System.Windows.Shapes.Rectangle[5];
-       
 
+        Inventory playerInventory;
 
         public Player(Canvas GS)
         {
+            playerInventory = new Inventory(GS);
             descActiveSkills=new TextBox();
             descActiveSkills.Text = "PICK ONE SKILL";
             descActiveSkills.FontFamily = new FontFamily("Algerian");
@@ -172,6 +175,15 @@ namespace BasicsOfGame
             descActiveSkills.Background = Brushes.Transparent;
             descActiveSkills.BorderBrush = Brushes.Transparent;
             descActiveSkills.IsHitTestVisible = false;
+            closeEquipmentButton = new Button();
+            Canvas.SetLeft(closeEquipmentButton, 1140);
+            Canvas.SetTop(closeEquipmentButton, 10);
+            closeEquipmentButton.Width = 50;
+            closeEquipmentButton.Height = 50;
+            Canvas.SetZIndex(closeEquipmentButton, 1000);
+            closeEquipmentButton.Content = "X";
+
+            closeEquipmentButton.Click += CloseEquipment_Click;
 
             Canvas.SetLeft(descActiveSkills, 420);
             Canvas.SetTop(descActiveSkills, 140);
@@ -186,6 +198,16 @@ namespace BasicsOfGame
             descSkillOne.BorderBrush = Brushes.Transparent;
             descSkillOne.IsHitTestVisible = false;
 
+            equipmentBackground = new System.Windows.Shapes.Rectangle();
+            ImageBrush temp = new ImageBrush();
+            temp.ImageSource= new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/equipmentUI.png", UriKind.Absolute));
+            equipmentBackground.Width = 1200;
+            equipmentBackground.Height = 600;
+            equipmentBackground.Fill = temp;
+            Canvas.SetZIndex(equipmentBackground, 999);
+            Canvas.SetLeft(equipmentBackground, 0);
+            Canvas.SetTop(equipmentBackground, 0);
+           
             Canvas.SetLeft(descSkillOne, 300);
             Canvas.SetTop(descSkillOne, 200);
             Canvas.SetZIndex(descSkillOne, 999);
@@ -230,14 +252,16 @@ namespace BasicsOfGame
 
             skillsToPick = 0;
             playerStatsHolder = new TextBox();
-            Canvas.SetLeft(playerStatsHolder, 700);
-            Canvas.SetTop(playerStatsHolder, 100);
-            Canvas.SetZIndex(playerStatsHolder, 400);
-            playerStatsHolder.Padding = new Thickness(20, 20, 20, 20);
-            playerStatsHolder.IsEnabled = false;
-            playerStatsHolder.Background = Brushes.Black;
-            playerStatsHolder.Foreground = Brushes.White;
-            playerStatsHolder.BorderBrush = Brushes.White;
+            Canvas.SetLeft(playerStatsHolder, 0);
+            Canvas.SetTop(playerStatsHolder, 280);
+            playerStatsHolder.FontSize = 9;
+           
+            Canvas.SetZIndex(playerStatsHolder, 1000);
+            
+            playerStatsHolder.IsHitTestVisible = false;
+            playerStatsHolder.Background = Brushes.Transparent;
+            playerStatsHolder.Foreground = Brushes.Black;
+            playerStatsHolder.BorderBrush = Brushes.Transparent;
             shieldPassiveVisual = new System.Windows.Shapes.Rectangle();
             immunityPassiveVisual = new System.Windows.Shapes.Rectangle();
             ImageBrush shieldSprite = new ImageBrush();
@@ -372,6 +396,25 @@ namespace BasicsOfGame
             }
 
         }
+        public void generateRandomItems()
+        {
+
+            for (int i = 0; i < 5; i++)
+            {
+                int x = new Random().Next(0, 5);
+                int y = new Random().Next(0, 4);
+                
+                playerInventory.addEquipment(new Equipment(x, y, GameScreen));
+
+            }
+        }
+
+        private void CloseEquipment_Click(object sender, RoutedEventArgs e)
+        {
+            closeEquipment();
+            e.Handled = true;
+        }
+
         private void updateSkills()
         {
             foreach(System.Windows.Shapes.Rectangle vs in visualsSkills)
@@ -566,10 +609,11 @@ namespace BasicsOfGame
             if (obtainedSkills.Count >= 5)
                 obtainedSkills[4].useSkill(mouse, player);
         }
-        public void showStats()
+        public void showEquipment()
         {
-            playerStatsHolder.Text = "";
 
+            playerInventory.showItems();
+            playerStatsHolder.Text = "";
             playerStatsHolder.Text += "Damage: " + minDmg.ToString() + "-" + maxDmg.ToString();
             playerStatsHolder.Text += "\nIncreased damage: " + Math.Round((increasedDamage - 1) * 100, 0).ToString() + "%";
             playerStatsHolder.Text += "\nIncreased fire damage: " + Math.Round((increasedFireDamage) * 100, 0).ToString() + "%";
@@ -602,12 +646,17 @@ namespace BasicsOfGame
             else
             {
                 showingStats = true;
+                GameScreen.Children.Add(equipmentBackground);
                 GameScreen.Children.Add(playerStatsHolder);
+                GameScreen.Children.Add(closeEquipmentButton);
             }
         }
-        public void hideStats()
+        public void closeEquipment()
         {
+            playerInventory.hideItems();
+            GameScreen.Children.Remove(equipmentBackground);
             GameScreen.Children.Remove(playerStatsHolder);
+            GameScreen.Children.Remove(closeEquipmentButton);
             showingStats = false;
         }
         private void recalculateStats(List<Tuple<string, string, double>> listOfSkills)
@@ -787,7 +836,7 @@ namespace BasicsOfGame
                 skill.recalculateStats(dmgIncreased, cooldownBaseTime);
             foreach (Skill skill in skillsThatCanBeObtained)
                 skill.recalculateStats(dmgIncreased, cooldownBaseTime);
-            if (showingStats) showStats();
+            if (showingStats) showEquipment();
         }
 
         private void updateHpBar()
