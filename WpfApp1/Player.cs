@@ -1915,7 +1915,7 @@ namespace BasicsOfGame
         }
         private void updateExp()
         {
-            if (exp >= 1000)
+            while (exp >= 1000)
             {
                 exp -= 1000;
                 level++;

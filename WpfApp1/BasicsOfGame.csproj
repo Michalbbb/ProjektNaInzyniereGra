@@ -101,6 +101,7 @@
     <None Remove="images\bgdecorations\StatueDestroyed.PNG" />
     <None Remove="images\bgdecorations\TarnishedFlag.PNG" />
     <None Remove="images\bgdecorations\tlo1Obstacle.PNG" />
+    <None Remove="images\Bosses\Skull.png" />
     <None Remove="images\Buffs_Debuffs\buff1.png" />
     <None Remove="images\Buffs_Debuffs\buff2.png" />
     <None Remove="images\Buffs_Debuffs\buff3.png" />
@@ -210,6 +211,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="images\Bosses\Skull.png" />
     <Resource Include="images\items\Buty.png" />
     <Resource Include="images\items\Helm.png" />
     <Resource Include="images\items\Pierscien.png" />

@@ -165,7 +165,7 @@ namespace BasicsOfGame
             if(type==0) return; // In case if something goes wrong
             if(usage=="bossRoom"){
             monsters = new List<Monster>();
-            enemyCount=rnd.Next(6,9); // 6-8
+            enemyCount=1; // boss
             int gridX = 7, gridY = 3;
             int objectPlacementX, objectPlacementY;
             bool correctPlacement;
@@ -194,10 +194,7 @@ namespace BasicsOfGame
                 x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
                 y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
 
-                if (whichOne == 0) addMeToList = new Spider(BelongTo, x1, y1);
-                else if (whichOne == 1) addMeToList = new Imp(BelongTo, x1, y1);
-                else if (whichOne == 2) addMeToList = new Golem(BelongTo, x1, y1);
-                else addMeToList = new Goblin(BelongTo, x1, y1);
+                    addMeToList = new oldGreatOne(BelongTo,x1,y1);
 
                 monsters.Add(addMeToList);
             }
@@ -437,7 +434,7 @@ namespace BasicsOfGame
     internal class Grid
     {
         public Pokoj[,] grid;
-        int roomCount = 16;
+        int roomCount = 3;
         static int gridSize = 9;
         int currX, currY;
         static int gridMid = gridSize / 2;
