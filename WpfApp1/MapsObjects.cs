@@ -120,6 +120,15 @@ namespace BasicsOfGame
             canv.Children.Add(mapObject);
             canv.Children.Add(objectCollision);
         }
+        public void Remove(Canvas canv)
+        {
+            canv.Children.Add(mapObject);
+            canv.Children.Add(objectCollision);
+        }
+        public System.Windows.Shapes.Rectangle getBody()
+        {
+            return mapObject;
+        }
         public int getWidth()
         {
             return Convert.ToInt32(Canvas.GetLeft(objectCollision));

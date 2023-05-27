@@ -18,6 +18,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows.Controls.Primitives;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Linq;
 
 namespace BasicsOfGame
 {
@@ -2287,6 +2289,8 @@ namespace BasicsOfGame
 
         int hitboxTicks = 0;
         double beamCooldown;
+        double dashCooldown;
+        double currentDashCooldown;
         double currentBeamCooldown;
         TextBox nameHolder;
         System.Windows.Shapes.Rectangle background;
@@ -2299,7 +2303,9 @@ namespace BasicsOfGame
             timerForSkills = 0;
             nameOfMonster = "Abomination";
             beamCooldown = 10;
+            dashCooldown = 10;
             currentBeamCooldown = 0;
+            currentDashCooldown = 0;
             expGiven = 2500;
             attackTicks = 0;
             animations = 8;
@@ -2752,6 +2758,112 @@ namespace BasicsOfGame
 
             }
         }
+        private void useDash(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg)
+        {
+            if (stage == 0)
+            {
+                Canvas.SetLeft(warning, Canvas.GetLeft(body) - 10);
+                Canvas.SetTop(warning, Canvas.GetTop(body) - 10);
+                warning.Background = Brushes.Red;
+                warning.Foreground = Brushes.White;
+                warning.Text = "!";
+                Canvas.SetZIndex(warning, 1000);
+                warning.FontSize = 20;
+                BelongTO.Children.Add(warning);
+                stage++;
+                System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2), Canvas.GetTop(player));
+
+            }
+            
+            else if (stage == 1 && timerForSkills <0.25)
+            { 
+                return;
+            }
+            else if (stage == 1 && timerForSkills > 0.25)
+            {
+                BelongTO.Children.Remove(warning);
+                System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2), Canvas.GetTop(player));
+                targetOfAttack = playerCenter;
+                stage++;
+            }
+            double moveMonsterByX = 0, moveMonsterByY = 0;
+            if (targetOfAttack.X > Canvas.GetLeft(body) + body.Width + attackRange / 2)
+            {
+                moveMonsterByX = Speed * 3;
+
+            }
+            if (targetOfAttack.X < Canvas.GetLeft(body) - attackRange / 2)
+            {
+                moveMonsterByX = -Speed * 3;
+
+            }
+            if (targetOfAttack.Y < Canvas.GetTop(body) - body.Height / 6)
+            {
+                moveMonsterByY = -Speed * 3;
+
+            }
+            if (targetOfAttack.Y > Canvas.GetTop(body))
+            {
+                moveMonsterByY = Speed * 3;
+
+            }
+            if (moveMonsterByX == 0 && moveMonsterByY==0)
+            {
+                currentDashCooldown = dashCooldown;
+                usingSkill = false;
+                timerForSkills = 0;
+                stage = 0;
+                return;
+            }
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
+            Rect hitBoxOfAttack = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body), body.Width, body.Height);
+            
+            foreach (System.Windows.Shapes.Rectangle x in BelongTO.Children.OfType<System.Windows.Shapes.Rectangle>())
+            {
+                Rect hitBoxOfElement = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+                if ((string)x.Tag != "collision" && (string)x.Name != "Player") continue;
+                if (determinateCollision(hitBoxOfElement, hitBoxOfAttack))
+                {
+                    if ((string)x.Tag == "collision")
+                    {
+                        BelongTO.Children.Remove(x);
+                        
+                        foreach (System.Windows.Shapes.Rectangle find in BelongTO.Children.OfType<System.Windows.Shapes.Rectangle>())
+                        {
+                            Rect hitBoxOfObstacle = new Rect(Canvas.GetLeft(find), Canvas.GetTop(find), find.Width, find.Height);
+                            if (determinateCollision(hitBoxOfObstacle, hitBoxOfAttack))
+                            {
+                                if((string)find.Tag == "obstacle")BelongTO.Children.Remove(find);
+                                break;
+                            }
+                        }
+                        currentDashCooldown = dashCooldown;
+                        usingSkill = false;
+                        timerForSkills = 0;
+                        stage = 0;
+                        return;
+                    }
+                    else if ((string)x.Name == "Player")
+                    {
+                        dealDmg(new Random().Next(70, 140), nameOfMonster);
+                        string statusEffect = "Stun";
+                        Monster.damageOverTime.Add(new Tuple<int, double, string>(0, 1000, statusEffect));
+                        currentDashCooldown = dashCooldown;
+                        usingSkill = false;
+                        timerForSkills = 0;
+                        stage = 0;
+                        return;
+                    }
+                
+                
+                }
+
+            }
+            
+            
+            
+        }
         private void useBeam(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg) {
             
           
@@ -2782,12 +2894,12 @@ namespace BasicsOfGame
                 if (directionOfAttack == "Left")
                 {
                     Canvas.SetLeft(beamSprite, 0);
-                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Width = Canvas.GetLeft(body)+body.Width/2;
                     beamSprite.Height = 10;
                 }
                 else
                 {
-                    
+                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body) + body.Width/2);
                     beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
                     beamSprite.Height = 10;
                 }
@@ -2801,7 +2913,8 @@ namespace BasicsOfGame
                 if (directionOfAttack == "Left")
                 {
                     Canvas.SetLeft(beamSprite, 0);
-                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Width = Canvas.GetLeft(body) + body.Width / 2;
+
                     beamSprite.Height = 25;
                 }
                 else
@@ -2821,7 +2934,8 @@ namespace BasicsOfGame
                 if (directionOfAttack == "Left")
                 {
                     Canvas.SetLeft(beamSprite, 0);
-                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Width = Canvas.GetLeft(body) + body.Width / 2;
+
                     beamSprite.Height = 40;
                 }
                 else
@@ -2841,7 +2955,7 @@ namespace BasicsOfGame
                 if (directionOfAttack == "Left")
                 {
                     Canvas.SetLeft(beamSprite, 0);
-                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Width = Canvas.GetLeft(body) + body.Width / 2;
                     beamSprite.Height = 60;
                 }
                 else
@@ -2875,13 +2989,19 @@ namespace BasicsOfGame
             {
                 useBeam(player, directionOfAttack,dealDmg);
             }
+            else if (currentlyUsing == "dash")
+            {
+                useDash(player, directionOfAttack, dealDmg);
+            }
             else
             {
                 timerForSkills = 0;
                 usingSkill = false;
             }
         }
+        TextBox warning=new TextBox();
         string directionOfAttack;
+        System.Windows.Point targetOfAttack;
         public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
@@ -2891,6 +3011,7 @@ namespace BasicsOfGame
                 return;
             }
             if(currentBeamCooldown>0)currentBeamCooldown -= delta;
+            if(currentDashCooldown > 0)currentDashCooldown -= delta;
             NormalizeSpeed(delta);
             dotUpdate(delta);
             bool tryAttack = true;
@@ -2903,6 +3024,33 @@ namespace BasicsOfGame
             {
                 useSkill(delta, name, directionOfAttack, dealDmg);
                 return;
+            }
+            if (currentDashCooldown <= 0)
+            {
+                targetOfAttack = playerCenter;
+                if (playerCenter.X > (Canvas.GetLeft(body) + body.Width / 2))
+                {
+                    directionOfAttack = "Right";
+
+                    moveInRightDirection = true;
+                    currentAnimation = 0;
+                    monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                    body.Fill = monsterSprite;
+
+
+
+                }
+                else
+                {
+                    directionOfAttack = "Left";
+                    moveInRightDirection = false;
+                    currentAnimation = 0;
+                    monsterSprite.ImageSource = monsterMovementLeft[currentAnimation];
+                    body.Fill = monsterSprite;
+                }
+                stage = 0;
+                usingSkill = true;
+                currentlyUsing = "dash";
             }
             if(Math.Abs((playerCenter.Y-name.Height/2) - (Canvas.GetTop(body)-body.Height/2)) < 60&&!prepareToAttack&&!usingSkill&&currentBeamCooldown<=0)
             {
