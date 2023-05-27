@@ -434,7 +434,7 @@ namespace BasicsOfGame
     internal class Grid
     {
         public Pokoj[,] grid;
-        int roomCount = 3;
+        int roomCount = 2;
         static int gridSize = 9;
         int currX, currY;
         static int gridMid = gridSize / 2;

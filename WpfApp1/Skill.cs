@@ -285,10 +285,10 @@ namespace BasicsOfGame
                     {
                         iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst2l.png", UriKind.Absolute)); ;
                         iceBurstHitBox.Fill = iceBurstSprite;
-                        Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox) - 45);
+                        Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox)-45);
                         Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
-                        modifiedHitBox.Width = iceBurstHitBox.Width - 75;
+                        modifiedHitBox.Width = iceBurstHitBox.Width;
                         modifiedHitBox.Height = iceBurstHitBox.Height;
 
 
@@ -297,9 +297,9 @@ namespace BasicsOfGame
                     {
                         iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst2.png", UriKind.Absolute)); ;
                         iceBurstHitBox.Fill = iceBurstSprite;
-                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox) + 75);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
-                        modifiedHitBox.Width = iceBurstHitBox.Width - 75;
+                        modifiedHitBox.Width = iceBurstHitBox.Width;
                         modifiedHitBox.Height = iceBurstHitBox.Height;
                     }
 
@@ -320,7 +320,7 @@ namespace BasicsOfGame
                         Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox) - 51);
                         Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
-                        modifiedHitBox.Width = iceBurstHitBox.Width - 120;
+                        modifiedHitBox.Width = iceBurstHitBox.Width ;
                         modifiedHitBox.Height = iceBurstHitBox.Height;
 
                     }
@@ -329,9 +329,9 @@ namespace BasicsOfGame
 
                         iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst3.png", UriKind.Absolute)); ;
                         iceBurstHitBox.Fill = iceBurstSprite;
-                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox) + 120);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
-                        modifiedHitBox.Width = iceBurstHitBox.Width - 120;
+                        modifiedHitBox.Width = iceBurstHitBox.Width ;
                         modifiedHitBox.Height = iceBurstHitBox.Height;
                     }
                     int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
@@ -352,16 +352,16 @@ namespace BasicsOfGame
                         Canvas.SetLeft(iceBurstHitBox, Canvas.GetLeft(iceBurstHitBox) - 85);
                         Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
-                        modifiedHitBox.Width = iceBurstHitBox.Width - 171;
+                        modifiedHitBox.Width = iceBurstHitBox.Width ;
                         modifiedHitBox.Height = iceBurstHitBox.Height;
                     }
                     else
                     {
                         iceBurstSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst4.png", UriKind.Absolute)); ;
                         iceBurstHitBox.Fill = iceBurstSprite;
-                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox) + 171);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(iceBurstHitBox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(iceBurstHitBox));
-                        modifiedHitBox.Width = iceBurstHitBox.Width - 171;
+                        modifiedHitBox.Width = iceBurstHitBox.Width;
                         modifiedHitBox.Height = iceBurstHitBox.Height;
                     }
                     int damageDealt = Skill.rnd.Next(minDamage, maxDamage);
@@ -1261,7 +1261,7 @@ namespace BasicsOfGame
                         Canvas.SetLeft(LightningStrikeHitbox, Canvas.GetLeft(LightningStrikeHitbox) - 45);
                         Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
-                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 75;
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width;
                         modifiedHitBox.Height = LightningStrikeHitbox.Height;
 
 
@@ -1270,9 +1270,9 @@ namespace BasicsOfGame
                     {
                         LightningStrikeSprite.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/ActiveSkills/iceBurst2.png", UriKind.Absolute)); ;
                         LightningStrikeHitbox.Fill = LightningStrikeSprite;
-                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox) + 75);
+                        Canvas.SetLeft(modifiedHitBox, Canvas.GetLeft(LightningStrikeHitbox));
                         Canvas.SetTop(modifiedHitBox, Canvas.GetTop(LightningStrikeHitbox));
-                        modifiedHitBox.Width = LightningStrikeHitbox.Width - 75;
+                        modifiedHitBox.Width = LightningStrikeHitbox.Width ;
                         modifiedHitBox.Height = LightningStrikeHitbox.Height;
                     }
 

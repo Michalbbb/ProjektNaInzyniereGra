@@ -318,13 +318,13 @@ namespace BasicsOfGame
             ticks += baseSpeed / 2 * delta;
             Speed = baseSpeed * delta * speedMultiplier;
         }
-        public void add()
+        public virtual void add()
         {
             BelongTO.Children.Add(weapon);
             BelongTO.Children.Add(body);
             BelongTO.Children.Add(monsterHpBar);
         }
-        public void remove()
+        public virtual void remove()
         {
             BelongTO.Children.Remove(weapon);
             BelongTO.Children.Remove(body);
@@ -338,7 +338,7 @@ namespace BasicsOfGame
             healthPoints = healthPoints * diffMulti;
             maxHealthPoints = maxHealthPoints * diffMulti;
         }
-        protected void hpBar()
+        protected virtual void hpBar()
         {
             monsterHpBar = new System.Windows.Shapes.Rectangle();
             monsterHpBar.Width = (body.Width * 4) / 5;
@@ -484,7 +484,7 @@ namespace BasicsOfGame
 
 
         }
-        public void damageTaken(ref int dmg)
+        public virtual void damageTaken(ref int dmg)
         {
             if (shocked)
             {
@@ -503,7 +503,7 @@ namespace BasicsOfGame
                 monsterHpBar.Width = 0;
             }
         }
-        public void dotDamageTaken(int dmg)
+        public virtual void dotDamageTaken(int dmg)
         {
             if (shocked) dmg = Convert.ToInt32(dmg * 1.5);
             healthPoints -= dmg;
@@ -2286,24 +2286,35 @@ namespace BasicsOfGame
     {
 
         int hitboxTicks = 0;
+        double beamCooldown;
+        double currentBeamCooldown;
+        TextBox nameHolder;
+        System.Windows.Shapes.Rectangle background;
+        string currentlyUsing;
+        private double gracePeriod = 0.2; 
+        private bool usingSkill = false;
+        private double timerForSkills;
         public oldGreatOne(Canvas canv, int x, int y)
         {
-            nameOfMonster = "Great old one";
+            timerForSkills = 0;
+            nameOfMonster = "Abomination";
+            beamCooldown = 10;
+            currentBeamCooldown = 0;
             expGiven = 2500;
             attackTicks = 0;
             animations = 8;
             currentAnimation = 0;
             attackRange = 100;
-            Speed = 130;
-            baseSpeed = 130;
-            healthPoints = 1500 * diffMulti;
+            Speed = 200;
+            baseSpeed = 200;
+            healthPoints = 2000;
             maxHealthPoints = healthPoints;
             body.Height = 132;
             body.Width = 85;
             body.Fill = Brushes.Blue;
             body.Tag = "enemy";
-            minDmg = Convert.ToInt32(18 * diffMulti);
-            maxDmg = Convert.ToInt32(36 * diffMulti);
+            minDmg = Convert.ToInt32(18);
+            maxDmg = Convert.ToInt32(36 );
             weapon.Height = 40;
             weapon.Width = 40;
             weapon.Fill = Brushes.Transparent;
@@ -2319,6 +2330,25 @@ namespace BasicsOfGame
 
 
         }
+        public override void damageTaken(ref int dmg)
+        {
+            if (shocked)
+            {
+                dmg = Convert.ToInt32(dmg * 1.5);
+
+            }
+            healthPoints -= dmg;
+            if (healthPoints > 0)
+            {
+                double width = (healthPoints / maxHealthPoints) * 500 ;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
         public override void loadImages()
         {
             monsterMovementRight = new BitmapImage[8];
@@ -2327,8 +2357,8 @@ namespace BasicsOfGame
             monsterAttackLeft = new BitmapImage[8];
             attackHitBoxLeft = new BitmapImage[3];
             attackHitBoxRight = new BitmapImage[3];
-            BitmapImage golemSpriteAttack = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
-            BitmapImage golemSpriteMovement = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
+            BitmapImage AbominationSpriteAttack = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
+            BitmapImage AbominationSpriteMovement = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
             int spriteWidth = 57;
             int spriteHeight = 88;
 
@@ -2341,8 +2371,8 @@ namespace BasicsOfGame
 
 
                     Int32Rect spriteRect = new Int32Rect(j, i, spriteWidth, spriteHeight);
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(golemSpriteAttack, spriteRect);
-                    CroppedBitmap croppedBitmapM = new CroppedBitmap(golemSpriteMovement, spriteRect);
+                    CroppedBitmap croppedBitmap = new CroppedBitmap(AbominationSpriteAttack, spriteRect);
+                    CroppedBitmap croppedBitmapM = new CroppedBitmap(AbominationSpriteMovement, spriteRect);
                     MemoryStream stream = new MemoryStream();
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
                     encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
@@ -2468,7 +2498,7 @@ namespace BasicsOfGame
                 return;
             }
             attackTimer += delta * 1000;
-            if (attackTicks == 0 && attackTimer / 150 > 1)
+            if (attackTicks == 0 && attackTimer / 50 > 1)
             {
 
                 if (moveInRightDirection)
@@ -2490,7 +2520,7 @@ namespace BasicsOfGame
                 attackTimer = 0;
                 return;
             }
-            if (attackTicks == 1 && attackTimer / 150 > 1)
+            if (attackTicks == 1 && attackTimer / 50 > 1)
             {
                 if (moveInRightDirection)
                 {
@@ -2508,7 +2538,7 @@ namespace BasicsOfGame
                 attackTimer = 0;
                 return;
             }
-            if (attackTicks == 2 && attackTimer / 150 > 1)
+            if (attackTicks == 2 && attackTimer / 50 > 1)
             {
                 if (moveInRightDirection)
                 {
@@ -2526,7 +2556,7 @@ namespace BasicsOfGame
                 attackTimer = 0;
                 return;
             }
-            if (attackTicks == 3 && attackTimer / 150 > 1)
+            if (attackTicks == 3 && attackTimer / 50 > 1)
             {
                 if (moveInRightDirection)
                 {
@@ -2545,7 +2575,7 @@ namespace BasicsOfGame
                 attackTimer = 0;
                 return;
             }
-            if (attackTicks == 4 && attackTimer / 300 > 1)
+            if (attackTicks == 4 && attackTimer / 150 > 1)
             {
                 if (moveInRightDirection)
                 {
@@ -2576,7 +2606,7 @@ namespace BasicsOfGame
                 Smash(player, dealDmg, 1);
                 return;
             }
-            if (attackTicks == 5 && attackTimer / 300 > 1)
+            if (attackTicks == 5 && attackTimer / 150 > 1)
             {
                 if (moveInRightDirection)
                 {
@@ -2607,7 +2637,7 @@ namespace BasicsOfGame
                 Smash(player, dealDmg, 2);
                 return;
             }
-            if (attackTicks == 6 && attackTimer / 300 > 1)
+            if (attackTicks == 6 && attackTimer / 150 > 1)
             {
                 if (moveInRightDirection)
                 {
@@ -2642,10 +2672,225 @@ namespace BasicsOfGame
 
 
         }
+        protected override void hpBar()
+        {
+            nameHolder = new TextBox();
+            nameHolder.Text = nameOfMonster;
+            nameHolder.FontFamily = new FontFamily("Algerian");
+            nameHolder.FontSize = 25;
+            nameHolder.TextAlignment=TextAlignment.Center;
+            nameHolder.Width = 200;
+            nameHolder.Height = 30;
+            Canvas.SetLeft(nameHolder, 655);
+            Canvas.SetTop(nameHolder, 10);
+            Canvas.SetZIndex(nameHolder, 700);
+
+            monsterHpBar = new System.Windows.Shapes.Rectangle();
+            background = new System.Windows.Shapes.Rectangle();
+            Canvas.SetZIndex(monsterHpBar, 700);
+            Canvas.SetZIndex(background, 699);
+
+            background.Width = 500;
+            background.Height = 20;
+            background.Fill = Brushes.Black;
+            Canvas.SetLeft(background, 500);
+            Canvas.SetTop(background, 40);
+            monsterHpBar.Width = 500;
+            monsterHpBar.Height = 20;
+            monsterHpBar.Fill = Brushes.Red;
+            Canvas.SetLeft(monsterHpBar, 500);
+            Canvas.SetTop(monsterHpBar,40);
+        }
+        public override void add()
+        {
+            base.add();
+            BelongTO.Children.Add(background);
+            BelongTO.Children.Add(nameHolder);
+
+
+
+        }
+        public override void remove()
+        {
+            base.remove();
+            BelongTO.Children.Remove(background);
+            BelongTO.Children.Remove(nameHolder);
+        }
+        public override void dotDamageTaken(int dmg)
+        {
+            if (shocked) dmg = Convert.ToInt32(dmg * 1.5);
+            healthPoints -= dmg;
+            if (healthPoints > 0)
+            {
+                double width = (healthPoints / maxHealthPoints) * 500;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                deadToDot.Invoke();
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
+        int stage;
+        System.Windows.Shapes.Rectangle beamSprite = new System.Windows.Shapes.Rectangle();
+        private void checkCollisionForSkill(System.Windows.Shapes.Rectangle player, System.Windows.Shapes.Rectangle hitbox,Action<int, string> dealDmg,int damage)
+        {
+            Rect hitBoxOfAttack = new Rect(Canvas.GetLeft(hitbox), Canvas.GetTop(hitbox), hitbox.Width, hitbox.Height);
+            Rect hitBoxOfPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
+            if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
+            {
+
+
+                int dealtDamage = damage;
+                if (ignited)
+                {
+                    dealtDamage = Convert.ToInt32(dealtDamage * 0.8);
+
+                }
+                dealDmg(dealtDamage, nameOfMonster);
+
+            }
+        }
+        private void useBeam(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg) {
+            
+          
+            beamSprite.Fill = Brushes.Orange;
+           
+            
+            if (stage == 0)
+            {
+                Canvas.SetTop(beamSprite, Canvas.GetTop(body) + body.Height / 3);
+                BelongTO.Children.Add(beamSprite);
+                if (directionOfAttack == "Left")
+                {
+                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body)-20);
+                    beamSprite.Width = 10;
+                    beamSprite.Height = 10;
+                }
+                else
+                {
+                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body) + body.Width);
+                    beamSprite.Width = 10;
+                    beamSprite.Height = 10;
+                }
+                    stage++;
+            }
+            else if (stage == 1 && timerForSkills > 0.30)
+            {
+
+                if (directionOfAttack == "Left")
+                {
+                    Canvas.SetLeft(beamSprite, 0);
+                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Height = 10;
+                }
+                else
+                {
+                    
+                    beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
+                    beamSprite.Height = 10;
+                }
+                checkCollisionForSkill(player, beamSprite, dealDmg,new Random().Next(10,15));
+                stage++;
+                timerForSkills = 0;
+            }
+            else if (stage == 2 && timerForSkills > 0.09)
+            {
+                Canvas.SetTop(beamSprite, Canvas.GetTop(body) - 7 + body.Height / 3);
+                if (directionOfAttack == "Left")
+                {
+                    Canvas.SetLeft(beamSprite, 0);
+                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Height = 25;
+                }
+                else
+                {
+
+                    beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
+                    beamSprite.Height = 25;
+                }
+                checkCollisionForSkill(player, beamSprite, dealDmg, new Random().Next(20, 25));
+                stage++;
+                timerForSkills = 0;
+            }
+            else if (stage == 3 && timerForSkills > 0.09)
+            {
+                Canvas.SetTop(beamSprite, Canvas.GetTop(body) - 15 + body.Height / 3);
+
+                if (directionOfAttack == "Left")
+                {
+                    Canvas.SetLeft(beamSprite, 0);
+                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Height = 40;
+                }
+                else
+                {
+
+                    beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
+                    beamSprite.Height = 40;
+                }
+                checkCollisionForSkill(player, beamSprite, dealDmg, new Random().Next(30, 35));
+                stage++;
+                timerForSkills = 0;
+            }
+            else if (stage == 4 && timerForSkills > 0.09)
+            {
+                Canvas.SetTop(beamSprite, Canvas.GetTop(body) - 25 + body.Height / 3);
+
+                if (directionOfAttack == "Left")
+                {
+                    Canvas.SetLeft(beamSprite, 0);
+                    beamSprite.Width = Canvas.GetLeft(body);
+                    beamSprite.Height = 60;
+                }
+                else
+                {
+
+                    beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
+                    beamSprite.Height = 60;
+                }
+                checkCollisionForSkill(player, beamSprite, dealDmg, new Random().Next(40, 45));
+                stage++;
+               
+
+            }
+            else if (stage == 5 && timerForSkills > 0.09)
+            {
+                stage = 0;
+                timerForSkills = 0;
+                currentBeamCooldown = beamCooldown;
+                usingSkill = false;
+                BelongTO.Children.Remove(beamSprite);
+            }
+                  
+
+        }
+
+        
+        private void useSkill(double delta,System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg)
+        {
+            timerForSkills += delta;
+            if (currentlyUsing == "beamAttack")
+            {
+                useBeam(player, directionOfAttack,dealDmg);
+            }
+            else
+            {
+                timerForSkills = 0;
+                usingSkill = false;
+            }
+        }
+        string directionOfAttack;
         public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
-
+            if (gracePeriod > 0)
+            {
+                gracePeriod -= delta;
+                return;
+            }
+            if(currentBeamCooldown>0)currentBeamCooldown -= delta;
             NormalizeSpeed(delta);
             dotUpdate(delta);
             bool tryAttack = true;
@@ -2653,7 +2898,45 @@ namespace BasicsOfGame
             setRelativeVisibility();
 
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name));
-            if (prepareToAttack)
+
+            if (usingSkill)
+            {
+                useSkill(delta, name, directionOfAttack, dealDmg);
+                return;
+            }
+            if(Math.Abs((playerCenter.Y-name.Height/2) - (Canvas.GetTop(body)-body.Height/2)) < 60&&!prepareToAttack&&!usingSkill&&currentBeamCooldown<=0)
+            {
+                if (currentBeamCooldown <= 0)
+                {
+                    stage = 0;
+                    timerForSkills = 0;
+                    if (playerCenter.X > (Canvas.GetLeft(body) - body.Width / 2))
+                    {
+                        directionOfAttack = "Right";
+
+                        moveInRightDirection = true;
+                        currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                        body.Fill = monsterSprite;
+
+
+
+                    }
+                    else
+                    {
+                        directionOfAttack = "Left";
+                        moveInRightDirection = false;
+                        currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementLeft[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                    usingSkill = true;
+                    currentlyUsing = "beamAttack";
+                   
+                    return;
+                }
+            }
+              if (prepareToAttack)
             {
                 attack(name, delta, dealDmg);
                 return;
@@ -2671,12 +2954,12 @@ namespace BasicsOfGame
                 moveMonsterByX = -Speed * friction;
                 tryAttack = false;
             }
-            if (playerCenter.Y < Canvas.GetTop(body) - body.Height / 3)
+            if (playerCenter.Y < Canvas.GetTop(body) - body.Height / 6)
             {
                 moveMonsterByY = -Speed * friction;
                 tryAttack = false;
             }
-            if (playerCenter.Y > Canvas.GetTop(body) + body.Height)
+            if (playerCenter.Y > Canvas.GetTop(body))
             {
                 moveMonsterByY = Speed * friction;
                 tryAttack = false;
@@ -2705,7 +2988,7 @@ namespace BasicsOfGame
             {
                 attackTicks = 0;
                 attackTimer = 0;
-                prepareToAttack = true;
+                 prepareToAttack = true;
                 return;
             }
             if ((moveMonsterByY != 0 || moveMonsterByX != 0) && ticks >= 10 / Speed)
@@ -2773,8 +3056,7 @@ namespace BasicsOfGame
             Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93 - (body.Height * 3 / 4)) Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
-            Canvas.SetLeft(monsterHpBar, Canvas.GetLeft(body) + (body.Width * 1) / 10);
-            Canvas.SetTop(monsterHpBar, Canvas.GetTop(body) - 15);
+            
 
 
 
@@ -2782,7 +3064,7 @@ namespace BasicsOfGame
 
 
 
-    };
+    }
 }
 
 
