@@ -2290,22 +2290,27 @@ namespace BasicsOfGame
         int hitboxTicks = 0;
         double beamCooldown;
         double dashCooldown;
+        double tentacleCooldown;
         double currentDashCooldown;
         double currentBeamCooldown;
+        double currenctTentacleCooldown;
         TextBox nameHolder;
         System.Windows.Shapes.Rectangle background;
         string currentlyUsing;
         private double gracePeriod = 0.2; 
         private bool usingSkill = false;
         private double timerForSkills;
+        BitmapImage[] tentacleSprite; 
         public oldGreatOne(Canvas canv, int x, int y)
         {
             timerForSkills = 0;
-            nameOfMonster = "Abomination";
+            nameOfMonster = "Sehn, Harbringer of Madness";
             beamCooldown = 10;
             dashCooldown = 10;
+            tentacleCooldown = 13;
             currentBeamCooldown = 0;
             currentDashCooldown = 0;
+            currenctTentacleCooldown = 0;
             expGiven = 2500;
             attackTicks = 0;
             animations = 8;
@@ -2363,8 +2368,11 @@ namespace BasicsOfGame
             monsterAttackLeft = new BitmapImage[8];
             attackHitBoxLeft = new BitmapImage[3];
             attackHitBoxRight = new BitmapImage[3];
+            tentacleSprite = new BitmapImage[8];
             BitmapImage AbominationSpriteAttack = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
             BitmapImage AbominationSpriteMovement = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
+            BitmapImage tentacleImages = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/BossAnimations/tentacles.png", UriKind.Absolute));
+            
             int spriteWidth = 57;
             int spriteHeight = 88;
 
@@ -2418,6 +2426,35 @@ namespace BasicsOfGame
                         monsterAttackRight[animation] = sprite;
                     }
                     animation++;
+
+                }
+            }
+            int tenWidth = 25;
+            int tenHeight = 90;
+            int animationTen = 0;
+            for (int i = 0; i < 180; i += tenHeight)
+            {
+
+                
+                for (int j = 0; j < 200; j += tenWidth*2)
+                {
+
+
+                    Int32Rect spriteRect = new Int32Rect(j, i, tenWidth, tenHeight);
+                    CroppedBitmap croppedBitmap = new CroppedBitmap(tentacleImages, spriteRect);
+                    
+                    MemoryStream stream = new MemoryStream();
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
+                    encoder.Save(stream);
+                   
+                    BitmapImage sprite = new BitmapImage();
+                    sprite.BeginInit();
+                    sprite.CacheOption = BitmapCacheOption.OnLoad;
+                    sprite.StreamSource = stream;
+                    sprite.EndInit();
+                    tentacleSprite[animationTen] = sprite;
+                    animationTen++;
 
                 }
             }
@@ -2685,9 +2722,9 @@ namespace BasicsOfGame
             nameHolder.FontFamily = new FontFamily("Algerian");
             nameHolder.FontSize = 25;
             nameHolder.TextAlignment=TextAlignment.Center;
-            nameHolder.Width = 200;
+            nameHolder.Width = 400;
             nameHolder.Height = 30;
-            Canvas.SetLeft(nameHolder, 655);
+            Canvas.SetLeft(nameHolder, 550);
             Canvas.SetTop(nameHolder, 10);
             Canvas.SetZIndex(nameHolder, 700);
 
@@ -2771,8 +2808,7 @@ namespace BasicsOfGame
                 warning.FontSize = 20;
                 BelongTO.Children.Add(warning);
                 stage++;
-                System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2), Canvas.GetTop(player));
-
+                return;
             }
             
             else if (stage == 1 && timerForSkills <0.25)
@@ -2782,7 +2818,18 @@ namespace BasicsOfGame
             else if (stage == 1 && timerForSkills > 0.25)
             {
                 BelongTO.Children.Remove(warning);
-                System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2), Canvas.GetTop(player));
+                System.Windows.Point playerCenter;
+                if (directionOfAttack == "Right")
+                {
+                    double offsetRight = rnd.Next(0, 2)*player.Width;
+                    playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2)+offsetRight, Canvas.GetTop(player));
+
+                }
+                else
+                {
+                    double offsetLeft = rnd.Next(0, 2) * -1*player.Width;
+                    playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2)+offsetLeft, Canvas.GetTop(player));
+                }
                 targetOfAttack = playerCenter;
                 stage++;
             }
@@ -2864,6 +2911,162 @@ namespace BasicsOfGame
             
             
         }
+        private void dealDmgWithOffset(System.Windows.Shapes.Rectangle player,System.Windows.Shapes.Rectangle damager,Action<int,string> dealDmg,int minDmg,int maxDmg)
+        {
+            Rect hitBoxPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
+            Rect hitBoxAttack = new Rect(Canvas.GetLeft(damager), Canvas.GetTop(damager), damager.Width, damager.Height);
+            if (determinateCollision(hitBoxPlayer, hitBoxAttack))
+            {
+                dealDmg(rnd.Next(minDmg, maxDmg+1), nameOfMonster);
+                if ((Canvas.GetLeft(player) + player.Width / 2) > (Canvas.GetLeft(damager) + damager.Width / 2))
+                {
+                    Canvas.SetLeft(player, Canvas.GetLeft(player) + 30);
+                }
+                else
+                {
+                    Canvas.SetLeft(player, Canvas.GetLeft(player) - 30);
+
+                }
+            }
+        }
+        private void useAbyss(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg)
+        {
+            if (stage == 0)
+            {
+                Canvas.SetLeft(warning, Canvas.GetLeft(body) - 10);
+                Canvas.SetTop(warning, Canvas.GetTop(body) - 10);
+                warning.Background = Brushes.Red;
+                warning.Foreground = Brushes.White;
+                warning.Text = "!!!";
+                Canvas.SetZIndex(warning, 1000);
+                warning.FontSize = 20;
+                BelongTO.Children.Add(warning);
+                stage++;
+                return;
+            }
+            else if (stage == 1 && timerForSkills < 0.15)
+            {
+                return;
+            }
+            else if (stage == 1 && timerForSkills > 0.15)
+            {
+                BelongTO.Children.Remove(warning);
+                
+                tentacle = new System.Windows.Shapes.Rectangle();
+                tentacleHolder = new System.Windows.Shapes.Rectangle();
+                tentacle.Width = 125;
+                tentacle.Height = 200;
+                tentacleHolder.Width = 125;
+                tentacleHolder.Height = 450;
+                tentacle.Fill = Brushes.Red;
+                ImageBrush helper=new ImageBrush();
+                helper.ImageSource = tentacleSprite[0];
+                tentacleHolder.Fill = helper;
+                tentacle.Opacity = 0.6;
+                Canvas.SetLeft(tentacle,Canvas.GetLeft(player)+player.Width/2-tentacle.Width/2);
+                Canvas.SetTop(tentacle,Canvas.GetTop(player) +player.Height/2-tentacle.Height/2);
+                Canvas.SetLeft(tentacleHolder, Canvas.GetLeft(tentacle));
+                Canvas.SetZIndex(tentacleHolder, 60);
+                Canvas.SetTop(tentacleHolder, Canvas.GetTop(tentacle)-250);
+
+                BelongTO.Children.Add(tentacle);
+                
+
+                stage++;
+                timerForSkills = 0;
+            }
+            else if (stage == 2 && timerForSkills > 0.30)
+            {
+                tentacle.Fill = Brushes.Transparent;
+                BelongTO.Children.Add(tentacleHolder);
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+            }
+            else if(stage==3 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage-2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+            else if (stage == 4 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage-2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+            else if (stage == 5 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage - 2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+            else if (stage == 6 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage - 2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+            else if (stage == 7 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage - 2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+
+            else if (stage == 8 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage - 2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+            else if (stage == 9 && timerForSkills > 0.09)
+            {
+                ImageBrush helper = new ImageBrush();
+                helper.ImageSource = tentacleSprite[stage - 2];
+                tentacleHolder.Fill = helper;
+                stage++;
+                timerForSkills = 0;
+                dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
+
+            }
+            else if (stage == 10 && timerForSkills > 0.09)
+            {
+                stage=0;
+                currenctTentacleCooldown = tentacleCooldown;
+                usingSkill = false;
+                timerForSkills = 0;
+                
+                    BelongTO.Children.Remove(tentacleHolder);
+                    BelongTO.Children.Remove(tentacle);
+            }
+        }
+        System.Windows.Shapes.Rectangle tentacle; 
+        System.Windows.Shapes.Rectangle tentacleHolder; 
         private void useBeam(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg) {
             
           
@@ -2993,6 +3196,10 @@ namespace BasicsOfGame
             {
                 useDash(player, directionOfAttack, dealDmg);
             }
+            else if (currentlyUsing == "abyss")
+            {
+                useAbyss(player, directionOfAttack, dealDmg);
+            }
             else
             {
                 timerForSkills = 0;
@@ -3012,6 +3219,7 @@ namespace BasicsOfGame
             }
             if(currentBeamCooldown>0)currentBeamCooldown -= delta;
             if(currentDashCooldown > 0)currentDashCooldown -= delta;
+            if(currenctTentacleCooldown > 0) currenctTentacleCooldown -= delta;
             NormalizeSpeed(delta);
             dotUpdate(delta);
             bool tryAttack = true;
@@ -3058,7 +3266,7 @@ namespace BasicsOfGame
                 {
                     stage = 0;
                     timerForSkills = 0;
-                    if (playerCenter.X > (Canvas.GetLeft(body) - body.Width / 2))
+                    if (playerCenter.X > (Canvas.GetLeft(body) + body.Width / 2))
                     {
                         directionOfAttack = "Right";
 
@@ -3084,7 +3292,16 @@ namespace BasicsOfGame
                     return;
                 }
             }
-              if (prepareToAttack)
+            if (currenctTentacleCooldown <= 0&&!usingSkill)
+            {
+                stage = 0;
+                timerForSkills = 0;
+                usingSkill = true;
+                currentlyUsing = "abyss";
+                return;
+
+            }
+            if (prepareToAttack)
             {
                 attack(name, delta, dealDmg);
                 return;
