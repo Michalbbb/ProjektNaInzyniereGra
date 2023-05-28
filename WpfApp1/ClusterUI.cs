@@ -94,8 +94,16 @@ namespace BasicsOfGame
             canvas.Background = deathBG;
             TextBox info = new TextBox();
             TextBox importantInfo = new TextBox();
-            info.Text = $"You were killed by\n\nLethal hit dealt";
-            importantInfo.Text = $"{name}\n\n{dealtDmg} damage.";
+            if (name.Length > 20)
+            {
+                info.Text = $"You were killed by\n\n\nLethal hit dealt";
+                importantInfo.Text = $"{name}\n\n{dealtDmg} damage.";
+            }
+            else
+            {
+                info.Text = $"You were killed by\n\nLethal hit dealt";
+                importantInfo.Text = $"{name}\n\n{dealtDmg} damage.";
+            }
             info.IsEnabled = false;
             info.FontFamily = new FontFamily("Algerian");
             info.FontSize = 40;

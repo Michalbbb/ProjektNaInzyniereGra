@@ -353,8 +353,8 @@ namespace BasicsOfGame
             minDmg = 10;
             maxDmg = 15;
             if (allocateMode) { unassignedSkillPoints = 25; level = 25;skillsToPick = 5; }
-            Speed = 300;
-            baseSpeed = 300;
+            Speed = 100;
+            baseSpeed = 100;
             player.Name = "Player";
             player.Width = 88;
             player.Height = 109;

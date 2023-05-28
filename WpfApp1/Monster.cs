@@ -2304,7 +2304,7 @@ namespace BasicsOfGame
         public oldGreatOne(Canvas canv, int x, int y)
         {
             timerForSkills = 0;
-            nameOfMonster = "Sehn, Harbringer of Madness";
+            nameOfMonster = "Sehn, Harbringer \nof Madness";
             beamCooldown = 10;
             dashCooldown = 10;
             tentacleCooldown = 13;
@@ -2718,7 +2718,7 @@ namespace BasicsOfGame
         protected override void hpBar()
         {
             nameHolder = new TextBox();
-            nameHolder.Text = nameOfMonster;
+            nameHolder.Text = "Sehn, Harbringer of Madness";
             nameHolder.FontFamily = new FontFamily("Algerian");
             nameHolder.FontSize = 25;
             nameHolder.TextAlignment=TextAlignment.Center;
