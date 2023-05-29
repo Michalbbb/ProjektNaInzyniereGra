@@ -3422,40 +3422,66 @@ namespace BasicsOfGame
         int hitboxTicks = 0;
         TextBox nameHolder;
         System.Windows.Shapes.Rectangle background;
+        double teleportCooldown;
+        double strongAttackCooldown;
+        double invisibilityCooldown;
+        double currentTeleportCooldown;
+        double currentStrongAttackCooldown;
+        double currentInvisibilityCooldown;
         string currentlyUsing;
         private double gracePeriod = 0.2;
         private bool usingSkill = false;
         private double timerForSkills;
         public ghostOfSenjuro(Canvas canv, int x, int y)
         {
+            timerForSkills = 0;
+            teleportCooldown = 30;
+            strongAttackCooldown = 20;
+            invisibilityCooldown = 15;
+            currentTeleportCooldown = 0;
+            currentStrongAttackCooldown = 0;
+            currentInvisibilityCooldown = 0;
+
             nameOfMonster = "Senjuro, Ghost Samurai \nof Kanto";
+            
             expGiven = 2000;
             attackTicks = 0;
-            animations = 8;
-            currentAnimation = 0;
             attackRange = 100;
+            
             Speed = 200;
             baseSpeed = 200;
-            healthPoints = 1500;
-            maxHealthPoints = healthPoints;
+            
+            animations = 8;
+            currentAnimation = 0;
             body.Height = 240;
             body.Width = 192;
             //body.Height = 240;
             //body.Width = 192;
+            
+            healthPoints = 1500;
+            maxHealthPoints = healthPoints;
+            
             body.Fill = Brushes.Blue;
             body.Tag = "enemy";
+            
             minDmg = Convert.ToInt32(24);
             maxDmg = Convert.ToInt32(52);
+            
             weapon.Height = 40;
             weapon.Width = 40;
             weapon.Fill = Brushes.Transparent;
             Canvas.SetZIndex(weapon, 0);
+            
             BelongTO = canv;
+            
             body.SetValue(Canvas.TopProperty, (double)y);
             body.SetValue(Canvas.LeftProperty, (double)x);
+            
             loadImages();
+            
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
+            
             hpBar();
         }
         public override void damageTaken(ref int dmg)
@@ -3602,6 +3628,7 @@ namespace BasicsOfGame
             Canvas.SetTop(monsterHpBar, 40);
         }
 
+        //string directionOfAttack;
         public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
         {
             if (delta > 1) return; // Starting delta value is about 3 billions 
@@ -3618,13 +3645,43 @@ namespace BasicsOfGame
 
             System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name));
 
+            if (currentInvisibilityCooldown > 0)
+            {
+                currentInvisibilityCooldown -= delta;
+            }
+            if (currentStrongAttackCooldown > 0)
+            {
+                currentStrongAttackCooldown -= delta;
+            }
+            if (currentTeleportCooldown > 0)
+            {
+                currentTeleportCooldown -= delta;
+            }
+
             if (usingSkill)
             {
-                //useSkill(delta, name, directionOfAttack, dealDmg);
+                useSkill(delta, name, dealDmg);
                 return;
             }
-            
-            
+            if(currentTeleportCooldown <= 0)
+            {
+                usingSkill = true;
+                currentlyUsing = "Teleport";
+            }
+            if(prepareToAttack && !usingSkill && currentStrongAttackCooldown <= 0)
+            {
+                timerForSkills = 0;
+                usingSkill = true;
+                currentlyUsing = "StrongAttack";
+            }
+            if (!usingSkill && currentInvisibilityCooldown <= 0)
+            {
+                timerForSkills = 0;
+                usingSkill = true;
+                currentlyUsing = "Disappear";
+            }
+
+
             if (prepareToAttack)
             {
                 attack(name, delta, dealDmg);
@@ -3912,6 +3969,22 @@ namespace BasicsOfGame
             BelongTO.Children.Remove(background);
             BelongTO.Children.Remove(nameHolder);
         }
+        public override void dotDamageTaken(int dmg)
+        {
+            if (shocked) dmg = Convert.ToInt32(dmg * 1.5);
+            healthPoints -= dmg;
+            if (healthPoints > 0)
+            {
+                double width = (healthPoints / maxHealthPoints) * 500;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                deadToDot.Invoke();
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
 
         private void Slash(System.Windows.Shapes.Rectangle player, Action<int, string> dealDmg)
         {
@@ -3939,11 +4012,132 @@ namespace BasicsOfGame
             }
         }
 
+        //funkcje zapożyczone do skilli
+        //int stage;
+        System.Windows.Shapes.Rectangle beamSprite = new System.Windows.Shapes.Rectangle();
+        private void checkCollisionForSkill(System.Windows.Shapes.Rectangle player, System.Windows.Shapes.Rectangle hitbox, Action<int, string> dealDmg, int damage)
+        {
+            Rect hitBoxOfAttack = new Rect(Canvas.GetLeft(hitbox), Canvas.GetTop(hitbox), hitbox.Width, hitbox.Height);
+            Rect hitBoxOfPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
+            if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
+            {
+
+
+                int dealtDamage = damage;
+                if (ignited)
+                {
+                    dealtDamage = Convert.ToInt32(dealtDamage * 0.8);
+
+                }
+                dealDmg(dealtDamage, nameOfMonster);
+
+            }
+        }
+
+        private void dealDmgWithOffset(System.Windows.Shapes.Rectangle player, System.Windows.Shapes.Rectangle damager, Action<int, string> dealDmg, int minDmg, int maxDmg)
+        {
+            Rect hitBoxPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
+            Rect hitBoxAttack = new Rect(Canvas.GetLeft(damager), Canvas.GetTop(damager), damager.Width, damager.Height);
+            if (determinateCollision(hitBoxPlayer, hitBoxAttack))
+            {
+                dealDmg(rnd.Next(minDmg, maxDmg + 1), nameOfMonster);
+                if ((Canvas.GetLeft(player) + player.Width / 2) > (Canvas.GetLeft(damager) + damager.Width / 2))
+                {
+                    Canvas.SetLeft(player, Canvas.GetLeft(player) + 30);
+                }
+                else
+                {
+                    Canvas.SetLeft(player, Canvas.GetLeft(player) - 30);
+
+                }
+            }
+        }
+
+        private void useSkill(double delta, System.Windows.Shapes.Rectangle player, Action<int, string> dealDmg)
+        {
+            timerForSkills += delta;
+            if (currentlyUsing == "Teleport")
+            {
+                useTeleport(player);//(player, directionOfAttack, dealDmg);
+            }
+            else if (currentlyUsing == "StrongAttack")
+            {
+                useStrongAttack(player, delta, dealDmg);//(player, directionOfAttack, dealDmg);
+            }
+            else if (currentlyUsing == "Disappear")
+            {
+                //useDisappear();//(player, directionOfAttack, dealDmg);
+            }
+            else
+            {
+                timerForSkills = 0;
+                usingSkill = false;
+            }
+        }
+
         //skill teleportacja
+        private void useTeleport(System.Windows.Shapes.Rectangle player)
+        {
+            
+            if (currentTeleportCooldown <= 0) //&& !usingSkill)
+            {
+                //MessageBox.Show("Teleport");
+                int randX, randY;
+                Random randomTeleport = new Random();
+                //System.Drawing.Point teleportDestination;
+
+                randX = randomTeleport.Next(40, 1110);
+                randY = randomTeleport.Next(40, 550);
+
+                //teleportDestination = new System.Drawing.Point(randX, randY);
+
+                Canvas.SetLeft(body, randX);
+                Canvas.SetTop(body, randY);
+
+                timerForSkills = 0;
+                currentTeleportCooldown = teleportCooldown;
+            }
+                usingSkill = false;
+        }
 
         //skill strongAttack
+        private void useStrongAttack(System.Windows.Shapes.Rectangle player, double delta, Action<int,string> dealDmg)
+        {
+            
+            if (currentStrongAttackCooldown <= 0)
+            {
+                TextBox strongAttack = new TextBox();
+                strongAttack.Text = "!";
+                strongAttack.Foreground = Brushes.Red;
+                strongAttack.Visibility = Visibility.Visible;
+                //MessageBox.Show("Strong");
+                int min = 100, max = 200, damageValue;
+                Random strongAttackRand = new Random();
+                damageValue = strongAttackRand.Next(min, max + 1);
+                
+                checkCollisionForSkill(player, body, dealDmg, damageValue);
 
-        //skill flyingKatana
+                Canvas.SetLeft(strongAttack, Canvas.GetLeft(body)-10);
+                Canvas.SetTop(strongAttack, Canvas.GetTop(body)-10);
+                attack(player, delta, dealDmg);
+                currentStrongAttackCooldown = strongAttackCooldown;
+            }
+            usingSkill = false;
+        }
+
+
+        //skill niewidzialność
+        /*
+        private void useDisappear()
+        {
+            //MessageBox.Show("Disappear");
+            if (currentInvisibilityCooldown <= 0)
+            {
+                
+                currentInvisibilityCooldown = invisibilityCooldown;
+            }
+            usingSkill = false;
+        }*/
     }
 }
 
