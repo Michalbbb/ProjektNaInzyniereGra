@@ -194,7 +194,8 @@ namespace BasicsOfGame
                 x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
                 y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
 
-                    addMeToList = new oldGreatOne(BelongTo,x1,y1);
+                    //addMeToList = new oldGreatOne(BelongTo,x1,y1);
+                    addMeToList = new ghostOfSenjuro(BelongTo, x1, y1);
 
                 monsters.Add(addMeToList);
             }
@@ -434,7 +435,7 @@ namespace BasicsOfGame
     internal class Grid
     {
         public Pokoj[,] grid;
-        int roomCount = 16;
+        int roomCount = 2;
         static int gridSize = 9;
         int currX, currY;
         static int gridMid = gridSize / 2;

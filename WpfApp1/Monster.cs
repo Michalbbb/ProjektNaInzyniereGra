@@ -18,7 +18,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows.Controls.Primitives;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
 
 namespace BasicsOfGame
@@ -2297,10 +2297,10 @@ namespace BasicsOfGame
         TextBox nameHolder;
         System.Windows.Shapes.Rectangle background;
         string currentlyUsing;
-        private double gracePeriod = 0.2; 
+        private double gracePeriod = 0.2;
         private bool usingSkill = false;
         private double timerForSkills;
-        BitmapImage[] tentacleSprite; 
+        BitmapImage[] tentacleSprite;
         public oldGreatOne(Canvas canv, int x, int y)
         {
             timerForSkills = 0;
@@ -2325,7 +2325,7 @@ namespace BasicsOfGame
             body.Fill = Brushes.Blue;
             body.Tag = "enemy";
             minDmg = Convert.ToInt32(18);
-            maxDmg = Convert.ToInt32(36 );
+            maxDmg = Convert.ToInt32(36);
             weapon.Height = 40;
             weapon.Width = 40;
             weapon.Fill = Brushes.Transparent;
@@ -2351,7 +2351,7 @@ namespace BasicsOfGame
             healthPoints -= dmg;
             if (healthPoints > 0)
             {
-                double width = (healthPoints / maxHealthPoints) * 500 ;
+                double width = (healthPoints / maxHealthPoints) * 500;
                 monsterHpBar.Width = width;
             }
             else
@@ -2372,7 +2372,7 @@ namespace BasicsOfGame
             BitmapImage AbominationSpriteAttack = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
             BitmapImage AbominationSpriteMovement = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Skull.png", UriKind.Absolute));
             BitmapImage tentacleImages = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/BossAnimations/tentacles.png", UriKind.Absolute));
-            
+
             int spriteWidth = 57;
             int spriteHeight = 88;
 
@@ -2435,19 +2435,19 @@ namespace BasicsOfGame
             for (int i = 0; i < 180; i += tenHeight)
             {
 
-                
-                for (int j = 0; j < 200; j += tenWidth*2)
+
+                for (int j = 0; j < 200; j += tenWidth * 2)
                 {
 
 
                     Int32Rect spriteRect = new Int32Rect(j, i, tenWidth, tenHeight);
                     CroppedBitmap croppedBitmap = new CroppedBitmap(tentacleImages, spriteRect);
-                    
+
                     MemoryStream stream = new MemoryStream();
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
                     encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
                     encoder.Save(stream);
-                   
+
                     BitmapImage sprite = new BitmapImage();
                     sprite.BeginInit();
                     sprite.CacheOption = BitmapCacheOption.OnLoad;
@@ -2721,7 +2721,7 @@ namespace BasicsOfGame
             nameHolder.Text = "Sehn, Harbringer of Madness";
             nameHolder.FontFamily = new FontFamily("Algerian");
             nameHolder.FontSize = 25;
-            nameHolder.TextAlignment=TextAlignment.Center;
+            nameHolder.TextAlignment = TextAlignment.Center;
             nameHolder.Width = 400;
             nameHolder.Height = 30;
             Canvas.SetLeft(nameHolder, 550);
@@ -2742,16 +2742,13 @@ namespace BasicsOfGame
             monsterHpBar.Height = 20;
             monsterHpBar.Fill = Brushes.Red;
             Canvas.SetLeft(monsterHpBar, 500);
-            Canvas.SetTop(monsterHpBar,40);
+            Canvas.SetTop(monsterHpBar, 40);
         }
         public override void add()
         {
             base.add();
             BelongTO.Children.Add(background);
             BelongTO.Children.Add(nameHolder);
-
-
-
         }
         public override void remove()
         {
@@ -2777,7 +2774,7 @@ namespace BasicsOfGame
         }
         int stage;
         System.Windows.Shapes.Rectangle beamSprite = new System.Windows.Shapes.Rectangle();
-        private void checkCollisionForSkill(System.Windows.Shapes.Rectangle player, System.Windows.Shapes.Rectangle hitbox,Action<int, string> dealDmg,int damage)
+        private void checkCollisionForSkill(System.Windows.Shapes.Rectangle player, System.Windows.Shapes.Rectangle hitbox, Action<int, string> dealDmg, int damage)
         {
             Rect hitBoxOfAttack = new Rect(Canvas.GetLeft(hitbox), Canvas.GetTop(hitbox), hitbox.Width, hitbox.Height);
             Rect hitBoxOfPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
@@ -2810,9 +2807,9 @@ namespace BasicsOfGame
                 stage++;
                 return;
             }
-            
-            else if (stage == 1 && timerForSkills <0.25)
-            { 
+
+            else if (stage == 1 && timerForSkills < 0.25)
+            {
                 return;
             }
             else if (stage == 1 && timerForSkills > 0.25)
@@ -2821,14 +2818,14 @@ namespace BasicsOfGame
                 System.Windows.Point playerCenter;
                 if (directionOfAttack == "Right")
                 {
-                    double offsetRight = rnd.Next(0, 2)*player.Width;
-                    playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2)+offsetRight, Canvas.GetTop(player));
+                    double offsetRight = rnd.Next(0, 2) * player.Width;
+                    playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2) + offsetRight, Canvas.GetTop(player));
 
                 }
                 else
                 {
-                    double offsetLeft = rnd.Next(0, 2) * -1*player.Width;
-                    playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2)+offsetLeft, Canvas.GetTop(player));
+                    double offsetLeft = rnd.Next(0, 2) * -1 * player.Width;
+                    playerCenter = new System.Windows.Point(Canvas.GetLeft(player) + (player.Width / 2) + offsetLeft, Canvas.GetTop(player));
                 }
                 targetOfAttack = playerCenter;
                 stage++;
@@ -2854,7 +2851,7 @@ namespace BasicsOfGame
                 moveMonsterByY = Speed * 3;
 
             }
-            if (moveMonsterByX == 0 && moveMonsterByY==0)
+            if (moveMonsterByX == 0 && moveMonsterByY == 0)
             {
                 currentDashCooldown = dashCooldown;
                 usingSkill = false;
@@ -2865,7 +2862,7 @@ namespace BasicsOfGame
             Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
             Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             Rect hitBoxOfAttack = new Rect(Canvas.GetLeft(body), Canvas.GetTop(body), body.Width, body.Height);
-            
+
             foreach (System.Windows.Shapes.Rectangle x in BelongTO.Children.OfType<System.Windows.Shapes.Rectangle>())
             {
                 Rect hitBoxOfElement = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
@@ -2875,13 +2872,13 @@ namespace BasicsOfGame
                     if ((string)x.Tag == "collision")
                     {
                         BelongTO.Children.Remove(x);
-                        
+
                         foreach (System.Windows.Shapes.Rectangle find in BelongTO.Children.OfType<System.Windows.Shapes.Rectangle>())
                         {
                             Rect hitBoxOfObstacle = new Rect(Canvas.GetLeft(find), Canvas.GetTop(find), find.Width, find.Height);
                             if (determinateCollision(hitBoxOfObstacle, hitBoxOfAttack))
                             {
-                                if((string)find.Tag == "obstacle")BelongTO.Children.Remove(find);
+                                if ((string)find.Tag == "obstacle") BelongTO.Children.Remove(find);
                                 break;
                             }
                         }
@@ -2902,22 +2899,22 @@ namespace BasicsOfGame
                         stage = 0;
                         return;
                     }
-                
-                
+
+
                 }
 
             }
-            
-            
-            
+
+
+
         }
-        private void dealDmgWithOffset(System.Windows.Shapes.Rectangle player,System.Windows.Shapes.Rectangle damager,Action<int,string> dealDmg,int minDmg,int maxDmg)
+        private void dealDmgWithOffset(System.Windows.Shapes.Rectangle player, System.Windows.Shapes.Rectangle damager, Action<int, string> dealDmg, int minDmg, int maxDmg)
         {
             Rect hitBoxPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
             Rect hitBoxAttack = new Rect(Canvas.GetLeft(damager), Canvas.GetTop(damager), damager.Width, damager.Height);
             if (determinateCollision(hitBoxPlayer, hitBoxAttack))
             {
-                dealDmg(rnd.Next(minDmg, maxDmg+1), nameOfMonster);
+                dealDmg(rnd.Next(minDmg, maxDmg + 1), nameOfMonster);
                 if ((Canvas.GetLeft(player) + player.Width / 2) > (Canvas.GetLeft(damager) + damager.Width / 2))
                 {
                     Canvas.SetLeft(player, Canvas.GetLeft(player) + 30);
@@ -2951,7 +2948,7 @@ namespace BasicsOfGame
             else if (stage == 1 && timerForSkills > 0.15)
             {
                 BelongTO.Children.Remove(warning);
-                
+
                 tentacle = new System.Windows.Shapes.Rectangle();
                 tentacleHolder = new System.Windows.Shapes.Rectangle();
                 tentacle.Width = 125;
@@ -2959,18 +2956,18 @@ namespace BasicsOfGame
                 tentacleHolder.Width = 125;
                 tentacleHolder.Height = 450;
                 tentacle.Fill = Brushes.Red;
-                ImageBrush helper=new ImageBrush();
+                ImageBrush helper = new ImageBrush();
                 helper.ImageSource = tentacleSprite[0];
                 tentacleHolder.Fill = helper;
                 tentacle.Opacity = 0.6;
-                Canvas.SetLeft(tentacle,Canvas.GetLeft(player)+player.Width/2-tentacle.Width/2);
-                Canvas.SetTop(tentacle,Canvas.GetTop(player) +player.Height/2-tentacle.Height/2);
+                Canvas.SetLeft(tentacle, Canvas.GetLeft(player) + player.Width / 2 - tentacle.Width / 2);
+                Canvas.SetTop(tentacle, Canvas.GetTop(player) + player.Height / 2 - tentacle.Height / 2);
                 Canvas.SetLeft(tentacleHolder, Canvas.GetLeft(tentacle));
                 Canvas.SetZIndex(tentacleHolder, 60);
-                Canvas.SetTop(tentacleHolder, Canvas.GetTop(tentacle)-250);
+                Canvas.SetTop(tentacleHolder, Canvas.GetTop(tentacle) - 250);
 
                 BelongTO.Children.Add(tentacle);
-                
+
 
                 stage++;
                 timerForSkills = 0;
@@ -2983,10 +2980,10 @@ namespace BasicsOfGame
                 timerForSkills = 0;
                 dealDmgWithOffset(player, tentacle, dealDmg, 10, 20);
             }
-            else if(stage==3 && timerForSkills > 0.09)
+            else if (stage == 3 && timerForSkills > 0.09)
             {
                 ImageBrush helper = new ImageBrush();
-                helper.ImageSource = tentacleSprite[stage-2];
+                helper.ImageSource = tentacleSprite[stage - 2];
                 tentacleHolder.Fill = helper;
                 stage++;
                 timerForSkills = 0;
@@ -2996,7 +2993,7 @@ namespace BasicsOfGame
             else if (stage == 4 && timerForSkills > 0.09)
             {
                 ImageBrush helper = new ImageBrush();
-                helper.ImageSource = tentacleSprite[stage-2];
+                helper.ImageSource = tentacleSprite[stage - 2];
                 tentacleHolder.Fill = helper;
                 stage++;
                 timerForSkills = 0;
@@ -3056,30 +3053,31 @@ namespace BasicsOfGame
             }
             else if (stage == 10 && timerForSkills > 0.09)
             {
-                stage=0;
+                stage = 0;
                 currenctTentacleCooldown = tentacleCooldown;
                 usingSkill = false;
                 timerForSkills = 0;
-                
-                    BelongTO.Children.Remove(tentacleHolder);
-                    BelongTO.Children.Remove(tentacle);
+
+                BelongTO.Children.Remove(tentacleHolder);
+                BelongTO.Children.Remove(tentacle);
             }
         }
-        System.Windows.Shapes.Rectangle tentacle; 
-        System.Windows.Shapes.Rectangle tentacleHolder; 
-        private void useBeam(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg) {
-            
-          
+        System.Windows.Shapes.Rectangle tentacle;
+        System.Windows.Shapes.Rectangle tentacleHolder;
+        private void useBeam(System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg)
+        {
+
+
             beamSprite.Fill = Brushes.Orange;
-           
-            
+
+
             if (stage == 0)
             {
                 Canvas.SetTop(beamSprite, Canvas.GetTop(body) + body.Height / 3);
                 BelongTO.Children.Add(beamSprite);
                 if (directionOfAttack == "Left")
                 {
-                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body)-20);
+                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body) - 20);
                     beamSprite.Width = 10;
                     beamSprite.Height = 10;
                 }
@@ -3089,7 +3087,7 @@ namespace BasicsOfGame
                     beamSprite.Width = 10;
                     beamSprite.Height = 10;
                 }
-                    stage++;
+                stage++;
             }
             else if (stage == 1 && timerForSkills > 0.30)
             {
@@ -3097,16 +3095,16 @@ namespace BasicsOfGame
                 if (directionOfAttack == "Left")
                 {
                     Canvas.SetLeft(beamSprite, 0);
-                    beamSprite.Width = Canvas.GetLeft(body)+body.Width/2;
+                    beamSprite.Width = Canvas.GetLeft(body) + body.Width / 2;
                     beamSprite.Height = 10;
                 }
                 else
                 {
-                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body) + body.Width/2);
+                    Canvas.SetLeft(beamSprite, Canvas.GetLeft(body) + body.Width / 2);
                     beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
                     beamSprite.Height = 10;
                 }
-                checkCollisionForSkill(player, beamSprite, dealDmg,new Random().Next(10,15));
+                checkCollisionForSkill(player, beamSprite, dealDmg, new Random().Next(10, 15));
                 stage++;
                 timerForSkills = 0;
             }
@@ -3117,12 +3115,10 @@ namespace BasicsOfGame
                 {
                     Canvas.SetLeft(beamSprite, 0);
                     beamSprite.Width = Canvas.GetLeft(body) + body.Width / 2;
-
                     beamSprite.Height = 25;
                 }
                 else
                 {
-
                     beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
                     beamSprite.Height = 25;
                 }
@@ -3163,14 +3159,11 @@ namespace BasicsOfGame
                 }
                 else
                 {
-
                     beamSprite.Width = 1200 - Canvas.GetLeft(beamSprite);
                     beamSprite.Height = 60;
                 }
                 checkCollisionForSkill(player, beamSprite, dealDmg, new Random().Next(40, 45));
                 stage++;
-               
-
             }
             else if (stage == 5 && timerForSkills > 0.09)
             {
@@ -3180,17 +3173,15 @@ namespace BasicsOfGame
                 usingSkill = false;
                 BelongTO.Children.Remove(beamSprite);
             }
-                  
-
         }
 
-        
-        private void useSkill(double delta,System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg)
+
+        private void useSkill(double delta, System.Windows.Shapes.Rectangle player, string directionOfAttack, Action<int, string> dealDmg)
         {
             timerForSkills += delta;
             if (currentlyUsing == "beamAttack")
             {
-                useBeam(player, directionOfAttack,dealDmg);
+                useBeam(player, directionOfAttack, dealDmg);
             }
             else if (currentlyUsing == "dash")
             {
@@ -3206,7 +3197,7 @@ namespace BasicsOfGame
                 usingSkill = false;
             }
         }
-        TextBox warning=new TextBox();
+        TextBox warning = new TextBox();
         string directionOfAttack;
         System.Windows.Point targetOfAttack;
         public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
@@ -3217,9 +3208,9 @@ namespace BasicsOfGame
                 gracePeriod -= delta;
                 return;
             }
-            if(currentBeamCooldown>0)currentBeamCooldown -= delta;
-            if(currentDashCooldown > 0)currentDashCooldown -= delta;
-            if(currenctTentacleCooldown > 0) currenctTentacleCooldown -= delta;
+            if (currentBeamCooldown > 0) currentBeamCooldown -= delta;
+            if (currentDashCooldown > 0) currentDashCooldown -= delta;
+            if (currenctTentacleCooldown > 0) currenctTentacleCooldown -= delta;
             NormalizeSpeed(delta);
             dotUpdate(delta);
             bool tryAttack = true;
@@ -3260,7 +3251,7 @@ namespace BasicsOfGame
                 usingSkill = true;
                 currentlyUsing = "dash";
             }
-            if(Math.Abs((playerCenter.Y-name.Height/2) - (Canvas.GetTop(body)-body.Height/2)) < 60&&!prepareToAttack&&!usingSkill&&currentBeamCooldown<=0)
+            if (Math.Abs((playerCenter.Y - name.Height / 2) - (Canvas.GetTop(body) - body.Height / 2)) < 60 && !prepareToAttack && !usingSkill && currentBeamCooldown <= 0)
             {
                 if (currentBeamCooldown <= 0)
                 {
@@ -3269,14 +3260,10 @@ namespace BasicsOfGame
                     if (playerCenter.X > (Canvas.GetLeft(body) + body.Width / 2))
                     {
                         directionOfAttack = "Right";
-
                         moveInRightDirection = true;
                         currentAnimation = 0;
                         monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
                         body.Fill = monsterSprite;
-
-
-
                     }
                     else
                     {
@@ -3288,11 +3275,11 @@ namespace BasicsOfGame
                     }
                     usingSkill = true;
                     currentlyUsing = "beamAttack";
-                   
+
                     return;
                 }
             }
-            if (currenctTentacleCooldown <= 0&&!usingSkill)
+            if (currenctTentacleCooldown <= 0 && !usingSkill)
             {
                 stage = 0;
                 timerForSkills = 0;
@@ -3353,7 +3340,7 @@ namespace BasicsOfGame
             {
                 attackTicks = 0;
                 attackTimer = 0;
-                 prepareToAttack = true;
+                prepareToAttack = true;
                 return;
             }
             if ((moveMonsterByY != 0 || moveMonsterByX != 0) && ticks >= 10 / Speed)
@@ -3421,7 +3408,7 @@ namespace BasicsOfGame
             Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
             if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
             if (Canvas.GetTop(body) <= 93 - (body.Height * 3 / 4)) Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
-            
+
 
 
 
@@ -3429,6 +3416,534 @@ namespace BasicsOfGame
 
 
 
+    }
+    internal class ghostOfSenjuro : Monster
+    {
+        int hitboxTicks = 0;
+        TextBox nameHolder;
+        System.Windows.Shapes.Rectangle background;
+        string currentlyUsing;
+        private double gracePeriod = 0.2;
+        private bool usingSkill = false;
+        private double timerForSkills;
+        public ghostOfSenjuro(Canvas canv, int x, int y)
+        {
+            nameOfMonster = "Senjuro, Ghost Samurai \nof Kanto";
+            expGiven = 2000;
+            attackTicks = 0;
+            animations = 8;
+            currentAnimation = 0;
+            attackRange = 100;
+            Speed = 200;
+            baseSpeed = 200;
+            healthPoints = 1500;
+            maxHealthPoints = healthPoints;
+            body.Height = 240;
+            body.Width = 192;
+            //body.Height = 240;
+            //body.Width = 192;
+            body.Fill = Brushes.Blue;
+            body.Tag = "enemy";
+            minDmg = Convert.ToInt32(24);
+            maxDmg = Convert.ToInt32(52);
+            weapon.Height = 40;
+            weapon.Width = 40;
+            weapon.Fill = Brushes.Transparent;
+            Canvas.SetZIndex(weapon, 0);
+            BelongTO = canv;
+            body.SetValue(Canvas.TopProperty, (double)y);
+            body.SetValue(Canvas.LeftProperty, (double)x);
+            loadImages();
+            monsterSprite.ImageSource = monsterMovementRight[0];
+            body.Fill = monsterSprite;
+            hpBar();
+        }
+        public override void damageTaken(ref int dmg)
+        {
+            if (shocked)
+            {
+                dmg = Convert.ToInt32(dmg * 1.5);
+
+            }
+            healthPoints -= dmg;
+            if (healthPoints > 0)
+            {
+                double width = (healthPoints / maxHealthPoints) * 500;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
+        public override void loadImages()
+        {
+            monsterMovementRight = new BitmapImage[8];
+            monsterMovementLeft = new BitmapImage[8];
+            monsterAttackRight = new BitmapImage[8];
+            monsterAttackLeft = new BitmapImage[8];
+            attackHitBoxLeft = new BitmapImage[3];
+            attackHitBoxRight = new BitmapImage[3];
+            BitmapImage SamuraiSpriteAttack = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/SamuraiAttack.png", UriKind.Absolute));
+            BitmapImage SamuraiSpriteAttackL = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/SamuraiAttackL.png", UriKind.Absolute));
+            BitmapImage SamuraiSpriteMovement = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/SamuraiRun.png", UriKind.Absolute));
+            BitmapImage SamuraiSpriteMovementLeft = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/SamuraiRunL.png", UriKind.Absolute));
+
+            int spriteWidth = 232;
+            int spriteHeight = 214;
+
+            for (int i = 0; i < 214; i += spriteHeight)
+            {
+
+                int animation = 0;
+                for (int j = 0; j < (232*8); j += spriteWidth)
+                {
+                    Int32Rect spriteRect = new Int32Rect(j, i, spriteWidth, spriteHeight);
+                    CroppedBitmap croppedBitmapM = new CroppedBitmap(SamuraiSpriteMovement, spriteRect);
+                    CroppedBitmap croppedBitmapML = new CroppedBitmap(SamuraiSpriteMovementLeft, spriteRect);
+                    MemoryStream stream2 = new MemoryStream();
+                    PngBitmapEncoder encoder2 = new PngBitmapEncoder();
+                    encoder2.Frames.Add(BitmapFrame.Create(croppedBitmapM));
+                    encoder2.Save(stream2);
+                    MemoryStream stream3 = new MemoryStream();
+                    PngBitmapEncoder encoder3 = new PngBitmapEncoder();
+                    encoder3.Frames.Add(BitmapFrame.Create(croppedBitmapML));
+                    encoder3.Save(stream3);
+                    BitmapImage sprite2 = new BitmapImage();
+                    sprite2.BeginInit();
+                    sprite2.CacheOption = BitmapCacheOption.OnLoad;
+                    sprite2.StreamSource = stream2;
+                    sprite2.EndInit();
+                    BitmapImage sprite3 = new BitmapImage();
+                    sprite3.BeginInit();
+                    sprite3.CacheOption = BitmapCacheOption.OnLoad;
+                    sprite3.StreamSource = stream3;
+                    sprite3.EndInit();
+
+                    monsterMovementLeft[animation] = sprite3;
+                    monsterMovementRight[animation] = sprite2;
+                    animation++;
+
+                }
+            }
+
+            int attackspriteHeight = 280;
+            int attackspriteWidth = 460;
+
+            for (int i = 0; i < 280; i += attackspriteHeight)
+            {
+
+                int animation = 0;
+                for (int j = 0; j < (460 * 6); j += attackspriteWidth)
+                {
+                    Int32Rect spriteRect = new Int32Rect(j, i, attackspriteWidth, attackspriteHeight);
+                    
+                    CroppedBitmap croppedBitmap = new CroppedBitmap(SamuraiSpriteAttack, spriteRect);
+                    MemoryStream stream = new MemoryStream();
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
+                    encoder.Save(stream);
+
+                    BitmapImage sprite = new BitmapImage();
+                    sprite.BeginInit();
+                    sprite.CacheOption = BitmapCacheOption.OnLoad;
+                    sprite.StreamSource = stream;
+                    sprite.EndInit();
+
+                    CroppedBitmap croppedBitmapL = new CroppedBitmap(SamuraiSpriteAttackL, spriteRect);
+                    MemoryStream streamL = new MemoryStream();
+                    PngBitmapEncoder encoderL = new PngBitmapEncoder();
+                    encoderL.Frames.Add(BitmapFrame.Create(croppedBitmapL));
+                    encoderL.Save(streamL);
+
+                    BitmapImage spriteL = new BitmapImage();
+                    spriteL.BeginInit();
+                    spriteL.CacheOption = BitmapCacheOption.OnLoad;
+                    spriteL.StreamSource = streamL;
+                    spriteL.EndInit();
+
+                    monsterAttackRight[animation] = sprite;
+                    monsterAttackLeft[animation] = spriteL;
+                    animation++;
+
+                }
+            }
+
+        }
+
+        protected override void hpBar()
+        {
+            nameHolder = new TextBox();
+            nameHolder.Text = "Senjuro, Ghost Samurai \nof Kanto";
+            nameHolder.FontFamily = new FontFamily("Algerian");
+            nameHolder.FontSize = 25;
+            nameHolder.TextAlignment = TextAlignment.Center;
+            nameHolder.Width = 400;
+            nameHolder.Height = 30;
+            Canvas.SetLeft(nameHolder, 550);
+            Canvas.SetTop(nameHolder, 10);
+            Canvas.SetZIndex(nameHolder, 700);
+
+            monsterHpBar = new System.Windows.Shapes.Rectangle();
+            background = new System.Windows.Shapes.Rectangle();
+            Canvas.SetZIndex(monsterHpBar, 700);
+            Canvas.SetZIndex(background, 699);
+
+            background.Width = 500;
+            background.Height = 20;
+            background.Fill = Brushes.Black;
+            Canvas.SetLeft(background, 500);
+            Canvas.SetTop(background, 40);
+            monsterHpBar.Width = 500;
+            monsterHpBar.Height = 20;
+            monsterHpBar.Fill = Brushes.Red;
+            Canvas.SetLeft(monsterHpBar, 500);
+            Canvas.SetTop(monsterHpBar, 40);
+        }
+
+        public override void moveToTarget(System.Windows.Shapes.Rectangle name, double delta, double friction, Action<int, string> dealDmg)
+        {
+            if (delta > 1) return; // Starting delta value is about 3 billions 
+            if (gracePeriod > 0)
+            {
+                gracePeriod -= delta;
+                return;
+            }
+            NormalizeSpeed(delta);
+            dotUpdate(delta);
+            bool tryAttack = true;
+
+            setRelativeVisibility();
+
+            System.Windows.Point playerCenter = new System.Windows.Point(Canvas.GetLeft(name) + (name.Width / 2), Canvas.GetTop(name));
+
+            if (usingSkill)
+            {
+                //useSkill(delta, name, directionOfAttack, dealDmg);
+                return;
+            }
+            
+            
+            if (prepareToAttack)
+            {
+                attack(name, delta, dealDmg);
+                return;
+            }
+
+
+            double moveMonsterByX = 0, moveMonsterByY = 0;
+            if (playerCenter.X > Canvas.GetLeft(body) + body.Width + attackRange / 2)
+            {
+                moveMonsterByX = Speed * friction;
+                tryAttack = false;
+            }
+            if (playerCenter.X < Canvas.GetLeft(body) - attackRange / 2)
+            {
+                moveMonsterByX = -Speed * friction;
+                tryAttack = false;
+            }
+            if (playerCenter.Y < Canvas.GetTop(body) - body.Height / -140)
+            {
+                moveMonsterByY = -Speed * friction;
+                tryAttack = false;
+            }
+            if (playerCenter.Y > Canvas.GetTop(body) - body.Height / -2)
+            {
+                moveMonsterByY = Speed * friction;
+                tryAttack = false;
+            }
+            if (moveMonsterByX == 0 && moveMonsterByY == 0)
+            {
+                if (playerCenter.X > Canvas.GetLeft(body) + body.Width / 2)
+                {
+                    moveInRightDirection = true;
+                    currentAnimation = 0;
+                    monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                    body.Fill = monsterSprite;
+                }
+                if (playerCenter.X <= Canvas.GetLeft(body) + body.Width / 2)
+                {
+                    moveInRightDirection = false;
+                    currentAnimation = 0;
+                    monsterSprite.ImageSource = monsterMovementLeft[currentAnimation];
+                    body.Fill = monsterSprite;
+                }
+            }
+
+            if (!tryAttack)
+                checkCollisions(ref moveMonsterByX, ref moveMonsterByY, friction, playerCenter, delta);
+            else
+            {
+                attackTicks = 0;
+                attackTimer = 0;
+                prepareToAttack = true;
+                return;
+            }
+            if ((moveMonsterByY != 0 || moveMonsterByX != 0) && ticks >= 10 / Speed)
+            {
+
+                ticks -= 10 / Speed;
+                if (ticks < 0) ticks = 0;
+                if (ticks >= 10 / Speed) ticks = 0;
+                if (moveMonsterByX > 0)
+                {
+                    if (moveInRightDirection)
+                    {
+                        currentAnimation++;
+                        if (currentAnimation == animations) currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                    else
+                    {
+                        moveInRightDirection = true;
+                        currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                }
+                else if (moveMonsterByX < 0)
+                {
+                    if (!moveInRightDirection)
+                    {
+                        currentAnimation++;
+                        if (currentAnimation == animations) currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementLeft[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                    else
+                    {
+                        moveInRightDirection = false;
+                        currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                }
+                else if (moveMonsterByX == 0)
+                {
+                    if (moveInRightDirection)
+                    {
+                        currentAnimation++;
+                        if (currentAnimation == animations) currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementRight[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                    else
+                    {
+                        currentAnimation++;
+                        if (currentAnimation == animations) currentAnimation = 0;
+                        monsterSprite.ImageSource = monsterMovementLeft[currentAnimation];
+                        body.Fill = monsterSprite;
+                    }
+                }
+
+            }
+            Canvas.SetLeft(body, Canvas.GetLeft(body) + moveMonsterByX);
+            Canvas.SetTop(body, Canvas.GetTop(body) + moveMonsterByY);
+            if (Canvas.GetTop(body) >= 600 - body.Height) Canvas.SetTop(body, 600 - body.Height);
+            if (Canvas.GetTop(body) <= 93 - (body.Height * 3 / 4)) Canvas.SetTop(body, 93 - (body.Height * 3 / 4));
+        }
+
+        private void attack(System.Windows.Shapes.Rectangle player, double delta, Action<int, string> dealDmg)
+        {
+            if (attackTicks == 7 && attackTimer / 200 > 1)
+            {
+                prepareToAttack = false;
+                attackTicks = 0;
+                attackTimer = 0;
+                hitboxTicks = 0;
+                weapon.Fill = Brushes.Transparent;
+                return;
+            }
+            attackTimer += delta * 1000;
+            if (attackTicks == 0 && attackTimer / 50 > 1)
+            {
+
+                if (moveInRightDirection)
+                {
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+                }
+                else
+                {
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+                }
+                body.Fill = monsterSprite;
+                attackTicks++;
+                attackTimer = 0;
+                return;
+            }
+            if (attackTicks == 1 && attackTimer / 50 > 1)
+            {
+                if (moveInRightDirection)
+                {
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+
+                }
+                else
+                {
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+
+
+                }
+                body.Fill = monsterSprite;
+                attackTicks++;
+                attackTimer = 0;
+                return;
+            }
+            if (attackTicks == 2 && attackTimer / 50 > 1)
+            {
+                if (moveInRightDirection)
+                {
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+
+                }
+                else
+                {
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+
+
+                }
+                body.Fill = monsterSprite;
+                attackTicks++;
+                attackTimer = 0;
+                return;
+            }
+            if (attackTicks == 3 && attackTimer / 50 > 1)
+            {
+                if (moveInRightDirection)
+                {
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+
+                }
+                else
+                {
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+
+
+                }
+                body.Fill = monsterSprite;
+                attackTicks++;
+
+                attackTimer = 0;
+                return;
+            }
+            if (attackTicks == 4 && attackTimer / 150 > 1)
+            {
+                if (moveInRightDirection)
+                {
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+
+                }
+                else
+                {
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+
+
+                }
+                body.Fill = monsterSprite;
+                attackTicks++;
+
+                attackTimer = 0;
+                return;
+            }
+            if (attackTicks == 5 && attackTimer / 150 > 1)
+            {
+                if (moveInRightDirection)
+                {
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+
+                }
+                else
+                {
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+
+
+                }
+                body.Fill = monsterSprite;
+                attackTicks++;
+
+                attackTimer = 0;
+                return;
+            }
+            if (attackTicks == 6 && attackTimer / 150 > 1)
+            {
+                if (moveInRightDirection)
+                {
+                    weapon.Height = 150;
+                    weapon.Width = 240;
+                    Canvas.SetLeft(weapon, Canvas.GetLeft(body) + body.Width * 2 / 3 - 50);
+                    Canvas.SetTop(weapon, Canvas.GetTop(body) + body.Height * 3 / 4 - 50);
+                    monsterSprite.ImageSource = monsterAttackRight[attackTicks];
+                    weaponSprite.ImageSource = attackHitBoxRight[hitboxTicks];
+                    weapon.Fill = weaponSprite;
+                }
+                else
+                {
+                    weapon.Height = 150;
+                    weapon.Width = 240;
+                    Canvas.SetLeft(weapon, Canvas.GetLeft(body) - body.Width / 4 - 50);
+                    Canvas.SetTop(weapon, Canvas.GetTop(body) + body.Height * 3 / 4 - 50);
+                    monsterSprite.ImageSource = monsterAttackLeft[attackTicks];
+                    weaponSprite.ImageSource = attackHitBoxLeft[hitboxTicks];
+                    weapon.Fill = weaponSprite;
+
+                }
+
+                body.Fill = monsterSprite;
+                attackTicks++;
+                hitboxTicks++;
+                attackTimer = 0;
+                Slash(player, dealDmg);
+
+                return;
+            }
+
+        }
+        public override void add()
+        {
+            base.add();
+            BelongTO.Children.Add(background);
+            BelongTO.Children.Add(nameHolder);
+        }
+        public override void remove()
+        {
+            base.remove();
+            BelongTO.Children.Remove(background);
+            BelongTO.Children.Remove(nameHolder);
+        }
+
+        private void Slash(System.Windows.Shapes.Rectangle player, Action<int, string> dealDmg)
+        {
+            int min;
+            int max;
+
+            min = minDmg;
+            max = maxDmg;
+
+            Rect hitBoxOfAttack = new Rect(Canvas.GetLeft(weapon), Canvas.GetTop(weapon), weapon.Width, weapon.Height);
+            Rect hitBoxOfPlayer = new Rect(Canvas.GetLeft(player), Canvas.GetTop(player), player.Width, player.Height);
+            if (determinateCollision(hitBoxOfPlayer, hitBoxOfAttack))
+            {
+
+
+                int dealtDamage = rnd.Next(min, max + 1);
+                if (ignited)
+                {
+                    dealtDamage = Convert.ToInt32(dealtDamage * 0.8);
+
+                }
+                dealDmg(dealtDamage, nameOfMonster);
+
+
+            }
+        }
+
+        //skill teleportacja
+
+        //skill strongAttack
+
+        //skill flyingKatana
     }
 }
 

@@ -102,6 +102,10 @@
     <None Remove="images\bgdecorations\TarnishedFlag.PNG" />
     <None Remove="images\bgdecorations\tlo1Obstacle.PNG" />
     <None Remove="images\BossAnimations\tentacles.png" />
+    <None Remove="images\Bosses\SamuraiAttack.png" />
+    <None Remove="images\Bosses\SamuraiAttackL.png" />
+    <None Remove="images\Bosses\SamuraiRun.png" />
+    <None Remove="images\Bosses\SamuraiRunL.png" />
     <None Remove="images\Bosses\Skull.png" />
     <None Remove="images\Buffs_Debuffs\buff1.png" />
     <None Remove="images\Buffs_Debuffs\buff2.png" />
@@ -213,6 +217,10 @@
 
   <ItemGroup>
     <Resource Include="images\BossAnimations\tentacles.png" />
+    <Resource Include="images\Bosses\SamuraiAttack.png" />
+    <Resource Include="images\Bosses\SamuraiAttackL.png" />
+    <Resource Include="images\Bosses\SamuraiRun.png" />
+    <Resource Include="images\Bosses\SamuraiRunL.png" />
     <Resource Include="images\Bosses\Skull.png" />
     <Resource Include="images\items\Buty.png" />
     <Resource Include="images\items\Helm.png" />
