@@ -3443,45 +3443,45 @@ namespace BasicsOfGame
             currentInvisibilityCooldown = 0;
 
             nameOfMonster = "Senjuro, Ghost Samurai \nof Kanto";
-            
+
             expGiven = 2000;
             attackTicks = 0;
             attackRange = 100;
-            
+
             Speed = 200;
             baseSpeed = 200;
-            
+
             animations = 8;
             currentAnimation = 0;
             body.Height = 240;
             body.Width = 192;
             //body.Height = 240;
             //body.Width = 192;
-            
+
             healthPoints = 1500;
             maxHealthPoints = healthPoints;
-            
+
             body.Fill = Brushes.Blue;
             body.Tag = "enemy";
-            
+
             minDmg = Convert.ToInt32(24);
             maxDmg = Convert.ToInt32(52);
-            
+
             weapon.Height = 40;
             weapon.Width = 40;
             weapon.Fill = Brushes.Transparent;
             Canvas.SetZIndex(weapon, 0);
-            
+
             BelongTO = canv;
-            
+
             body.SetValue(Canvas.TopProperty, (double)y);
             body.SetValue(Canvas.LeftProperty, (double)x);
-            
+
             loadImages();
-            
+
             monsterSprite.ImageSource = monsterMovementRight[0];
             body.Fill = monsterSprite;
-            
+
             hpBar();
         }
         public override void damageTaken(ref int dmg)
@@ -3523,7 +3523,7 @@ namespace BasicsOfGame
             {
 
                 int animation = 0;
-                for (int j = 0; j < (232*8); j += spriteWidth)
+                for (int j = 0; j < (232 * 8); j += spriteWidth)
                 {
                     Int32Rect spriteRect = new Int32Rect(j, i, spriteWidth, spriteHeight);
                     CroppedBitmap croppedBitmapM = new CroppedBitmap(SamuraiSpriteMovement, spriteRect);
@@ -3564,7 +3564,7 @@ namespace BasicsOfGame
                 for (int j = 0; j < (460 * 6); j += attackspriteWidth)
                 {
                     Int32Rect spriteRect = new Int32Rect(j, i, attackspriteWidth, attackspriteHeight);
-                    
+
                     CroppedBitmap croppedBitmap = new CroppedBitmap(SamuraiSpriteAttack, spriteRect);
                     MemoryStream stream = new MemoryStream();
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
@@ -3663,12 +3663,12 @@ namespace BasicsOfGame
                 useSkill(delta, name, dealDmg);
                 return;
             }
-            if(currentTeleportCooldown <= 0)
+            if (currentTeleportCooldown <= 0)
             {
                 usingSkill = true;
                 currentlyUsing = "Teleport";
             }
-            if(prepareToAttack && !usingSkill && currentStrongAttackCooldown <= 0)
+            if (prepareToAttack && !usingSkill && currentStrongAttackCooldown <= 0)
             {
                 timerForSkills = 0;
                 usingSkill = true;
@@ -4066,7 +4066,7 @@ namespace BasicsOfGame
             }
             else if (currentlyUsing == "Disappear")
             {
-                //useDisappear();//(player, directionOfAttack, dealDmg);
+                useDisappear();//(player, directionOfAttack, dealDmg);
             }
             else
             {
@@ -4078,7 +4078,7 @@ namespace BasicsOfGame
         //skill teleportacja
         private void useTeleport(System.Windows.Shapes.Rectangle player)
         {
-            
+
             if (currentTeleportCooldown <= 0) //&& !usingSkill)
             {
                 //MessageBox.Show("Teleport");
@@ -4097,13 +4097,13 @@ namespace BasicsOfGame
                 timerForSkills = 0;
                 currentTeleportCooldown = teleportCooldown;
             }
-                usingSkill = false;
+            usingSkill = false;
         }
 
         //skill strongAttack
-        private void useStrongAttack(System.Windows.Shapes.Rectangle player, double delta, Action<int,string> dealDmg)
+        private void useStrongAttack(System.Windows.Shapes.Rectangle player, double delta, Action<int, string> dealDmg)
         {
-            
+
             if (currentStrongAttackCooldown <= 0)
             {
                 TextBox strongAttack = new TextBox();
@@ -4114,11 +4114,11 @@ namespace BasicsOfGame
                 int min = 100, max = 200, damageValue;
                 Random strongAttackRand = new Random();
                 damageValue = strongAttackRand.Next(min, max + 1);
-                
+
                 checkCollisionForSkill(player, body, dealDmg, damageValue);
 
-                Canvas.SetLeft(strongAttack, Canvas.GetLeft(body)-10);
-                Canvas.SetTop(strongAttack, Canvas.GetTop(body)-10);
+                Canvas.SetLeft(strongAttack, Canvas.GetLeft(body) - 10);
+                Canvas.SetTop(strongAttack, Canvas.GetTop(body) - 10);
                 attack(player, delta, dealDmg);
                 currentStrongAttackCooldown = strongAttackCooldown;
             }
@@ -4127,7 +4127,7 @@ namespace BasicsOfGame
 
 
         //skill niewidzialność
-        /*
+        
         private void useDisappear()
         {
             //MessageBox.Show("Disappear");
@@ -4137,7 +4137,161 @@ namespace BasicsOfGame
                 currentInvisibilityCooldown = invisibilityCooldown;
             }
             usingSkill = false;
-        }*/
+        }
+    }
+    internal class DemonOfBelow : Monster
+    {
+        int hitboxTicks = 0;
+        TextBox nameHolder;
+        System.Windows.Shapes.Rectangle background;
+       
+        private double gracePeriod = 0.2;
+        private bool usingSkill = false;
+        private double timerForSkills;
+        double teleportCooldown;
+        double currentTeleportCooldown;
+
+        public DemonOfBelow(Canvas canv, int x, int y)
+        {
+            timerForSkills = 0;
+            teleportCooldown = 30;
+            currentTeleportCooldown = 0;
+            
+            
+
+            nameOfMonster = "Sidragaso son of a Judas,   \n Demon from HELL";
+
+            expGiven = 2000;
+            attackTicks = 0;
+            attackRange = 100;
+
+            Speed = 200;
+            baseSpeed = 200;
+
+            animations = 8;
+            currentAnimation = 0;
+            body.Height = 240;
+            body.Width = 192;
+            //body.Height = 240;
+            //body.Width = 192;
+
+            healthPoints = 1500;
+            maxHealthPoints = healthPoints;
+
+            body.Fill = Brushes.Blue;
+            body.Tag = "enemy";
+
+            minDmg = Convert.ToInt32(24);
+            maxDmg = Convert.ToInt32(52);
+
+            weapon.Height = 40;
+            weapon.Width = 40;
+            weapon.Fill = Brushes.Transparent;
+            Canvas.SetZIndex(weapon, 0);
+
+            BelongTO = canv;
+
+            body.SetValue(Canvas.TopProperty, (double)y);
+            body.SetValue(Canvas.LeftProperty, (double)x);
+
+            loadImages();
+
+            monsterSprite.ImageSource = monsterMovementRight[0];
+            body.Fill = monsterSprite;
+
+            hpBar();
+        }
+        public override void damageTaken(ref int dmg)
+        {
+            if (shocked)
+            {
+                dmg = Convert.ToInt32(dmg * 1.5);
+
+            }
+            healthPoints -= dmg;
+            if (healthPoints > 0)
+            {
+                double width = (healthPoints / maxHealthPoints) * 500;
+                monsterHpBar.Width = width;
+            }
+            else
+            {
+                dead = true;
+                monsterHpBar.Width = 0;
+            }
+        }
+
+        public override void loadImages()
+        {
+            monsterMovementRight = new BitmapImage[6];
+            monsterMovementLeft = new BitmapImage[6];
+            monsterAttackRight = new BitmapImage[7];
+            monsterAttackLeft = new BitmapImage[7];
+            // 1-7 attack 1-6 movement
+
+            //ruchy
+            for (int i = 0; i < 6; i++)
+            {
+                monsterMovementLeft[i] = new BitmapImage();
+                monsterMovementLeft[i].BeginInit();
+                monsterMovementLeft[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Demon/demon_walk_L{1 + i}.png", UriKind.Absolute);
+                monsterMovementLeft[i].EndInit();
+                monsterMovementRight[i] = new BitmapImage();
+                monsterMovementRight[i].BeginInit();
+                monsterMovementRight[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Demon/demon_walk_R{1 + i}.png", UriKind.Absolute);
+                monsterMovementRight[i].EndInit();
+
+            }
+            // Ładowanie klatek do animacji ataku
+
+            for (int i = 0; i < 7; i++)
+            {
+                monsterMovementLeft[i] = new BitmapImage();
+                monsterMovementLeft[i].BeginInit();
+                monsterMovementLeft[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Demon/demon_cleave_L{1 + i}l.png", UriKind.Absolute);
+                monsterMovementLeft[i].EndInit();
+                monsterAttackRight[i] = new BitmapImage();
+                monsterAttackRight[i].BeginInit();
+                monsterAttackRight[i].UriSource = new Uri($"pack://application:,,,/BasicsOfGame;component/images/Bosses/Demon/demon_cleave_R{1 + i}.png", UriKind.Absolute);
+                monsterAttackRight[i].EndInit();
+            }
+
+        }
+
+        protected override void hpBar()
+        {
+            nameHolder = new TextBox();
+            nameHolder.Text = "Sidragaso son of a Judas \n Demon from HELL";
+            nameHolder.FontFamily = new FontFamily("Algerian");
+            nameHolder.FontSize = 25;
+            nameHolder.TextAlignment = TextAlignment.Center;
+            nameHolder.Width = 400;
+            nameHolder.Height = 30;
+            Canvas.SetLeft(nameHolder, 550);
+            Canvas.SetTop(nameHolder, 10);
+            Canvas.SetZIndex(nameHolder, 700);
+
+            monsterHpBar = new System.Windows.Shapes.Rectangle();
+            background = new System.Windows.Shapes.Rectangle();
+            Canvas.SetZIndex(monsterHpBar, 700);
+            Canvas.SetZIndex(background, 699);
+
+            background.Width = 500;
+            background.Height = 20;
+            background.Fill = Brushes.Black;
+            Canvas.SetLeft(background, 500);
+            Canvas.SetTop(background, 40);
+            monsterHpBar.Width = 500;
+            monsterHpBar.Height = 20;
+            monsterHpBar.Fill = Brushes.Red;
+            Canvas.SetLeft(monsterHpBar, 500);
+            Canvas.SetTop(monsterHpBar, 40);
+        }
+
+
+
+
+
     }
 }
 
