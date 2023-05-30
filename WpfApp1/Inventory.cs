@@ -272,9 +272,9 @@ namespace BasicsOfGame
             toolTip.FontSize = 10.0;
             backgroundOfButton.Width = 48;
             backgroundOfButton.Height = 48;
-            Canvas.SetZIndex(backgroundOfButton, 1000);
-            Canvas.SetZIndex(clickToEquipItem, 1001);
-            Canvas.SetZIndex(toolTip, 1002);
+            Canvas.SetZIndex(backgroundOfButton, 1200);
+            Canvas.SetZIndex(clickToEquipItem, 1201);
+            Canvas.SetZIndex(toolTip, 1202);
             toolTip.Foreground = Brushes.Black;
             toolTip.Padding = new Thickness(10);
             if(type == WEAPON) 
@@ -372,7 +372,7 @@ namespace BasicsOfGame
             }
             clickToEquipItem.Width = 50;
             clickToEquipItem.Height = 50;
-            Canvas.SetZIndex(clickToEquipItem, 1001);
+            Canvas.SetZIndex(clickToEquipItem, 1201);
             clickToEquipItem.MouseMove += showToolTip;
             clickToEquipItem.MouseLeave += hideToolTip;
 

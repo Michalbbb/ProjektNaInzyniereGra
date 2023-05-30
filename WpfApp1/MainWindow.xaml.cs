@@ -48,7 +48,6 @@ namespace BasicsOfGame
 
         Menu gameMenu;
         Grid map;
-        //TextBox helper; // Current minimap
         GroupBox miniMapHolder;  // new minimap
         Player mainCharacter;
 
@@ -107,7 +106,7 @@ namespace BasicsOfGame
             if(e.Key == Key.D1)
             {
 
-                mainCharacter.generateRandomItems();
+                //mainCharacter.generateRandomItems();
                 
                 System.Windows.Point mousePosition = Mouse.GetPosition(GameScreen);
                 

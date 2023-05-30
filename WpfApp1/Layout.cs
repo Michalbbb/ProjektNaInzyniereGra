@@ -161,6 +161,8 @@ namespace BasicsOfGame
                 }
             }
         }
+        const int SENJURO=0;
+        const int SEHN=1;
         public void changeRoomUsage(string usage){
             if(type==0) return; // In case if something goes wrong
             if(usage=="bossRoom"){
@@ -193,14 +195,14 @@ namespace BasicsOfGame
                 } while (!correctPlacement);
                 x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
                 y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
-
-                    //addMeToList = new oldGreatOne(BelongTo,x1,y1);
-                    //addMeToList = new ghostOfSenjuro(BelongTo, x1, y1);
-                    addMeToList = new DemonOfBelow(BelongTo, x1, y1);
+                    int boss = rnd.Next(0, 2);
+                    if(boss==SENJURO)addMeToList = new ghostOfSenjuro(BelongTo, x1, y1);
+                    else if(boss==SEHN)addMeToList = new oldGreatOne(BelongTo,x1,y1);
+                    else addMeToList = new DemonOfBelow(BelongTo, x1, y1);
                     monsters.Add(addMeToList);
             }
             }
-            // others else if
+          
         }
         public bool isCleared()
         {
@@ -435,7 +437,7 @@ namespace BasicsOfGame
     internal class Grid
     {
         public Pokoj[,] grid;
-        int roomCount = 2;
+        int roomCount = 16;
         static int gridSize = 9;
         int currX, currY;
         static int gridMid = gridSize / 2;
@@ -588,7 +590,8 @@ namespace BasicsOfGame
                     Label question = new Label();
                     question.Width = c.Width / gridSize;
                     question.Height = c.Height / gridSize;
-                    question.Content = "  ?";
+                    if (grid[currX - 1, currY].getType() == 1) question.Content = "  ?";
+                    else if (grid[currX - 1, currY].getType() == 2) question.Content = "  B";
                     question.Foreground = Brushes.White;
                     question.BorderBrush = Brushes.White;
                     question.FontSize = 20;
@@ -608,7 +611,8 @@ namespace BasicsOfGame
                     Label question = new Label();
                     question.Width = c.Width / gridSize;
                     question.Height = c.Height / gridSize;
-                    question.Content = "  ?";
+                    if (grid[currX, currY - 1].getType() == 1) question.Content = "  ?";
+                    else if (grid[currX, currY - 1].getType() == 2) question.Content = "  B";
                     question.Foreground = Brushes.White;
                     question.BorderBrush = Brushes.White;
                     question.FontSize = 20;
@@ -626,7 +630,8 @@ namespace BasicsOfGame
                     Label question = new Label();
                     question.Width = c.Width / gridSize;
                     question.Height = c.Height / gridSize;
-                    question.Content = "  ?";
+                    if (grid[currX + 1, currY].getType() == 1) question.Content = "  ?";
+                    else if (grid[currX + 1, currY].getType() == 2) question.Content = "  B";
                     question.Foreground = Brushes.White;
                     question.BorderBrush = Brushes.White;
                     question.FontSize = 20;
@@ -644,7 +649,8 @@ namespace BasicsOfGame
                     Label question = new Label();
                     question.Width = c.Width / gridSize;
                     question.Height = c.Height / gridSize;
-                    question.Content = "  ?";
+                    if(grid[currX, currY + 1].getType()==1)question.Content = "  ?";
+                    else if (grid[currX, currY + 1].getType() == 2) question.Content = "  B";
                     question.Foreground = Brushes.White;
                     question.BorderBrush = Brushes.White;
                     question.FontSize = 20;

@@ -2800,7 +2800,7 @@ namespace BasicsOfGame
                 Canvas.SetTop(warning, Canvas.GetTop(body) - 10);
                 warning.Background = Brushes.Red;
                 warning.Foreground = Brushes.White;
-                warning.Text = "!";
+                warning.Text = "!!!";
                 Canvas.SetZIndex(warning, 1000);
                 warning.FontSize = 20;
                 BelongTO.Children.Add(warning);
@@ -2808,11 +2808,11 @@ namespace BasicsOfGame
                 return;
             }
 
-            else if (stage == 1 && timerForSkills < 0.25)
+            else if (stage == 1 && timerForSkills < 0.50)
             {
                 return;
             }
-            else if (stage == 1 && timerForSkills > 0.25)
+            else if (stage == 1 && timerForSkills > 0.50)
             {
                 BelongTO.Children.Remove(warning);
                 System.Windows.Point playerCenter;
@@ -2917,11 +2917,11 @@ namespace BasicsOfGame
                 dealDmg(rnd.Next(minDmg, maxDmg + 1), nameOfMonster);
                 if ((Canvas.GetLeft(player) + player.Width / 2) > (Canvas.GetLeft(damager) + damager.Width / 2))
                 {
-                    Canvas.SetLeft(player, Canvas.GetLeft(player) + 30);
+                    Canvas.SetLeft(player, Canvas.GetLeft(player) + 10);
                 }
                 else
                 {
-                    Canvas.SetLeft(player, Canvas.GetLeft(player) - 30);
+                    Canvas.SetLeft(player, Canvas.GetLeft(player) - 10);
 
                 }
             }
@@ -2934,7 +2934,7 @@ namespace BasicsOfGame
                 Canvas.SetTop(warning, Canvas.GetTop(body) - 10);
                 warning.Background = Brushes.Red;
                 warning.Foreground = Brushes.White;
-                warning.Text = "!!!";
+                warning.Text = "!";
                 Canvas.SetZIndex(warning, 1000);
                 warning.FontSize = 20;
                 BelongTO.Children.Add(warning);

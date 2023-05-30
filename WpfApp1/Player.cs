@@ -180,7 +180,7 @@ namespace BasicsOfGame
             Canvas.SetTop(closeEquipmentButton, 10);
             closeEquipmentButton.Width = 50;
             closeEquipmentButton.Height = 50;
-            Canvas.SetZIndex(closeEquipmentButton, 1000);
+            Canvas.SetZIndex(closeEquipmentButton, 1200);
             closeEquipmentButton.Content = "X";
 
             closeEquipmentButton.Click += CloseEquipment_Click;
@@ -204,7 +204,7 @@ namespace BasicsOfGame
             equipmentBackground.Width = 1200;
             equipmentBackground.Height = 600;
             equipmentBackground.Fill = temp;
-            Canvas.SetZIndex(equipmentBackground, 999);
+            Canvas.SetZIndex(equipmentBackground, 1199);
             Canvas.SetLeft(equipmentBackground, 0);
             Canvas.SetTop(equipmentBackground, 0);
            
@@ -256,7 +256,7 @@ namespace BasicsOfGame
             Canvas.SetTop(playerStatsHolder, 280);
             playerStatsHolder.FontSize = 9;
            
-            Canvas.SetZIndex(playerStatsHolder, 1000);
+            Canvas.SetZIndex(playerStatsHolder, 1200);
             
             playerStatsHolder.IsHitTestVisible = false;
             playerStatsHolder.Background = Brushes.Transparent;
@@ -1661,6 +1661,8 @@ namespace BasicsOfGame
                 return;
             }
             dealtDamage = Convert.ToInt16(dealtDamage * (1 - damageTakenReduction));
+            dealtDamage = Convert.ToInt16(dealtDamage * Convert.ToDouble(1 - Convert.ToDouble(Convert.ToDouble(armour) / 300))); // /3 and /100  
+
             int obecnyDmg = Convert.ToInt32(playerDmg.Text);
             obecnyDmg += dealtDamage;
             playerDmg.Text = obecnyDmg.ToString();
@@ -1702,7 +1704,7 @@ namespace BasicsOfGame
             {
                 if (map.grid[map.getX(), map.getY()].checkIfDead(updateState[j], ref exp))
                 {
-
+                    generateItem();
                     GameScreen.Children.Remove(boxes[j]);
                     boxes.RemoveAt(j);
                     updateExp();
@@ -1809,7 +1811,7 @@ namespace BasicsOfGame
             {
                 if (map.grid[map.getX(), map.getY()].checkIfDead(updateState[j], ref exp))
                 {
-
+                    generateItem();
                     GameScreen.Children.Remove(boxes[j]);
                     boxes.RemoveAt(j);
                     updateExp();
@@ -1883,12 +1885,59 @@ namespace BasicsOfGame
             {
                 if (map.grid[map.getX(), map.getY()].checkIfDead(updateState[j], ref exp))
                 {
-
+                    generateItem();
                     GameScreen.Children.Remove(boxes[j]);
                     boxes.RemoveAt(j);
                     updateExp();
                 }
             }
+        }
+        private double mercySystem = 1;
+        const int NORMAL = 0;
+        const int RARE = 1;
+        const int EPIC = 2;
+        const int LEGENDARY = 3;
+        private void generateItem()
+        {
+            int legendary = 10;
+            int epic = 15;
+            int rare = 25;
+            legendary = (int)(legendary * itemQuality);
+            epic = (int)(epic * itemQuality);
+            rare = (int)(rare * itemQuality);
+            int baseDropChance = 100; // 15 by default 100 for testing purposes
+            baseDropChance = (int)(baseDropChance * itemQuantity * mercySystem);
+            int itemDropRequiredChance = getRand.Next(0, 100);
+            if (itemDropRequiredChance >= baseDropChance)
+            {
+                mercySystem *= 1.05;
+                return;
+            }
+            mercySystem = 1; // reset, because we got item
+            int quality = getRand.Next(0, 100);
+            if (quality < legendary)
+            {
+                int typeOfEquipment = getRand.Next(0, 5);
+                playerInventory.addEquipment(new Equipment(typeOfEquipment, LEGENDARY, GameScreen));
+            }
+            else if (quality < (epic + legendary))
+            {
+                int typeOfEquipment = getRand.Next(0, 5);
+                playerInventory.addEquipment(new Equipment(typeOfEquipment, EPIC, GameScreen));
+            }
+            else if (quality < (epic + legendary+rare))
+            {
+                int typeOfEquipment = getRand.Next(0, 5);
+                playerInventory.addEquipment(new Equipment(typeOfEquipment, RARE, GameScreen));
+            }
+            else
+            {
+
+                int typeOfEquipment = getRand.Next(0, 5);
+                playerInventory.addEquipment(new Equipment(typeOfEquipment, NORMAL, GameScreen));
+            }
+
+
         }
         public void hideSkillTree()
         {
