@@ -195,9 +195,9 @@ namespace BasicsOfGame
                 y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
 
                     //addMeToList = new oldGreatOne(BelongTo,x1,y1);
-                    addMeToList = new ghostOfSenjuro(BelongTo, x1, y1);
-
-                monsters.Add(addMeToList);
+                    //addMeToList = new ghostOfSenjuro(BelongTo, x1, y1);
+                    addMeToList = new DemonOfBelow(BelongTo, x1, y1);
+                    monsters.Add(addMeToList);
             }
             }
             // others else if
