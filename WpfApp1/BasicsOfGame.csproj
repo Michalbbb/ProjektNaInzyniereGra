@@ -239,6 +239,7 @@
 
     <None Remove="images\UI\equipmentClosedSprite.png" />
     <None Remove="images\UI\equipmentOpenSprite.png" />
+    <None Remove="images\UI\winnerScreen.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -453,6 +454,7 @@
     <Resource Include="images\UI\SkillPicker.png" />
     <Resource Include="images\UI\Start.PNG" />
     <Resource Include="images\UI\StartH.PNG" />
+    <Resource Include="images\UI\winnerScreen.png" />
   
   </ItemGroup>
 

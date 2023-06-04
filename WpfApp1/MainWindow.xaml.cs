@@ -217,6 +217,10 @@ namespace BasicsOfGame
                
             }
         }
+        public void winnerScreen()
+        {
+            gameMenu.winnerScreen();
+        }
         public void startGame()
         {
             
@@ -231,6 +235,7 @@ namespace BasicsOfGame
             }
             mainCharacter = new Player(GameScreen);
             map = new Grid(GameScreen);
+            map.gameWon += winnerScreen;
             miniMapHolder = new GroupBox();
             miniMapHolder.Opacity = 0;
             GameScreen.Children.Add(miniMapHolder);

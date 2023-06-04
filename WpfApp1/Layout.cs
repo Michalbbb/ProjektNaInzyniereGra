@@ -25,6 +25,7 @@ namespace BasicsOfGame
         Point[,] objectGrid;
         bool[,] availableOnGrid;
         bool visited;
+        public Action endGame;
         
         public Pokoj(){ // Empty Room
                 type=0;
@@ -195,7 +196,7 @@ namespace BasicsOfGame
                 } while (!correctPlacement);
                 x1 = (int)objectGrid[objectPlacementX, objectPlacementY].X; 
                 y1 = (int)objectGrid[objectPlacementX, objectPlacementY].Y;
-                    int boss = rnd.Next(0, 2);
+                    int boss = rnd.Next(0, 3);
                     if(boss==SENJURO)addMeToList = new ghostOfSenjuro(BelongTo, x1, y1);
                     else if(boss==SEHN)addMeToList = new oldGreatOne(BelongTo,x1,y1);
                     else addMeToList = new DemonOfBelow(BelongTo, x1, y1);
@@ -224,6 +225,11 @@ namespace BasicsOfGame
                 exp += y.expOnDeath();
                 y.remove();
                 monsters.Remove(y);
+                if (type == 2)
+                {
+                    endGame?.Invoke();
+                    
+                }
                 if (monsters.Count == 0)
                 {
                     ImageBrush tempHolder = new ImageBrush(); 
@@ -437,7 +443,7 @@ namespace BasicsOfGame
     internal class Grid
     {
         public Pokoj[,] grid;
-        int roomCount = 16;
+        int roomCount =16;
         static int gridSize = 9;
         int currX, currY;
         static int gridMid = gridSize / 2;
@@ -453,11 +459,15 @@ namespace BasicsOfGame
         private const int QUESTION_MARK_ROOM = 2;
         private const int BOSS_ROOM = 3;
         private const int TREASURE_ROOM = 4;
-
+        public Action gameWon;
 
         Canvas canvas;
         private bool isMiniMapBeingUsed=false;
 
+        public void endGame()
+        {
+            gameWon?.Invoke();
+        }
         public Grid(Canvas canv)
         {
             grid = new Pokoj[gridSize, gridSize]; //if 0 then no room and 1,2,3,etc. mean different types of rooms
@@ -466,6 +476,7 @@ namespace BasicsOfGame
                  for(int j=0;j<gridSize; j++)
                 {
                     isAssignedAs[i, j] = NOTHING;
+                    
                 }
             }
             for (int i = 0; i < gridSize; i++)
@@ -473,6 +484,7 @@ namespace BasicsOfGame
                 for (int j = 0; j < gridSize; j++)
                 {
                     grid[i, j] = new Pokoj();
+                    
                     
                 }
             }
@@ -770,7 +782,7 @@ namespace BasicsOfGame
                         unlock = true;
                         firstDoor = i * 10 + j;
                         grid[i,j]=new Pokoj(canv,2,"startingRoom", 0);
-                       
+                        grid[i, j].endGame += endGame;
                         grid[i, j].setVisited(true);
                         bool left = false, right = false, down = false, up = false;
                         lastDoor = i * 10 + j;
@@ -785,6 +797,7 @@ namespace BasicsOfGame
                     {
                         int typeOfRoom=generateType.Next(1,2);
                         grid[i,j]=new Pokoj(canv,typeOfRoom,"basicRoom", firstRoomWeight++);
+                        grid[i, j].endGame += endGame;
                         bool left = false, right = false, down = false, up = false;
                         lastDoor = i * 10 + j;
                         if (i > 0) { if (grid[i - 1, j].getType() != 0) up = true; } // up

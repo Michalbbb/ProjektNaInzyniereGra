@@ -86,6 +86,58 @@ namespace BasicsOfGame
 
 
         }
+        public void winnerScreen()
+        {
+            canvas.Children.Clear();
+            ImageBrush deathBG = new ImageBrush();
+            deathBG.ImageSource = new BitmapImage(new Uri($"pack://application:,,,/BasicsOfGame;component/images/UI/winnerScreen.png", UriKind.Absolute));
+            canvas.Background = deathBG;
+            
+            GroupBox a = new GroupBox();
+            a.Header = "Wanna play again?";
+            a.Foreground = Brushes.WhiteSmoke;
+            a.Background = Brushes.DarkBlue;
+            Canvas.SetLeft(a, 415);
+            Canvas.SetTop(a, 190);
+            Canvas.SetZIndex(a, 999);
+            a.Width = 440;
+            a.FontFamily = new FontFamily("Algerian");
+            a.FontSize = 40;
+            StackPanel buttonHolder = new StackPanel();
+            Button optionOne = new Button();
+            optionOne.Content = "Try again";
+            optionOne.FontFamily = new FontFamily("Algerian");
+            Button optionTwo = new Button();
+            optionTwo.Content = "Exit to menu";
+            optionTwo.FontFamily = new FontFamily("Algerian");
+            Button optionThree = new Button();
+            optionThree.Content = "Exit game";
+            optionThree.FontFamily = new FontFamily("Algerian");
+            System.Windows.Shapes.Rectangle sep = new System.Windows.Shapes.Rectangle();
+            sep.Height = 30;
+            sep.Fill = Brushes.Transparent;
+            System.Windows.Shapes.Rectangle sep2 = new System.Windows.Shapes.Rectangle();
+            sep2.Height = 30;
+            sep2.Fill = Brushes.Transparent;
+            optionOne.FontSize = 40;
+            optionThree.FontSize = 40;
+            optionTwo.FontSize = 40;
+            optionOne.Background = Brushes.LightCyan;
+            optionTwo.Background = Brushes.LightCyan;
+            optionThree.Background = Brushes.LightCyan;
+            buttonHolder.Children.Add(optionOne);
+            buttonHolder.Children.Add(sep);
+            buttonHolder.Children.Add(optionTwo);
+            buttonHolder.Children.Add(sep2);
+            buttonHolder.Children.Add(optionThree);
+            optionOne.Click += setGame;
+            optionTwo.Click += exMenu;
+            optionThree.Click += exitGame;
+            a.Content = buttonHolder;
+            canvas.Children.Add(a);
+
+
+        }
         public void deathScreen(string name,int dealtDmg)
         {
             canvas.Children.Clear();
