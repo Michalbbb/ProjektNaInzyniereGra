@@ -24,7 +24,7 @@ namespace BasicsOfGame
  
     internal partial class Player
     {
-        bool allocateMode = true;
+        bool allocateMode = false;
 
         TextBox playerStatsHolder;
         TextBox visualForShieldCooldown;
